@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.SystemConfigMapper">
+
+    <select id="findAll" resultType="com.library.entity.SystemConfig">
+        SELECT id, config_key, config_value, description, update_time
+        FROM system_config
+    </select>
+
+    <select id="findById" resultType="com.library.entity.SystemConfig">
+        SELECT id, config_key, config_value, description, update_time
+        FROM system_config WHERE id = #{id}
+    </select>
+
+    <select id="findByKey" resultType="com.library.entity.SystemConfig">
+        SELECT id, config_key, config_value, description, update_time
+        FROM system_config WHERE config_key = #{configKey}
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.SystemConfig">
+        INSERT INTO system_config (config_key, config_value, description)
+        VALUES (#{configKey}, #{configValue}, #{description})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.SystemConfig">
+        UPDATE system_config
+        SET config_value = #{configValue},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM system_config WHERE id = #{id}
+    </delete>
+
+</mapper>

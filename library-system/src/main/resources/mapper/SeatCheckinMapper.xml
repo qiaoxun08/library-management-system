@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.SeatCheckinMapper">
+
+    <select id="findAll" resultType="com.library.entity.SeatCheckin">
+        SELECT id, seat_id, reader_id, reservation_id, checkin_time, checkout_time, status
+        FROM seat_checkin
+        ORDER BY checkin_time DESC
+    </select>
+
+    <select id="findById" resultType="com.library.entity.SeatCheckin">
+        SELECT id, seat_id, reader_id, reservation_id, checkin_time, checkout_time, status
+        FROM seat_checkin WHERE id = #{id}
+    </select>
+
+    <select id="findBySeatId" resultType="com.library.entity.SeatCheckin">
+        SELECT id, seat_id, reader_id, reservation_id, checkin_time, checkout_time, status
+        FROM seat_checkin WHERE seat_id = #{seatId}
+        ORDER BY checkin_time DESC
+    </select>
+
+    <select id="findByReaderId" resultType="com.library.entity.SeatCheckin">
+        SELECT id, seat_id, reader_id, reservation_id, checkin_time, checkout_time, status
+        FROM seat_checkin WHERE reader_id = #{readerId}
+        ORDER BY checkin_time DESC
+    </select>
+
+    <select id="findActiveByReaderId" resultType="com.library.entity.SeatCheckin">
+        SELECT id, seat_id, reader_id, reservation_id, checkin_time, checkout_time, status
+        FROM seat_checkin
+        WHERE reader_id = #{readerId} AND status = 1
+        ORDER BY checkin_time DESC LIMIT 1
+    </select>
+
+    <select id="findActiveBySeatId" resultType="com.library.entity.SeatCheckin">
+        SELECT id, seat_id, reader_id, reservation_id, checkin_time, checkout_time, status
+        FROM seat_checkin
+        WHERE seat_id = #{seatId} AND status = 1
+        ORDER BY checkin_time DESC LIMIT 1
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.SeatCheckin">
+        INSERT INTO seat_checkin (seat_id, reader_id, reservation_id, status)
+        VALUES (#{seatId}, #{readerId}, #{reservationId}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.SeatCheckin">
+        UPDATE seat_checkin
+        SET checkout_time = #{checkoutTime},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="checkout">
+        UPDATE seat_checkin
+        SET checkout_time = NOW(),
+            status = 0
+        WHERE id = #{id}
+    </update>
+
+    <select id="countByDateRange" resultType="int">
+        SELECT COUNT(*) FROM seat_checkin
+        WHERE DATE(checkin_time) BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <select id="countBySeatAndDateRange" resultType="int">
+        SELECT COUNT(*) FROM seat_checkin
+        WHERE seat_id = #{seatId} AND DATE(checkin_time) BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <select id="findCheckinStatsByDateRange" resultType="java.util.Map">
+        SELECT DATE(checkin_time) AS date, COUNT(*) AS count
+        FROM seat_checkin
+        WHERE DATE(checkin_time) BETWEEN #{startDate} AND #{endDate}
+        GROUP BY DATE(checkin_time)
+        ORDER BY date
+    </select>
+
+    <select id="findReaderPreferredTimeSlots" resultType="java.util.Map">
+        SELECT HOUR(checkin_time) AS hour, COUNT(*) AS count
+        FROM seat_checkin
+        WHERE reader_id = #{readerId}
+        GROUP BY HOUR(checkin_time)
+        ORDER BY count DESC
+    </select>
+
+    <select id="findReaderPreferredAreas" resultType="java.util.Map">
+        SELECT s.area AS area, COUNT(*) AS count
+        FROM seat_checkin sc
+        JOIN seat s ON sc.seat_id = s.id
+        WHERE sc.reader_id = #{readerId}
+        GROUP BY s.area
+        ORDER BY count DESC
+    </select>
+
+    <select id="findHeatmapData" resultType="java.util.Map">
+        SELECT DAYOFWEEK(checkin_time) AS dayOfWeek,
+               HOUR(checkin_time) AS hour,
+               COUNT(*) AS count
+        FROM seat_checkin
+        GROUP BY DAYOFWEEK(checkin_time), HOUR(checkin_time)
+        ORDER BY dayOfWeek, hour
+    </select>
+
+    <select id="countActiveSeatsAtTime" resultType="int">
+        SELECT COUNT(*) FROM seat_checkin
+        WHERE DAYOFWEEK(checkin_time) = #{dayOfWeek}
+        AND HOUR(checkin_time) = #{hour}
+        AND status = 1
+    </select>
+
+    <select id="countTotalCheckedIn" resultType="int">
+        SELECT COUNT(*) FROM seat_checkin WHERE status = 1
+    </select>
+
+    <!-- 按座位和日期范围统计签到次数 -->
+    <select id="countCheckinsBySeatAndDateRange" resultType="int">
+        SELECT COUNT(*) FROM seat_checkin
+        WHERE seat_id = #{seatId}
+        AND checkin_time BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- 读者偏好的签到时段 -->
+    <select id="findPreferredSlotsByReader" resultType="java.util.HashMap">
+        SELECT HOUR(checkin_time) AS hour, DAYOFWEEK(checkin_time) AS day_of_week, COUNT(*) AS count
+        FROM seat_checkin
+        WHERE reader_id = #{readerId}
+        GROUP BY HOUR(checkin_time), DAYOFWEEK(checkin_time)
+        ORDER BY count DESC
+    </select>
+
+</mapper>

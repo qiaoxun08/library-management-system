@@ -1,0 +1,90 @@
+/* ========================================
+   全局响应式样式
+   断点：>=1200px 桌面 | 768-1199px 平板 | <768px 移动端
+   ======================================== */
+
+/* ---- 移动端通用适配 ---- */
+@media (max-width: 767px) {
+  /* 表格横向滚动 */
+  .el-table {
+    width: 100% !important;
+    overflow-x: auto;
+  }
+
+  /* 弹窗全屏 */
+  .el-dialog {
+    width: 95% !important;
+    margin: 10px auto !important;
+  }
+
+  /* 分页居中 */
+  .el-pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* 搜索栏换行 */
+  .search-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .search-bar .el-input {
+    width: 100% !important;
+  }
+  .search-bar .el-select {
+    width: 100% !important;
+    margin-left: 0 !important;
+  }
+
+  /* 卡片列表代替表格 */
+  .mobile-card-list .el-table {
+    display: none;
+  }
+
+  /* 页面内边距缩小 */
+  .book-search-view,
+  .seat-reservation-view,
+  .my-borrowings-view,
+  .notification-view,
+  .user-profile-view,
+  .data-export-view {
+    padding: 12px !important;
+  }
+}
+
+/* ---- 平板适配 ---- */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .el-dialog {
+    width: 80% !important;
+  }
+}
+
+/* ---- 侧边栏抽屉模式（移动端） ---- */
+@media (max-width: 767px) {
+  .dashboard-container :deep(.el-aside) {
+    display: none;
+  }
+  .dashboard-container :deep(.el-main) {
+    margin-left: 0 !important;
+  }
+  .mobile-menu-toggle {
+    display: flex !important;
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 200;
+    background: #409eff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+}
+
+/* 桌面端隐藏汉堡菜单按钮 */
+.mobile-menu-toggle {
+  display: none;
+}

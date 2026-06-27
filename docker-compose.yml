@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: library-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      MYSQL_DATABASE: library_system
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./sql/V2_new_tables.sql:/docker-entrypoint-initdb.d/02-v2.sql
+      - ./sql/V3_innovation.sql:/docker-entrypoint-initdb.d/03-v3.sql
+      - ./sql/V4_reply.sql:/docker-entrypoint-initdb.d/04-v4.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - library-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: library-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - library-net
+
+  backend:
+    build:
+      context: ./library-system
+      dockerfile: Dockerfile
+    container_name: library-backend
+    environment:
+      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: library_system
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-production-secret-key-change-me-32bytes!}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/auth/captcha"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - library-net
+
+  frontend:
+    build:
+      context: ./vue-frontend
+      dockerfile: Dockerfile
+    container_name: library-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - library-net
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  library-net:
+    driver: bridge

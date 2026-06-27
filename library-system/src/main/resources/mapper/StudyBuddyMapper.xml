@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.StudyBuddyMapper">
+
+    <resultMap id="StudyBuddyResult" type="com.library.entity.StudyBuddy">
+        <id column="id" property="id"/>
+        <result column="reader_id" property="readerId"/>
+        <result column="preferred_slot" property="preferredSlot"/>
+        <result column="preferred_area" property="preferredArea"/>
+        <result column="study_goal" property="studyGoal"/>
+        <result column="status" property="status"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.library.entity.StudyBuddy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO study_buddy (reader_id, preferred_slot, preferred_area, study_goal, status)
+        VALUES (#{readerId}, #{preferredSlot}, #{preferredArea}, #{studyGoal}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.StudyBuddy">
+        UPDATE study_buddy
+        SET preferred_slot = #{preferredSlot},
+            preferred_area = #{preferredArea},
+            study_goal = #{studyGoal},
+            status = #{status},
+            update_time = NOW()
+        WHERE reader_id = #{readerId}
+    </update>
+
+    <select id="findByReaderId" resultMap="StudyBuddyResult">
+        SELECT id, reader_id, preferred_slot, preferred_area, study_goal, status, create_time, update_time
+        FROM study_buddy
+        WHERE reader_id = #{readerId}
+        LIMIT 1
+    </select>
+
+    <select id="findOpenBuddies" resultMap="StudyBuddyResult">
+        SELECT id, reader_id, preferred_slot, preferred_area, study_goal, status, create_time, update_time
+        FROM study_buddy
+        WHERE status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <delete id="deleteByReaderId">
+        DELETE FROM study_buddy
+        WHERE reader_id = #{readerId}
+    </delete>
+
+</mapper>

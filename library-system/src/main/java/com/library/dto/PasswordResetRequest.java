@@ -1,0 +1,16 @@
+package com.library.dto;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
+
+/**
+ * 重置密码请求 DTO（管理员操作）
+ */
+@Data
+public class PasswordResetRequest {
+
+    @NotBlank(message = "新密码不能为空")
+    @Size(min = 6, max = 50, message = "新密码长度需在6-50个字符之间")
+    private String newPassword;
+}

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.BookReviewMapper">
+
+    <resultMap id="BookReviewResult" type="com.library.entity.BookReview">
+        <id column="id" property="id"/>
+        <result column="book_id" property="bookId"/>
+        <result column="reader_id" property="readerId"/>
+        <result column="rating" property="rating"/>
+        <result column="content" property="content"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="com.library.entity.BookReview" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO book_review (book_id, reader_id, rating, content)
+        VALUES (#{bookId}, #{readerId}, #{rating}, #{content})
+    </insert>
+
+    <delete id="deleteById">
+        DELETE FROM book_review WHERE id = #{id}
+    </delete>
+
+    <select id="findByBookId" resultMap="BookReviewResult">
+        SELECT br.id, br.book_id, br.reader_id, br.rating, br.content,
+               br.create_time, br.update_time
+        FROM book_review br
+        WHERE br.book_id = #{bookId} AND br.status = 1
+        ORDER BY br.create_time DESC
+    </select>
+
+    <select id="findByReaderId" resultMap="BookReviewResult">
+        SELECT id, book_id, reader_id, rating, content, create_time, update_time
+        FROM book_review
+        WHERE reader_id = #{readerId} AND status = 1
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="countByBookId" resultType="int">
+        SELECT COUNT(*) FROM book_review
+        WHERE book_id = #{bookId} AND status = 1
+    </select>
+
+    <select id="findById" resultMap="BookReviewResult">
+        SELECT * FROM book_review WHERE id = #{id}
+    </select>
+
+    <!-- 优化：联表查询图书评论（避免 N+1） -->
+    <select id="findBookReviewsWithDetail" resultType="java.util.HashMap">
+        SELECT br.id, br.book_id AS bookId, br.reader_id AS readerId,
+               r.real_name AS readerName,
+               br.content, br.rating, br.create_time AS createTime,
+               COALESCE(rl.like_count, 0) AS likeCount
+        FROM book_review br
+        LEFT JOIN reader r ON br.reader_id = r.id
+        LEFT JOIN (
+            SELECT review_id, COUNT(*) AS like_count
+            FROM review_like
+            GROUP BY review_id
+        ) rl ON br.id = rl.review_id
+        WHERE br.book_id = #{bookId} AND br.status = 1
+        ORDER BY br.create_time DESC
+    </select>
+
+    <!-- 优化：联表查询读者评论（避免 N+1） -->
+    <select id="findReaderReviewsWithDetail" resultType="java.util.HashMap">
+        SELECT br.id, br.book_id AS bookId, br.reader_id AS readerId,
+               b.title AS bookTitle,
+               br.content, br.rating, br.create_time AS createTime,
+               COALESCE(rl.like_count, 0) AS likeCount
+        FROM book_review br
+        LEFT JOIN book b ON br.book_id = b.id
+        LEFT JOIN (
+            SELECT review_id, COUNT(*) AS like_count
+            FROM review_like
+            GROUP BY review_id
+        ) rl ON br.id = rl.review_id
+        WHERE br.reader_id = #{readerId} AND br.status = 1
+        ORDER BY br.create_time DESC
+    </select>
+
+    <!-- 批量查询图书平均评分 -->
+    <select id="findAvgRatingByBookIds" resultType="java.util.HashMap">
+        SELECT book_id AS bookId,
+               AVG(rating) AS avgRating,
+               COUNT(*) AS reviewCount
+        FROM book_review
+        WHERE book_id IN
+        <foreach collection="bookIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND status = 1
+        GROUP BY book_id
+    </select>
+
+</mapper>

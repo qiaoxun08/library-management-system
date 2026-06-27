@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.ReaderMapper">
+    <select id="findById" resultType="com.library.entity.Reader">
+        SELECT * FROM reader WHERE id = #{id}
+    </select>
+
+    <select id="findByReaderId" resultType="com.library.entity.Reader">
+        SELECT * FROM reader WHERE reader_id = #{readerId}
+    </select>
+
+    <select id="findByUsername" resultType="com.library.entity.Reader">
+        SELECT * FROM reader WHERE reader_id = #{username}
+    </select>
+
+    <select id="findAll" resultType="com.library.entity.Reader">
+        SELECT * FROM reader
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.Reader" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reader (reader_id, password, real_name, gender, phone, email, department, max_borrow_count, current_borrow_count, fine_amount, status)
+        VALUES (#{readerId}, #{password}, #{realName}, #{gender}, #{phone}, #{email}, #{department}, #{maxBorrowCount}, #{currentBorrowCount}, #{fineAmount}, #{status})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.Reader">
+        UPDATE reader
+        <set>
+            <if test="readerId != null">reader_id = #{readerId},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="realName != null">real_name = #{realName},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="maxBorrowCount != null">max_borrow_count = #{maxBorrowCount},</if>
+            <if test="currentBorrowCount != null">current_borrow_count = #{currentBorrowCount},</if>
+            <if test="fineAmount != null">fine_amount = #{fineAmount},</if>
+            <if test="status != null">status = #{status},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM reader WHERE id = #{id}
+    </delete>
+
+    <select id="countTotalReaders" resultType="int">
+        SELECT COUNT(*) FROM reader
+    </select>
+
+    <select id="countActiveReaders" resultType="int">
+        SELECT COUNT(*) FROM reader WHERE status = 1
+    </select>
+
+    <update id="incrementBorrowCount">
+        UPDATE reader SET current_borrow_count = current_borrow_count + 1 WHERE id = #{id}
+    </update>
+
+    <update id="decrementBorrowCount">
+        UPDATE reader SET current_borrow_count = GREATEST(current_borrow_count - 1, 0) WHERE id = #{id}
+    </update>
+
+    <update id="incrementFineAmount">
+        UPDATE reader SET fine_amount = fine_amount + #{amount} WHERE id = #{id}
+    </update>
+
+    <update id="decrementFineAmount">
+        UPDATE reader SET fine_amount = GREATEST(fine_amount - #{amount}, 0) WHERE id = #{id}
+    </update>
+
+    <update id="updateStatus">
+        UPDATE reader SET status = #{status}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updatePreferredCategories">
+        UPDATE reader SET preferred_categories = #{preferredCategories}, update_time = NOW() WHERE id = #{id}
+    </update>
+
+    <update id="updateLanguage">
+        UPDATE reader SET language = #{language}, update_time = NOW() WHERE id = #{id}
+    </update>
+</mapper>

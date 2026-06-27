@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.BlacklistMapper">
+
+    <select id="findAll" resultType="com.library.entity.Blacklist">
+        SELECT id, reader_id, reason, violation_count, blacklisted, start_time, end_time, create_time
+        FROM blacklist
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findById" resultType="com.library.entity.Blacklist">
+        SELECT id, reader_id, reason, violation_count, blacklisted, start_time, end_time, create_time
+        FROM blacklist WHERE id = #{id}
+    </select>
+
+    <select id="findByReaderId" resultType="com.library.entity.Blacklist">
+        SELECT id, reader_id, reason, violation_count, blacklisted, start_time, end_time, create_time
+        FROM blacklist WHERE reader_id = #{readerId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findActiveBlacklist" resultType="com.library.entity.Blacklist">
+        SELECT id, reader_id, reason, violation_count, blacklisted, start_time, end_time, create_time
+        FROM blacklist
+        WHERE blacklisted = 1
+        AND (end_time IS NULL OR end_time > NOW())
+        ORDER BY create_time DESC
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.Blacklist" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO blacklist (reader_id, reason, violation_count, blacklisted, start_time, end_time)
+        VALUES (#{readerId}, #{reason}, #{violationCount}, #{blacklisted}, #{startTime}, #{endTime})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.Blacklist">
+        UPDATE blacklist
+        SET reason = #{reason},
+            violation_count = #{violationCount},
+            blacklisted = #{blacklisted},
+            start_time = #{startTime},
+            end_time = #{endTime}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM blacklist WHERE id = #{id}
+    </delete>
+
+    <update id="incrementViolationCount">
+        UPDATE blacklist
+        SET violation_count = violation_count + 1
+        WHERE reader_id = #{readerId}
+    </update>
+
+</mapper>

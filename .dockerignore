@@ -1,0 +1,10 @@
+# 根目录 .dockerignore
+.git
+.vscode
+.idea
+node_modules
+target
+dist
+*.md
+docs/
+sql/mock_data*.sql

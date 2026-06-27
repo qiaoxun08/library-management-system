@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.SeatMapper">
+    <select id="findById" resultType="com.library.entity.Seat">
+        SELECT * FROM seat WHERE id = #{id}
+    </select>
+
+    <select id="findBySeatNumber" resultType="com.library.entity.Seat">
+        SELECT * FROM seat WHERE seat_number = #{seatNumber}
+    </select>
+
+    <select id="findAll" resultType="com.library.entity.Seat">
+        SELECT * FROM seat
+    </select>
+
+    <select id="findByArea" resultType="com.library.entity.Seat">
+        SELECT * FROM seat WHERE area = #{area}
+    </select>
+
+    <select id="findByStatus" resultType="com.library.entity.Seat">
+        SELECT * FROM seat WHERE status = #{status}
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.Seat" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO seat (seat_number, area, status, device_id)
+        VALUES (#{seatNumber}, #{area}, #{status}, #{deviceId})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.Seat">
+        UPDATE seat
+        <set>
+            <if test="seatNumber != null">seat_number = #{seatNumber},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            update_time = NOW()
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM seat WHERE id = #{id}
+    </delete>
+
+    <update id="updateStatus">
+        UPDATE seat SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <select id="countTotalSeats" resultType="int">
+        SELECT COUNT(*) FROM seat
+    </select>
+
+    <select id="countAvailableSeats" resultType="int">
+        SELECT COUNT(*) FROM seat WHERE status = 0
+    </select>
+
+    <select id="countByAreaAndStatus" resultType="int">
+        SELECT COUNT(*) FROM seat
+        WHERE area = #{area}
+        <if test="status != null">AND status = #{status}</if>
+    </select>
+</mapper>

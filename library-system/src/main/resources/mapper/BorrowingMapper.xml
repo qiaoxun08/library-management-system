@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.BorrowingMapper">
+    <select id="findById" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing
+    </select>
+
+    <select id="findAllWithBook" resultType="com.library.dto.BorrowingDTO">
+        SELECT b.*, bk.title as bookTitle, r.real_name as readerName
+        FROM borrowing b
+        LEFT JOIN book bk ON b.book_id = bk.id
+        LEFT JOIN reader r ON b.reader_id = r.id
+    </select>
+
+    <select id="findByReaderId" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE reader_id = #{readerId}
+    </select>
+
+    <select id="findByReaderIdString" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE reader_id = (SELECT id FROM reader WHERE reader_id = #{readerId})
+    </select>
+
+    <select id="findByBookId" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE book_id = #{bookId}
+    </select>
+
+    <select id="findByStatus" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE status = #{status}
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.Borrowing" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO borrowing (reader_id, book_id, borrow_date, due_date, return_date, renew_count, status, fine_amount)
+        VALUES (#{readerId}, #{bookId}, #{borrowDate}, #{dueDate}, #{returnDate}, #{renewCount}, #{status}, #{fineAmount})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.Borrowing">
+        UPDATE borrowing
+        <set>
+            <if test="readerId != null">reader_id = #{readerId},</if>
+            <if test="bookId != null">book_id = #{bookId},</if>
+            <if test="borrowDate != null">borrow_date = #{borrowDate},</if>
+            <if test="dueDate != null">due_date = #{dueDate},</if>
+            <if test="returnDate != null">return_date = #{returnDate},</if>
+            <if test="renewCount != null">renew_count = #{renewCount},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="fineAmount != null">fine_amount = #{fineAmount},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM borrowing WHERE id = #{id}
+    </delete>
+
+    <update id="updateStatus">
+        UPDATE borrowing SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <update id="updateReturnDate">
+        UPDATE borrowing SET return_date = #{returnDate} WHERE id = #{id}
+    </update>
+
+    <select id="countTodayBorrowings" resultType="int">
+        SELECT COUNT(*) FROM borrowing WHERE DATE(borrow_date) = CURDATE()
+    </select>
+
+    <select id="countActiveBorrowings" resultType="int">
+        SELECT COUNT(*) FROM borrowing WHERE status = 1
+    </select>
+
+    <select id="countOverdueBooks" resultType="int">
+        SELECT COUNT(*) FROM borrowing WHERE status = 1 AND due_date &lt; NOW()
+    </select>
+
+    <select id="countByMonth" resultType="int">
+        SELECT COUNT(*) FROM borrowing WHERE borrow_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) GROUP BY YEAR(borrow_date), MONTH(borrow_date) ORDER BY YEAR(borrow_date), MONTH(borrow_date)
+    </select>
+
+    <select id="countActiveByBookId" resultType="int">
+        SELECT COUNT(*) FROM borrowing WHERE book_id = #{bookId} AND status = 1
+    </select>
+
+    <update id="payFine">
+        UPDATE borrowing SET fine_amount = 0 WHERE id = #{id}
+    </update>
+
+    <select id="findActiveByReaderAndBook" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE reader_id = #{readerId} AND book_id = #{bookId} AND status = 1 LIMIT 1
+    </select>
+
+    <select id="findDueSoonOrOverdue" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing
+        WHERE status = 1
+        AND due_date &lt;= DATE_ADD(NOW(), INTERVAL #{remindDays} DAY)
+    </select>
+
+    <select id="findBorrowedBookIdsByReaderId" resultType="int">
+        SELECT DISTINCT book_id FROM borrowing WHERE reader_id = #{readerId}
+    </select>
+
+    <select id="findCategoryCountsByReaderId" resultType="java.util.Map">
+        SELECT b.category AS category, COUNT(*) AS count
+        FROM borrowing br
+        JOIN book b ON br.book_id = b.id
+        WHERE br.reader_id = #{readerId}
+        GROUP BY b.category
+        ORDER BY count DESC
+    </select>
+
+    <select id="countOverdueByReaderId" resultType="int">
+        SELECT COUNT(*) FROM borrowing
+        WHERE reader_id = #{readerId} AND status = 1 AND due_date &lt; NOW()
+    </select>
+
+    <select id="findOverdueByReaderId" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing
+        WHERE reader_id = #{readerId} AND status = 1 AND due_date &lt; NOW()
+    </select>
+
+    <select id="findActiveByReaderId" resultType="com.library.entity.Borrowing">
+        SELECT * FROM borrowing WHERE reader_id = #{readerId} AND status = 1
+    </select>
+
+    <select id="countByReaderIdAndStatus" resultType="int">
+        SELECT COUNT(*) FROM borrowing WHERE reader_id = #{readerId} AND status = #{status}
+    </select>
+
+    <select id="countByCategoryAndDays" resultType="java.util.Map">
+        SELECT b.category AS category, COUNT(*) AS count
+        FROM borrowing br
+        JOIN book b ON br.book_id = b.id
+        WHERE br.borrow_date &gt;= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        GROUP BY b.category
+        ORDER BY count DESC
+    </select>
+
+    <!-- 热门图书：按借阅次数降序排列 -->
+    <select id="findPopularBooks" resultType="com.library.entity.Book">
+        SELECT b.*
+        FROM book b
+        JOIN borrowing br ON b.id = br.book_id
+        GROUP BY b.id
+        ORDER BY COUNT(*) DESC
+        LIMIT #{limit}
+    </select>
+
+    <!-- 读者最近N天的借阅记录 -->
+    <select id="findRecentByReaderId" resultType="com.library.entity.Borrowing">
+        SELECT br.*, b.title AS book_title, b.category
+        FROM borrowing br
+        JOIN book b ON br.book_id = b.id
+        WHERE br.reader_id = (SELECT id FROM reader WHERE reader_id = #{readerId})
+        AND br.borrow_date &gt;= DATE_SUB(NOW(), INTERVAL #{days} DAY)
+        ORDER BY br.borrow_date DESC
+    </select>
+
+    <!-- 按月统计逾期率（最近12个月） -->
+    <select id="countOverdueRateByMonth" resultType="java.util.Map">
+        SELECT
+            DATE_FORMAT(borrow_date, '%Y-%m') AS month,
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = 1 AND due_date &lt; NOW() THEN 1 ELSE 0 END) AS overdue
+        FROM borrowing
+        WHERE borrow_date &gt;= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(borrow_date, '%Y-%m')
+        ORDER BY month
+    </select>
+
+    <!-- 按院系统计借阅量 -->
+    <select id="countByDepartment" resultType="java.util.Map">
+        SELECT
+            r.department AS department,
+            COUNT(*) AS count
+        FROM borrowing br
+        JOIN reader r ON br.reader_id = r.id
+        WHERE r.department IS NOT NULL AND r.department != ''
+        GROUP BY r.department
+        ORDER BY count DESC
+    </select>
+
+    <!-- 查询读者的违约明细（超时未签到/取消预约） -->
+    <select id="findViolationDetails" resultType="java.util.Map">
+        SELECT
+            '超时未签到' AS type,
+            s.checkin_time AS time,
+            s.seat_id AS targetId,
+            CONCAT(sa.area, ' ', sa.seat_number) AS targetName
+        FROM seat_checkin s
+        JOIN seat sa ON s.seat_id = sa.id
+        WHERE s.reader_id = #{readerId} AND s.status = 2
+        UNION ALL
+        SELECT
+            '取消预约' AS type,
+            r.reservation_date AS time,
+            r.id AS targetId,
+            COALESCE(b.title, CONCAT(sa2.area, ' ', sa2.seat_number)) AS targetName
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat sa2 ON r.seat_id = sa2.id
+        WHERE r.reader_id = #{readerId} AND r.status = 3
+        ORDER BY time DESC
+        LIMIT 20
+    </select>
+</mapper>

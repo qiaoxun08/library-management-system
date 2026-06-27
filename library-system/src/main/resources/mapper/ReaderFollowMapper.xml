@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.ReaderFollowMapper">
+
+    <insert id="insert" parameterType="com.library.entity.ReaderFollow" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reader_follow (follower_id, followee_id)
+        VALUES (#{followerId}, #{followeeId})
+    </insert>
+
+    <delete id="deleteByPair">
+        DELETE FROM reader_follow
+        WHERE follower_id = #{followerId} AND followee_id = #{followeeId}
+    </delete>
+
+    <select id="existsByPair" resultType="int">
+        SELECT COUNT(*) FROM reader_follow
+        WHERE follower_id = #{followerId} AND followee_id = #{followeeId}
+    </select>
+
+    <!-- 获取关注者列表（谁关注了我），包含读者信息 -->
+    <select id="findFollowers" resultType="java.util.HashMap">
+        SELECT rf.id AS follow_id, rf.create_time AS follow_time,
+               r.id AS reader_id, r.reader_id AS reader_no, r.real_name, r.department
+        FROM reader_follow rf
+        LEFT JOIN reader r ON rf.follower_id = r.id
+        WHERE rf.followee_id = #{followeeId}
+        ORDER BY rf.create_time DESC
+    </select>
+
+    <!-- 获取我关注的人列表，包含读者信息 -->
+    <select id="findFollowees" resultType="java.util.HashMap">
+        SELECT rf.id AS follow_id, rf.create_time AS follow_time,
+               r.id AS reader_id, r.reader_id AS reader_no, r.real_name, r.department
+        FROM reader_follow rf
+        LEFT JOIN reader r ON rf.followee_id = r.id
+        WHERE rf.follower_id = #{followerId}
+        ORDER BY rf.create_time DESC
+    </select>
+
+    <select id="countFollowers" resultType="int">
+        SELECT COUNT(*) FROM reader_follow WHERE followee_id = #{followeeId}
+    </select>
+
+    <select id="countFollowees" resultType="int">
+        SELECT COUNT(*) FROM reader_follow WHERE follower_id = #{followerId}
+    </select>
+
+</mapper>

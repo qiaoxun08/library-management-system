@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.ReservationMapper">
+    <select id="findById" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+    </select>
+
+    <select id="findByReaderId" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.reader_id = #{readerId}
+    </select>
+
+    <select id="findByReaderIdString" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.reader_id = (SELECT id FROM reader WHERE reader_id = #{readerId})
+    </select>
+
+    <select id="findByBookId" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.book_id = #{bookId}
+    </select>
+
+    <select id="findByStatus" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.status = #{status}
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.Reservation" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reservation (reader_id, book_id, seat_id, reservation_date, status, expiry_date)
+        VALUES (#{readerId}, #{bookId}, #{seatId}, #{reservationDate}, #{status}, #{expiryDate})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.Reservation">
+        UPDATE reservation
+        <set>
+            <if test="readerId != null">reader_id = #{readerId},</if>
+            <if test="bookId != null">book_id = #{bookId},</if>
+            <if test="seatId != null">seat_id = #{seatId},</if>
+            <if test="reservationDate != null">reservation_date = #{reservationDate},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="expiryDate != null">expiry_date = #{expiryDate},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM reservation WHERE id = #{id}
+    </delete>
+
+    <update id="updateStatus">
+        UPDATE reservation SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <select id="findBySeatId" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.seat_id = #{seatId}
+    </select>
+
+    <select id="findExpired" resultType="com.library.dto.ReservationDTO">
+        SELECT
+            r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
+            r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            b.title as bookTitle,
+            s.seat_number as seatNumber, s.area as area
+        FROM reservation r
+        LEFT JOIN book b ON r.book_id = b.id
+        LEFT JOIN seat s ON r.seat_id = s.id
+        WHERE r.status = 0 AND r.expiry_date IS NOT NULL AND r.expiry_date &lt; #{now}
+    </select>
+
+    <select id="countTodayReservations" resultType="int">
+        SELECT COUNT(*) FROM reservation WHERE DATE(reservation_date) = CURDATE()
+    </select>
+
+    <select id="countByStatus" resultType="com.library.dto.ReservationStatusCount">
+        SELECT status, COUNT(*) as count FROM reservation GROUP BY status
+    </select>
+
+    <select id="countCancelledByReaderSince" resultType="int">
+        SELECT COUNT(*) FROM reservation
+        WHERE reader_id = #{readerId} AND status = 3 AND reservation_date &gt;= #{since}
+    </select>
+
+    <select id="countByReaderIdAndStatus" resultType="int">
+        SELECT COUNT(*) FROM reservation WHERE reader_id = #{readerId} AND status = #{status}
+    </select>
+
+    <select id="findReservedSeatIdsByDateAndSlot" resultType="java.lang.Integer">
+        SELECT DISTINCT seat_id FROM reservation
+        WHERE seat_id IS NOT NULL
+          AND preferred_time_slot = #{timeSlot}
+          AND DATE(reservation_date) = #{date}
+          AND status IN (0, 1)
+    </select>
+</mapper>

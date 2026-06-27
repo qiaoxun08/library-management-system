@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.ReviewLikeMapper">
+
+    <insert id="insert" parameterType="com.library.entity.ReviewLike" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO review_like (review_id, reader_id)
+        VALUES (#{reviewId}, #{readerId})
+    </insert>
+
+    <delete id="deleteByReviewAndReader">
+        DELETE FROM review_like WHERE review_id = #{reviewId} AND reader_id = #{readerId}
+    </delete>
+
+    <select id="existsByReviewAndReader" resultType="int">
+        SELECT COUNT(*) FROM review_like
+        WHERE review_id = #{reviewId} AND reader_id = #{readerId}
+    </select>
+
+    <select id="countByReviewId" resultType="int">
+        SELECT COUNT(*) FROM review_like WHERE review_id = #{reviewId}
+    </select>
+
+</mapper>

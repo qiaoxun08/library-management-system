@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.ReaderLevelMapper">
+
+    <select id="findAll" resultType="com.library.entity.ReaderLevel">
+        SELECT id, reader_id, points, level, total_borrow_count, total_return_on_time, create_time, update_time
+        FROM reader_level
+    </select>
+
+    <select id="findByReaderId" resultType="com.library.entity.ReaderLevel">
+        SELECT id, reader_id, points, level, total_borrow_count, total_return_on_time, create_time, update_time
+        FROM reader_level WHERE reader_id = #{readerId}
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.ReaderLevel">
+        INSERT INTO reader_level (reader_id, points, level, total_borrow_count, total_return_on_time)
+        VALUES (#{readerId}, #{points}, #{level}, #{totalBorrowCount}, #{totalReturnOnTime})
+    </insert>
+
+    <update id="update" parameterType="com.library.entity.ReaderLevel">
+        UPDATE reader_level
+        SET points = #{points},
+            level = #{level},
+            total_borrow_count = #{totalBorrowCount},
+            total_return_on_time = #{totalReturnOnTime}
+        WHERE id = #{id}
+    </update>
+
+    <update id="addPoints">
+        UPDATE reader_level
+        SET points = points + #{points}
+        WHERE reader_id = #{readerId}
+    </update>
+
+    <update id="subtractPoints">
+        UPDATE reader_level
+        SET points = GREATEST(points - #{points}, 0)
+        WHERE reader_id = #{readerId}
+    </update>
+
+    <update id="incrementBorrowCount">
+        UPDATE reader_level
+        SET total_borrow_count = total_borrow_count + 1
+        WHERE reader_id = #{readerId}
+    </update>
+
+    <update id="incrementReturnOnTime">
+        UPDATE reader_level
+        SET total_return_on_time = total_return_on_time + 1
+        WHERE reader_id = #{readerId}
+    </update>
+
+</mapper>

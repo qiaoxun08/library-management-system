@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.NotificationMapper">
+
+    <select id="findByReaderId" resultType="com.library.entity.Notification">
+        SELECT id, reader_id, title, content, type, is_read, create_time
+        FROM notification
+        WHERE reader_id = #{readerId}
+        ORDER BY create_time DESC
+    </select>
+
+    <select id="findById" resultType="com.library.entity.Notification">
+        SELECT id, reader_id, title, content, type, is_read, create_time
+        FROM notification WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.Notification">
+        INSERT INTO notification (reader_id, title, content, type, is_read)
+        VALUES (#{readerId}, #{title}, #{content}, #{type}, #{isRead})
+    </insert>
+
+    <update id="markAsRead">
+        UPDATE notification SET is_read = 1 WHERE id = #{id}
+    </update>
+
+    <update id="markAllAsRead">
+        UPDATE notification SET is_read = 1 WHERE reader_id = #{readerId} AND is_read = 0
+    </update>
+
+    <delete id="delete">
+        DELETE FROM notification WHERE id = #{id}
+    </delete>
+
+    <select id="countUnread" resultType="int">
+        SELECT COUNT(*) FROM notification WHERE reader_id = #{readerId} AND is_read = 0
+    </select>
+
+    <insert id="insertNotification" parameterType="com.library.entity.Notification" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO notification (reader_id, title, content, type, is_read)
+        VALUES (#{readerId}, #{title}, #{content}, #{type}, #{isRead})
+    </insert>
+
+</mapper>
