@@ -132,4 +132,34 @@ public class BookController {
             return Result.error(e.getMessage());
         }
     }
+
+    /**
+     * 导出图书列表
+     */
+    @GetMapping("/export")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    @Operation(summary = "导出图书列表", description = "导出所有图书数据")
+    public Result<List<Book>> exportBooks() {
+        try {
+            List<Book> books = bookService.exportBooks();
+            return Result.success(books);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 导入图书
+     */
+    @PostMapping("/import")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "批量导入图书", description = "批量导入图书数据")
+    public Result<Void> importBooks(@RequestBody List<Book> books) {
+        try {
+            bookService.importBooks(books);
+            return Result.success();
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

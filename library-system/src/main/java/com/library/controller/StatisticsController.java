@@ -3,6 +3,7 @@ package com.library.controller;
 import com.library.dto.Result;
 import com.library.dto.StatisticsDTO;
 import com.library.mapper.BorrowingMapper;
+import com.library.service.AnalysisService;
 import com.library.service.StatisticsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +23,9 @@ public class StatisticsController {
 
     @Autowired
     private StatisticsService statisticsService;
+
+    @Autowired
+    private AnalysisService analysisService;
 
     @Autowired
     private BorrowingMapper borrowingMapper;
@@ -90,20 +94,7 @@ public class StatisticsController {
     @Operation(summary = "获取座位使用热力图数据")
     public Result<Map<String, Object>> getSeatHeatmap() {
         try {
-            // 模拟热力图数据
-            Map<String, Object> result = new java.util.LinkedHashMap<>();
-            java.util.List<Map<String, Object>> heatmapData = new java.util.ArrayList<>();
-            String[] areas = {"A区", "B区", "C区", "D区"};
-            for (String area : areas) {
-                Map<String, Object> areaData = new java.util.LinkedHashMap<>();
-                areaData.put("area", area);
-                areaData.put("utilization", (int) (Math.random() * 100));
-                areaData.put("totalSeats", 20);
-                areaData.put("occupiedSeats", (int) (Math.random() * 20));
-                heatmapData.add(areaData);
-            }
-            result.put("heatmapData", heatmapData);
-            result.put("lastUpdated", java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            Map<String, Object> result = analysisService.getSeatHeatmap();
             return Result.success(result);
         } catch (Exception e) {
             return Result.error(e.getMessage());

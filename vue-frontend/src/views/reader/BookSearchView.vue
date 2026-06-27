@@ -129,6 +129,9 @@
                   <el-button link size="small" @click="toggleReplyPanel(review)">
                     <el-icon><ChatDotRound /></el-icon> {{ review.replyCount || 0 }} {{ $t('reader.bookSearch.replies') }}
                   </el-button>
+                  <el-button v-if="isAdmin" link size="small" type="danger" @click="handleAdminDeleteReview(review)">
+                    <el-icon><Delete /></el-icon> {{ $t('common.button.delete') }}
+                  </el-button>
                 </div>
                 <!-- 回复区域 -->
                 <div v-if="review.showReplies" class="reply-section">
@@ -187,12 +190,12 @@
 <script>
 import { getBooks, searchBooks } from '../../api/book'
 import { addReservation } from '../../api/reservation'
-import { User, Document, Search, Star, ChatDotRound } from '@element-plus/icons-vue'
+import { User, Document, Search, Star, ChatDotRound, Delete } from '@element-plus/icons-vue'
 
 export default {
   name: 'BookSearchView',
   setup() {
-    return { User, Document, Search, Star, ChatDotRound }
+    return { User, Document, Search, Star, ChatDotRound, Delete }
   },
   data() {
     return {
@@ -216,6 +219,10 @@ export default {
     }
   },
   computed: {
+    isAdmin() {
+      const user = this.$store.state.user
+      return user && (user.role === 'admin' || user.role === 'ADMIN' || user.role === 'librarian' || user.role === 'LIBRARIAN')
+    },
     totalCount() {
       return this.books.length
     },
@@ -443,6 +450,19 @@ export default {
       const user = this.$store.state.user
       if (!user) return false
       return user.role === 'ADMIN' || user.role === 'LIBRARIAN' || reply.readerId === user.id
+    },
+    async handleAdminDeleteReview(review) {
+      try {
+        await this.$confirm(this.$t('reader.bookSearch.confirmDeleteReview'), this.$t('common.button.confirm'), { type: 'warning' })
+        const { deleteReview } = await import('@/api/review')
+        await deleteReview(review.id)
+        this.$message.success(this.$t('common.message.deleteSuccess'))
+        this.loadReviews(this.detailBook.id)
+      } catch (error) {
+        if (error !== 'cancel') {
+          this.$message.error(this.$t('messages.error.operationFailed') + ': ' + (error.message || error))
+        }
+      }
     },
     async loadSimilarBooks(bookId) {
       this.similarLoading = true

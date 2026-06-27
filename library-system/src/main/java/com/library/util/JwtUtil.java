@@ -72,4 +72,18 @@ public class JwtUtil {
             return false;
         }
     }
+
+    /**
+     * 刷新 Token：验证旧 Token 有效后签发新 Token
+     */
+    public String refreshToken(String token) {
+        try {
+            Claims claims = getAllClaimsFromToken(token);
+            String username = claims.getSubject();
+            String role = (String) claims.get("role");
+            return generateToken(username, role);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

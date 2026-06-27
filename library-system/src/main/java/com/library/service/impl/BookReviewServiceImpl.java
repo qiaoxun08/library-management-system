@@ -91,6 +91,18 @@ public class BookReviewServiceImpl implements BookReviewService {
                 throw new BusinessException("只能删除自己的评论");
             }
         }
+
+        // 管理员/馆员删除时，通知评论作者
+        if (isAdminOrLibrarian && review.getReaderId() != null) {
+            Notification notification = new Notification();
+            notification.setReaderId(review.getReaderId());
+            notification.setType("system");
+            notification.setTitle("书评被删除");
+            notification.setContent("您的一条书评因违反社区规则已被管理员删除。如有疑问请联系图书馆管理员。");
+            notification.setIsRead(0);
+            notificationMapper.insert(notification);
+        }
+
         bookReviewMapper.deleteById(reviewId);
         // 级联软删除该书评下的所有回复
         reviewReplyService.deleteByReviewId(reviewId);
