@@ -13,6 +13,10 @@ import java.util.List;
 public interface ReaderLevelMapper {
     List<ReaderLevel> findAll();
     ReaderLevel findByReaderId(@Param("readerId") Integer readerId);
+    /**
+     * 悲观锁查询：锁定行，事务结束前其他事务不能修改
+     */
+    ReaderLevel findByReaderIdForUpdate(@Param("readerId") Integer readerId);
     int insert(ReaderLevel readerLevel);
     int update(ReaderLevel readerLevel);
     int addPoints(@Param("readerId") Integer readerId, @Param("points") Integer points);

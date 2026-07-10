@@ -66,27 +66,40 @@ class ReaderLevelServiceTest {
     // ==================== 积分测试 ====================
 
     @Test
-    @DisplayName("增加积分")
+    @DisplayName("增加积分 - 悲观锁")
     void addPoints() {
-        when(readerLevelMapper.addPoints(1, 10)).thenReturn(1);
-        when(readerLevelMapper.findByReaderId(1)).thenReturn(testLevel);
+        when(readerLevelMapper.findByReaderIdForUpdate(1)).thenReturn(testLevel);
+        when(readerLevelMapper.update(any(ReaderLevel.class))).thenReturn(1);
 
         readerLevelService.addPoints(1, 10);
 
-        verify(readerLevelMapper).addPoints(1, 10);
-        verify(readerLevelMapper).update(any(ReaderLevel.class));
+        verify(readerLevelMapper).findByReaderIdForUpdate(1);
+        verify(readerLevelMapper).update(argThat(level -> level.getPoints() == 10));
     }
 
     @Test
-    @DisplayName("扣除积分")
+    @DisplayName("扣除积分 - 悲观锁")
     void subtractPoints() {
         testLevel.setPoints(100);
-        when(readerLevelMapper.subtractPoints(1, 20)).thenReturn(1);
-        when(readerLevelMapper.findByReaderId(1)).thenReturn(testLevel);
+        when(readerLevelMapper.findByReaderIdForUpdate(1)).thenReturn(testLevel);
+        when(readerLevelMapper.update(any(ReaderLevel.class))).thenReturn(1);
 
         readerLevelService.subtractPoints(1, 20);
 
-        verify(readerLevelMapper).subtractPoints(1, 20);
+        verify(readerLevelMapper).findByReaderIdForUpdate(1);
+        verify(readerLevelMapper).update(argThat(level -> level.getPoints() == 80));
+    }
+
+    @Test
+    @DisplayName("扣除积分 - 最小为0")
+    void subtractPoints_MinZero() {
+        testLevel.setPoints(5);
+        when(readerLevelMapper.findByReaderIdForUpdate(1)).thenReturn(testLevel);
+        when(readerLevelMapper.update(any(ReaderLevel.class))).thenReturn(1);
+
+        readerLevelService.subtractPoints(1, 20);
+
+        verify(readerLevelMapper).update(argThat(level -> level.getPoints() == 0));
     }
 
     // ==================== 等级升级测试 ====================

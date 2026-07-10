@@ -9,6 +9,7 @@ import com.library.mapper.BookMapper;
 import com.library.mapper.ReaderMapper;
 import com.library.service.BorrowingService;
 import com.library.exception.BusinessException;
+import com.library.exception.OptimisticLockException;
 import com.library.service.ReaderLevelService;
 import com.library.service.SystemConfigService;
 import com.library.service.BlacklistService;
@@ -105,10 +106,17 @@ public class BorrowingServiceImpl implements BorrowingService {
             throw new BusinessException("您有未缴纳的罚款（¥" + reader.getFineAmount() + "），请先缴清后再借书");
         }
 
-        // 原子扣减可用数量，若返回0则说明已借完
+        // 乐观锁：原子扣减可用数量，若返回0则说明库存不足（可能被并发借走）
+        // WHERE available_count > 0 保证不会借出负数库存
         int affected = bookMapper.decrementAvailableCount(bookId);
         if (affected == 0) {
-            throw new RuntimeException("图书已借完");
+            // 重新查询最新库存，给用户更精确的提示
+            Book latestBook = bookMapper.findById(bookId);
+            if (latestBook.getAvailableCount() == 0) {
+                throw new OptimisticLockException("图书已借完，请稍后重试");
+            }
+            // 理论上不会到这里，但以防万一
+            throw new OptimisticLockException("库存不足，借书失败，请重试");
         }
 
         // 创建借阅记录

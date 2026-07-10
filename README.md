@@ -1,6 +1,8 @@
-# 高校图书馆借阅与座位管理系统 v5.3
+# 高校图书馆借阅与座位管理系统 v5.4
 
-一个基于 **Spring Boot 3.2 + Vue 3** 的前后端分离高校图书馆管理系统，实现图书管理、借阅管理、座位预约签到、罚款管理、数据统计、操作日志审计、黑名单管理、读者积分等级、催还通知等功能，支持三种角色（管理员、图书管理员、读者）的权限控制。
+一个基于 **Spring Boot 3.2 + Vue 3** 的前后端分离高校图书馆管理系统，实现图书管理、借阅管理、座位预约签到、罚款管理、数据统计、操作日志审计、黑名单管理、读者积分等级、催还通知等功能，支持三种角色（管理员、图书管理员、读者）的 RBAC 权限控制。
+
+**核心亮点**：三种并发控制策略（分布式锁/悲观锁/乐观锁）、RBAC 五表权限、XSS 防护、敏感字段加密
 
 ## v5.2 新增功能
 
@@ -15,6 +17,18 @@
 | **移动端响应式** | 基于 CSS Media Query + useScreenSize composable，移动端导航改抽屉、座位网格缩略 | ✅ 已完成 |
 | **Swagger API 文档** | springdoc-openapi 2.3.0，22 个 Controller 全覆盖 @Tag/@Operation 注解 | ✅ 已完成 |
 | **Docker 容器化** | 多阶段构建 Dockerfile + docker-compose（MySQL 8.0 + Redis 7 + Backend + Frontend） | ✅ 已完成 |
+
+## v5.4 新增功能
+
+| 方向 | 功能说明 | 状态 |
+|------|---------|------|
+| **并发安全** | 座位预约 Redis 分布式锁（SETNX + Lua）、积分悲观锁（SELECT FOR UPDATE）、借阅乐观锁 | ✅ 已完成 |
+| **RBAC 权限** | 五张表设计，URL级+方法级+数据级三层权限控制 | ✅ 已完成 |
+| **XSS 防护** | 请求参数过滤 script/onerror/event 等攻击代码 | ✅ 已完成 |
+| **字段加密** | 手机号/身份证 AES 加密存储，MyBatis TypeHandler 业务层无感 | ✅ 已完成 |
+| **异步化** | 操作日志异步写入（@Async + 线程池），主事务不阻塞 | ✅ 已完成 |
+| **缓存深化** | 座位详情/区域列表 Redis 缓存，状态变更自动失效 | ✅ 已完成 |
+| **测试升级** | Testcontainers 真实 MySQL 8.0 容器测试 | ✅ 已完成 |
 
 ### v5.1 已有功能
 
@@ -52,19 +66,29 @@
 ┌─────────────────────────────────────────────────────────────┐
 │                     后端 (Spring Boot 3.2)                  │
 │  ┌──────────────────────────────────────────────────────┐  │
-│  │  Security (JWT)  │  Controller(22) │ Service(22)    │  │
-│  │  + AOP操作日志   │  + /mine 端点   │ + 定时任务     │  │
-│  │  + 验证码(Redis) │  + ownership校验│ + 推荐算法     │  │
-│  │  + Redis限流     │  + Swagger注解  │ + 数据导出     │  │
-│  │  + MessageSource │  + LocaleResolver│ + 数据分析    │  │
+│  │  Security (JWT+RBAC) │  Controller(22) │ Service(22)│  │
+│  │  + RbacJwtFilter     │  + /mine 端点   │ + 定时任务 │  │
+│  │  + 验证码(Redis)      │  + ownership校验│ + 推荐算法 │  │
+│  │  + Redis限流          │  + Swagger注解  │ + 数据导出 │  │
+│  │  + MessageSource      │  + LocaleResolver│ + 数据分析│  │
+│  ├──────────────────────────────────────────────────────┤  │
+│  │  并发控制层                                         │  │
+│  │  + RedisLockService (座位预约分布式锁)              │  │
+│  │  + SELECT FOR UPDATE (积分悲观锁)                   │  │
+│  │  + WHERE available_count>0 (借阅乐观锁)            │  │
+│  ├──────────────────────────────────────────────────────┤  │
+│  │  安全防护层                                         │  │
+│  │  + XssFilter (XSS 防护)                            │  │
+│  │  + AesUtil + TypeHandler (字段加密)                 │  │
+│  │  + @Async (日志异步化)                              │  │
 │  └──────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
                               │
-                      MyBatis (20个Mapper)
+                      MyBatis (24个Mapper)
                               │
 ┌─────────────────────────────────────────────────────────────┐
 │              MySQL 8.0 + Redis                              │
-│         18张表 (核心8张 + 功能6张 + 社交4张)                │
+│         24张表 (核心8张+功能6张+社交5张+RBAC4张+座位1张)    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -75,18 +99,21 @@
 |------|------|------|
 | Java | 17+ | 运行环境 |
 | Spring Boot | 3.2.5 | 基础框架 |
-| Spring Security | 6.2 | 安全框架 |
+| Spring Security | 6.2 | 安全框架 + RBAC 权限 |
 | JWT (jjwt) | 0.12.5 | 无状态认证 |
 | MyBatis | 3.0.3 | ORM 框架 |
 | MySQL | 8.0 | 关系型数据库 |
-| Redis | - | 验证码存储、缓存 |
+| Redis | - | 验证码、缓存、分布式锁 |
 | Lombok | 1.18.32 | 简化 POJO |
 | Apache POI | 5.2.3 | Excel 导入导出 |
 | OpenCSV | 5.7.1 | CSV 导入导出 |
 | Spring AOP | - | 操作日志切面 |
+| Spring @Async | - | 异步任务（日志写入） |
 | Spring MessageSource | - | 国际化消息 |
 | SpringDoc OpenAPI | 2.3.0 | Swagger API 文档 |
 | H2 Database | - | 测试环境内存库 |
+| Testcontainers | 1.19.7 | 集成测试真实 MySQL |
+| AES 加密 | - | 敏感字段加密存储 |
 
 ### 前端
 | 技术 | 版本 | 说明 |
@@ -108,17 +135,27 @@ library-code/
 ├── docker-compose.yml                                 # Docker 一键部署
 ├── .dockerignore                                      # Docker 构建忽略
 │
+├── sql/                                               # 数据库脚本
+│   ├── init.sql                                       #   建表 + 初始数据
+│   ├── V2_new_tables.sql                              #   V2新增表
+│   ├── V3_innovation.sql                              #   V5.0创新功能表
+│   ├── V4_reply.sql                                   #   书评回复表
+│   ├── V5_rbac.sql                                    #   v5.4 RBAC权限表
+│   └── mock_data.sql                                  #   测试数据
+│
 ├── library-system/                                    # 后端 Spring Boot 项目
 │   ├── pom.xml                                        #   Maven 构建配置
 │   ├── Dockerfile                                     #   多阶段构建（Maven + JRE）
 │   └── src/
 │       ├── main/java/com/library/
-│       │   ├── LibraryApplication.java                #   启动入口 (@EnableScheduling)
-│       │   ├── config/                                #   配置类 (8个)
-│       │   │   ├── SecurityConfig.java                #     Security + JWT
+│       │   ├── LibraryApplication.java                #   启动入口 (@EnableScheduling + @EnableAsync)
+│       │   ├── config/                                #   配置类 (11个)
+│       │   │   ├── SecurityConfig.java                #     Security + JWT + RBAC
+│       │   │   ├── RbacJwtAuthenticationFilter.java   #     JWT + RBAC 认证过滤器
+│       │   │   ├── XssFilter.java                     #     XSS 防护过滤器
+│       │   │   ├── AsyncConfig.java                   #     异步线程池配置
 │       │   │   ├── CorsConfig.java                    #     跨域配置
 │       │   │   ├── GlobalExceptionHandler.java        #     全局异常处理（i18n）
-│       │   │   ├── JwtAuthenticationFilter.java       #     JWT 过滤器
 │       │   │   ├── I18nConfig.java                    #     国际化配置
 │       │   │   ├── SwaggerConfig.java                 #     Swagger API 文档
 │       │   │   ├── RateLimitInterceptor.java          #     IP 限流拦截器
@@ -126,26 +163,47 @@ library-code/
 │       │   ├── annotation/                            #   自定义注解
 │       │   ├── aspect/                                #   AOP切面
 │       │   ├── exception/                             #   自定义异常
+│       │   │   └── OptimisticLockException.java       #     乐观锁异常
+│       │   ├── handler/                               #   MyBatis TypeHandler
+│       │   │   └── EncryptedStringHandler.java        #     AES 加密处理器
 │       │   ├── controller/                            #   REST 控制器 (22个)
-│       │   ├── service/                               #   业务逻辑层 (22个接口+实现)
+│       │   ├── service/                               #   业务逻辑层 (25个接口+实现)
 │       │   │   ├── RedisCacheService.java             #     Redis 缓存服务（带降级）
+│       │   │   ├── RedisLockService.java              #     分布式锁服务（SETNX + Lua）
+│       │   │   ├── RbacService.java                   #     RBAC 权限服务
 │       │   │   └── impl/
-│       │   ├── mapper/                                #   MyBatis 映射接口 (20个)
-│       │   ├── entity/                                #   数据库实体 (20个)
+│       │   ├── mapper/                                #   MyBatis 映射接口 (24个)
+│       │   │   ├── SysRoleMapper.java                 #     角色 Mapper
+│       │   │   ├── SysPermissionMapper.java           #     权限 Mapper
+│       │   │   ├── SysUserRoleMapper.java             #     用户-角色 Mapper
+│       │   │   └── SysRolePermissionMapper.java       #     角色-权限 Mapper
+│       │   ├── entity/                                #   数据库实体 (24个)
+│       │   │   ├── SysRole.java                       #     角色实体
+│       │   │   ├── SysPermission.java                 #     权限实体
+│       │   │   ├── SysUserRole.java                   #     用户-角色关联
+│       │   │   └── SysRolePermission.java             #     角色-权限关联
 │       │   ├── dto/                                   #   数据传输对象 (19个)
-│       │   └── util/JwtUtil.java                      #   JWT 工具
+│       │   └── util/
+│       │       ├── JwtUtil.java                       #     JWT 工具（支持 RBAC）
+│       │       └── AesUtil.java                       #     AES 加密工具
 │       ├── main/resources/
 │       │   ├── application.properties                 #   主配置
 │       │   ├── messages_zh_CN.properties              #   中文消息
 │       │   ├── messages_en_US.properties              #   英文消息
-│       │   └── mapper/                                #   MyBatis XML (20个)
+│       │   └── mapper/                                #   MyBatis XML (24个)
 │       └── test/
 │           ├── java/com/library/
-│           │   ├── service/                           #   单元测试 (4个, 69个用例)
-│           │   └── integration/                       #   集成测试 (3个, 20个用例)
+│           │   ├── config/
+│           │   │   └── TestcontainersConfig.java      #   Testcontainers 基类
+│           │   ├── service/                           #   单元测试 (7个)
+│           │   │   ├── SeatConcurrencyTest.java       #     座位并发测试
+│           │   │   ├── PointsConcurrencyTest.java     #     积分并发测试
+│           │   │   └── BorrowingConcurrencyTest.java  #     借阅并发测试
+│           │   └── integration/                       #   集成测试 (3个)
 │           └── resources/
 │               ├── application-test.properties         #   测试配置（H2）
-│               └── schema-h2.sql                      #   测试建表脚本
+│               ├── schema-h2.sql                      #   H2 测试建表脚本
+│               └── schema-mysql.sql                   #   MySQL 测试建表脚本
 │
 ├── vue-frontend/                                      # 前端 Vue 3 项目
 │   ├── Dockerfile                                     #   多阶段构建（Node + Nginx）
@@ -334,7 +392,7 @@ http://localhost:8080/swagger-ui.html
 | 预约审批 | 审批图书/座位预约 | ✅ |
 | 罚款管理 | 处理罚款缴纳 | ✅ |
 
-## 数据库设计（19张表）
+## 数据库设计（24张表）
 
 ### 核心表
 | 表名 | 用途 | 关键字段 |
@@ -361,11 +419,38 @@ http://localhost:8080/swagger-ui.html
 ### 社交表
 | 表名 | 用途 | 关键字段 |
 |------|------|----------|
-| **book_review** | 书评 | book_id, reader_id, content, rating, status |
-| **review_like** | 书评点赞 | review_id, reader_id (唯一约束) |
-| **reader_follow** | 关注关系 | follower_id, followee_id (唯一约束) |
-| **study_buddy** | 学习伙伴 | reader_id, preferred_slot, preferred_area, study_goal, status |
-| **review_reply** | 书评回复 | review_id, reader_id, content, reply_to_reader_id, status |
+| book_review | 书评 | book_id, reader_id, content, rating, status |
+| review_like | 书评点赞 | review_id, reader_id (唯一约束) |
+| reader_follow | 关注关系 | follower_id, followee_id (唯一约束) |
+| study_buddy | 学习伙伴 | reader_id, preferred_slot, preferred_area, study_goal, status |
+| review_reply | 书评回复 | review_id, reader_id, content, reply_to_reader_id, status |
+
+### RBAC 权限表（v5.4）
+| 表名 | 用途 | 关键字段 |
+|------|------|----------|
+| sys_role | 角色表 | role_key (SUPER_ADMIN/LIBRARIAN/READER), role_name |
+| sys_permission | 权限表 | perm_key (book:create, borrow:return), module |
+| sys_user_role | 用户-角色关联 | user_type (READER/ADMIN/LIBRARIAN), user_id, role_id |
+| sys_role_permission | 角色-权限关联 | role_id, permission_id |
+
+```
+┌──────────────┐     ┌──────────────────┐     ┌──────────────┐
+│   sys_role   │────<│ sys_role_permission│>────│sys_permission│
+│   角色表     │     │   角色-权限关联   │     │   权限表     │
+└──────────────┘     └──────────────────┘     └──────────────┘
+       ▲
+       │
+┌──────────────────┐
+│  sys_user_role   │
+│  用户-角色关联   │
+└──────────────────┘
+       ▲
+       │
+┌──────┴───────┐
+│ reader/admin │
+│  librarian   │
+└──────────────┘
+```
 
 ## API 接口概览
 
@@ -455,12 +540,25 @@ http://localhost:8080/swagger-ui.html
 
 ## 安全机制
 
-- **认证**：JWT 无状态认证，BCrypt 密码加密
+### 认证与授权
+- **JWT 无状态认证**：BCrypt 密码加密，Token 包含 userId/userType/authorities
+- **RBAC 权限控制**：五张表设计（sys_role/sys_permission/sys_user_role/sys_role_permission），支持 URL 级 + @PreAuthorize 方法级 + 数据级三层权限
 - **验证码**：登录时图形验证码（Redis 存储，5分钟过期）
-- **权限**：URL级别 + @PreAuthorize 方法级别 + 前端路由守卫
 - **数据权限**：readerId 从 JWT Token 获取，不信前端传入；读者通过 `/mine` 端点访问个人数据
 - **越权防护**：markAsRead/checkout 等写操作增加 ownership 校验
-- **操作审计**：AOP 自动记录关键操作
+
+### 并发控制（三种锁策略）
+| 场景 | 锁方案 | 实现 |
+|------|--------|------|
+| **座位预约抢座** | Redis 分布式锁 | `SETNX lock:seat:{seatId} 1 EX 5` + Lua 原子释放 |
+| **积分变动** | 悲观锁 | `SELECT ... FOR UPDATE` 锁定行，事务内串行 |
+| **借阅库存** | 乐观锁 | `WHERE available_count > 0`，SQL 原子性保证 |
+
+### 防护措施
+- **XSS 防护**：`XssFilter` 过滤 `<script>`、`onerror=`、`javascript:` 等攻击代码
+- **字段加密**：手机号/身份证 AES 加密存储，MyBatis TypeHandler 业务层无感
+- **操作审计**：AOP + `@OperLog` 注解自动记录关键操作（异步写入）
+- **IP 限流**：Redis + `RateLimitInterceptor`（登录 10次/分钟、书评 5次/分钟）
 - **敏感配置**：环境变量外部化，不提交到 Git
 
 ## 国际化
@@ -536,6 +634,18 @@ A: 管理员在黑名单管理页点击"违约明细"按钮，可查看读者的
 | 罚款无宽限期 | 逾期3天内免罚 |
 
 ## 更新日志
+
+### v5.4 (2026-07-10)
+- **安全**：座位预约分布式锁 —— Redis SETNX + Lua 原子释放，防止并发抢座脏数据
+- **安全**：积分原子性 —— SELECT FOR UPDATE 悲观锁，借书/还书/签到并发操作积分不丢失
+- **安全**：借阅乐观锁 —— WHERE available_count > 0，最后一本书并发借阅正确处理
+- **安全**：RBAC 权限控制 —— 五张表设计（sys_role/sys_permission/sys_user_role/sys_role_permission），URL级+方法级+数据级三层权限
+- **安全**：XSS 防护过滤器 —— 过滤 script/onerror/event 等攻击代码
+- **安全**：敏感字段 AES 加密 —— 手机号/身份证加密存储，MyBatis TypeHandler 业务层无感
+- **架构**：操作日志异步化 —— @Async + 线程池，日志写入不阻塞主业务
+- **性能**：座位状态缓存 —— Redis 缓存座位详情/区域列表，状态变更时自动失效
+- **测试**：Testcontainers 集成 —— 真实 MySQL 8.0 容器测试，避免 H2 语法兼容问题
+- **测试**：并发测试用例 —— 3 个测试类验证分布式锁/悲观锁/乐观锁有效性
 
 ### v5.3 (2026-06-27)
 - **功能**：管理员删除书评时自动通知读者（系统消息告知违反规则）

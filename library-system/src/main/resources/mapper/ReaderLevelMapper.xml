@@ -12,6 +12,12 @@
         FROM reader_level WHERE reader_id = #{readerId}
     </select>
 
+    <!-- 悲观锁查询：锁定行，防止并发修改 -->
+    <select id="findByReaderIdForUpdate" resultType="com.library.entity.ReaderLevel">
+        SELECT id, reader_id, points, level, total_borrow_count, total_return_on_time, create_time, update_time
+        FROM reader_level WHERE reader_id = #{readerId} FOR UPDATE
+    </select>
+
     <insert id="insert" parameterType="com.library.entity.ReaderLevel">
         INSERT INTO reader_level (reader_id, points, level, total_borrow_count, total_return_on_time)
         VALUES (#{readerId}, #{points}, #{level}, #{totalBorrowCount}, #{totalReturnOnTime})

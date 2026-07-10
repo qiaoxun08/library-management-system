@@ -23,6 +23,9 @@ public class SecurityConfig {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private RbacJwtAuthenticationFilter rbacJwtAuthenticationFilter;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -56,7 +59,8 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             );
 
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class);
+        // 使用 RBAC JWT 过滤器替代原有过滤器
+        http.addFilterBefore(rbacJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

@@ -50,6 +50,9 @@ class ReservationServiceTest {
     @Mock
     private BlacklistService blacklistService;
 
+    @Mock
+    private RedisLockService redisLockService;
+
     @InjectMocks
     private ReservationServiceImpl reservationService;
 
@@ -189,6 +192,12 @@ class ReservationServiceTest {
         when(readerMapper.findById(1)).thenReturn(testReader);
         when(blacklistService.isBlacklisted(1)).thenReturn(false);
         when(reservationMapper.findBySeatId(1)).thenReturn(List.of(existing));
+
+        // Mock 分布式锁：直接执行传入的 lambda
+        doAnswer(invocation -> {
+            RedisLockService.LockAction<?> action = invocation.getArgument(2);
+            return action.execute();
+        }).when(redisLockService).executeWithLock(anyString(), anyLong(), any(RedisLockService.LockAction.class));
 
         BusinessException ex = assertThrows(BusinessException.class,
                 () -> reservationService.addReservation(reservation));

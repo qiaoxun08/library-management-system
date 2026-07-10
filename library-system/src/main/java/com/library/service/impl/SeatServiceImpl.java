@@ -3,7 +3,10 @@ package com.library.service.impl;
 import com.library.entity.Seat;
 import com.library.mapper.SeatMapper;
 import com.library.service.SeatService;
+import com.library.service.RedisCacheService;
 import com.library.exception.BusinessException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +15,15 @@ import java.util.List;
 @Service
 public class SeatServiceImpl implements SeatService {
 
+    private static final Logger log = LoggerFactory.getLogger(SeatServiceImpl.class);
+    private static final String SEAT_CACHE_PREFIX = "seat:detail:";
+    private static final String SEAT_AREA_CACHE_PREFIX = "seat:area:";
+
     @Autowired
     private SeatMapper seatMapper;
+
+    @Autowired
+    private RedisCacheService redisCacheService;
 
     @Override
     public List<Seat> getAllSeats() {
@@ -22,7 +32,16 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public Seat getSeatById(Integer id) {
-        return seatMapper.findById(id);
+        String cacheKey = SEAT_CACHE_PREFIX + id;
+        Seat cached = redisCacheService.get(cacheKey, Seat.class);
+        if (cached != null) {
+            return cached;
+        }
+        Seat seat = seatMapper.findById(id);
+        if (seat != null) {
+            redisCacheService.set(cacheKey, seat, 30);
+        }
+        return seat;
     }
 
     @Override
@@ -32,7 +51,17 @@ public class SeatServiceImpl implements SeatService {
 
     @Override
     public List<Seat> getSeatsByArea(String area) {
-        return seatMapper.findByArea(area);
+        String cacheKey = SEAT_AREA_CACHE_PREFIX + area;
+        @SuppressWarnings("unchecked")
+        List<Seat> cached = redisCacheService.get(cacheKey, List.class);
+        if (cached != null && !cached.isEmpty()) {
+            return cached;
+        }
+        List<Seat> seats = seatMapper.findByArea(area);
+        if (seats != null && !seats.isEmpty()) {
+            redisCacheService.set(cacheKey, seats, 10);
+        }
+        return seats;
     }
 
     @Override
@@ -66,6 +95,12 @@ public class SeatServiceImpl implements SeatService {
         Integer currentStatus = seat.getStatus();
         validateStatusTransition(currentStatus, newStatus);
         seatMapper.updateStatus(id, newStatus);
+        // 清除缓存
+        redisCacheService.delete(SEAT_CACHE_PREFIX + id);
+        if (seat.getArea() != null) {
+            redisCacheService.delete(SEAT_AREA_CACHE_PREFIX + seat.getArea());
+        }
+        log.debug("座位状态更新: id={}, {} -> {}", id, currentStatus, newStatus);
     }
 
     private void validateStatusTransition(Integer current, Integer target) {

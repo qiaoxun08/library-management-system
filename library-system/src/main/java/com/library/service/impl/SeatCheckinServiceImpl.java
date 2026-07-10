@@ -10,6 +10,7 @@ import com.library.entity.Seat;
 import com.library.service.SeatCheckinService;
 import com.library.service.BlacklistService;
 import com.library.service.SystemConfigService;
+import com.library.service.RedisLockService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class SeatCheckinServiceImpl implements SeatCheckinService {
     @Autowired
     private SystemConfigService systemConfigService;
 
+    @Autowired
+    private RedisLockService redisLockService;
+
     @Override
     public List<SeatCheckin> getAllCheckins() {
         return seatCheckinMapper.findAll();
@@ -65,37 +69,41 @@ public class SeatCheckinServiceImpl implements SeatCheckinService {
     @Override
     @Transactional
     public SeatCheckin checkin(Integer seatId, Integer readerId, Integer reservationId) {
-        // 检查座位是否存在
-        Seat seat = seatMapper.findById(seatId);
-        if (seat == null) {
-            throw new BusinessException("座位不存在");
-        }
+        // 使用分布式锁防止并发签到同一座位
+        String lockKey = "seat:checkin:" + seatId;
+        return redisLockService.executeWithLock(lockKey, 5, () -> {
+            // 检查座位是否存在
+            Seat seat = seatMapper.findById(seatId);
+            if (seat == null) {
+                throw new BusinessException("座位不存在");
+            }
 
-        // 检查读者是否已有在用座位
-        SeatCheckin activeCheckin = seatCheckinMapper.findActiveByReaderId(readerId);
-        if (activeCheckin != null) {
-            throw new BusinessException("您已有在用座位，请先签退");
-        }
+            // 检查读者是否已有在用座位
+            SeatCheckin activeCheckin = seatCheckinMapper.findActiveByReaderId(readerId);
+            if (activeCheckin != null) {
+                throw new BusinessException("您已有在用座位，请先签退");
+            }
 
-        // 检查座位是否已被占用
-        SeatCheckin activeSeat = seatCheckinMapper.findActiveBySeatId(seatId);
-        if (activeSeat != null) {
-            throw new BusinessException("该座位已被占用");
-        }
+            // 检查座位是否已被占用
+            SeatCheckin activeSeat = seatCheckinMapper.findActiveBySeatId(seatId);
+            if (activeSeat != null) {
+                throw new BusinessException("该座位已被占用");
+            }
 
-        // 创建签到记录
-        SeatCheckin checkin = new SeatCheckin();
-        checkin.setSeatId(seatId);
-        checkin.setReaderId(readerId);
-        checkin.setReservationId(reservationId);
-        checkin.setStatus(1); // 1: 使用中
-        seatCheckinMapper.insert(checkin);
+            // 创建签到记录
+            SeatCheckin checkin = new SeatCheckin();
+            checkin.setSeatId(seatId);
+            checkin.setReaderId(readerId);
+            checkin.setReservationId(reservationId);
+            checkin.setStatus(1); // 1: 使用中
+            seatCheckinMapper.insert(checkin);
 
-        // 更新座位状态为使用中
-        seat.setStatus(1);
-        seatMapper.update(seat);
+            // 更新座位状态为使用中
+            seat.setStatus(1);
+            seatMapper.update(seat);
 
-        return checkin;
+            return checkin;
+        });
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.library.service.ReservationService;
 import com.library.service.SeatService;
 import com.library.service.BorrowingService;
 import com.library.service.BlacklistService;
+import com.library.service.RedisLockService;
 import com.library.mapper.BookMapper;
 import com.library.mapper.BorrowingMapper;
 import com.library.exception.BusinessException;
@@ -46,6 +47,9 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
     private BlacklistService blacklistService;
+
+    @Autowired
+    private RedisLockService redisLockService;
 
     @Override
     public List<ReservationDTO> getAllReservations() {
@@ -95,7 +99,33 @@ public class ReservationServiceImpl implements ReservationService {
             throw new BusinessException("您在黑名单中，无法预约");
         }
 
-        // 重复预约检查：同一读者不能对同一图书/座位有待审批或已批准的预约
+        // 座位预约：使用分布式锁防止并发抢座
+        if (reservation.getSeatId() != null) {
+            String lockKey = "seat:reserve:" + reservation.getSeatId();
+            // 锁持有时间 5 秒，防止死锁
+            return redisLockService.executeWithLock(lockKey, 5, () -> {
+                // 重复预约检查：同一读者不能对同一座位有待审批或已批准的预约
+                List<ReservationDTO> existing = reservationMapper.findBySeatId(reservation.getSeatId());
+                boolean duplicate = existing.stream().anyMatch(r ->
+                        r.getReaderId() != null && r.getReaderId().equals(reservation.getReaderId())
+                        && (r.getStatus() == 0 || r.getStatus() == 1));
+                if (duplicate) {
+                    throw new BusinessException("您已预约过该座位，请等待审批或取消已有预约");
+                }
+
+                // 检查座位是否已被其他预约占用（同一时段）
+                boolean taken = existing.stream().anyMatch(r ->
+                        r.getStatus() == 0 || r.getStatus() == 1);
+                if (taken) {
+                    throw new BusinessException("该座位在所选时段已被预约");
+                }
+
+                reservationMapper.insert(reservation);
+                return reservation;
+            });
+        }
+
+        // 图书预约：检查重复预约
         if (reservation.getBookId() != null) {
             List<ReservationDTO> existing = reservationMapper.findByBookId(reservation.getBookId());
             boolean duplicate = existing.stream().anyMatch(r ->
@@ -103,15 +133,6 @@ public class ReservationServiceImpl implements ReservationService {
                     && (r.getStatus() == 0 || r.getStatus() == 1));
             if (duplicate) {
                 throw new BusinessException("您已预约过该图书，请等待审批或取消已有预约");
-            }
-        }
-        if (reservation.getSeatId() != null) {
-            List<ReservationDTO> existing = reservationMapper.findBySeatId(reservation.getSeatId());
-            boolean duplicate = existing.stream().anyMatch(r ->
-                    r.getReaderId() != null && r.getReaderId().equals(reservation.getReaderId())
-                    && (r.getStatus() == 0 || r.getStatus() == 1));
-            if (duplicate) {
-                throw new BusinessException("您已预约过该座位，请等待审批或取消已有预约");
             }
         }
 

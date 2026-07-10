@@ -30,6 +30,20 @@ public class JwtUtil {
         return createToken(claims, username);
     }
 
+    /**
+     * 生成 JWT Token（RBAC 版本）
+     * @param username 用户名
+     * @param userType 用户类型：READER/ADMIN/LIBRARIAN
+     * @param userId 用户ID
+     */
+    public String generateToken(String username, String userType, Integer userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("role", userType);
+        claims.put("userType", userType);
+        claims.put("userId", userId);
+        return createToken(claims, username);
+    }
+
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .claims(claims)
