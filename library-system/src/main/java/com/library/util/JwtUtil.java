@@ -94,6 +94,13 @@ public class JwtUtil {
         try {
             Claims claims = getAllClaimsFromToken(token);
             String username = claims.getSubject();
+            String userType = claims.get("userType", String.class);
+            Integer userId = claims.get("userId", Integer.class);
+            // 优先使用三参数版本（包含 userId 和 userType），确保 RBAC 过滤器正常工作
+            if (userType != null && userId != null) {
+                return generateToken(username, userType, userId);
+            }
+            // 兼容旧版 Token（只有 role）
             String role = (String) claims.get("role");
             return generateToken(username, role);
         } catch (Exception e) {

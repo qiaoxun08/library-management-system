@@ -1,6 +1,7 @@
 package com.library.service.impl;
 
 import com.library.entity.Book;
+import com.library.exception.BusinessException;
 import com.library.mapper.BookMapper;
 import com.library.mapper.BorrowingMapper;
 import com.library.service.BookService;
@@ -45,7 +46,7 @@ public class BookServiceImpl implements BookService {
         if (book.getIsbn() != null && !book.getIsbn().isEmpty()) {
             Book existingBook = bookMapper.findByIsbn(book.getIsbn());
             if (existingBook != null) {
-                throw new RuntimeException("ISBN已存在: " + book.getIsbn());
+                throw new BusinessException("ISBN已存在: " + book.getIsbn());
             }
         }
         if (book.getAvailableCount() == null && book.getTotalCount() != null) {

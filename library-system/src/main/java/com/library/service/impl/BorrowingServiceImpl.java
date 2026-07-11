@@ -11,6 +11,7 @@ import com.library.service.BorrowingService;
 import com.library.exception.BusinessException;
 import com.library.exception.OptimisticLockException;
 import com.library.service.ReaderLevelService;
+import com.library.service.RedisLockService;
 import com.library.service.SystemConfigService;
 import com.library.service.BlacklistService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class BorrowingServiceImpl implements BorrowingService {
     @Autowired
     private BlacklistService blacklistService;
 
+    @Autowired
+    private RedisLockService redisLockService;
+
     @Override
     public List<BorrowingDTO> getAllBorrowings() {
         return borrowingMapper.findAllWithBook();
@@ -74,71 +78,75 @@ public class BorrowingServiceImpl implements BorrowingService {
     @Override
     @Transactional
     public Borrowing borrowBook(String readerIdString, Integer bookId) {
-        // 通过业务readerId查找读者
-        Reader reader = readerMapper.findByReaderId(readerIdString);
-        if (reader == null) {
-            throw new RuntimeException("读者不存在");
-        }
-
-        // 检查读者账号状态：status != 1 表示已禁用
-        if (reader.getStatus() == null || reader.getStatus() != 1) {
-            throw new RuntimeException("读者账号已被禁用，无法借书");
-        }
-
-        // 检查黑名单
-        if (blacklistService.isBlacklisted(reader.getId())) {
-            throw new BusinessException("您在黑名单中，无法借书");
-        }
-
-        // 检查图书是否存在
-        Book book = bookMapper.findById(bookId);
-        if (book == null) {
-            throw new RuntimeException("图书不存在");
-        }
-
-        // 检查读者借阅数量限制
-        if (reader.getCurrentBorrowCount() >= reader.getMaxBorrowCount()) {
-            throw new RuntimeException("已达到最大借阅数量限制");
-        }
-
-        // 检查是否有未缴纳的罚款
-        if (reader.getFineAmount() != null && reader.getFineAmount().compareTo(BigDecimal.ZERO) > 0) {
-            throw new BusinessException("您有未缴纳的罚款（¥" + reader.getFineAmount() + "），请先缴清后再借书");
-        }
-
-        // 乐观锁：原子扣减可用数量，若返回0则说明库存不足（可能被并发借走）
-        // WHERE available_count > 0 保证不会借出负数库存
-        int affected = bookMapper.decrementAvailableCount(bookId);
-        if (affected == 0) {
-            // 重新查询最新库存，给用户更精确的提示
-            Book latestBook = bookMapper.findById(bookId);
-            if (latestBook.getAvailableCount() == 0) {
-                throw new OptimisticLockException("图书已借完，请稍后重试");
+        // 使用分布式锁确保同一本书不会被并发借出
+        String lockKey = "book:borrow:" + bookId;
+        return redisLockService.executeWithLock(lockKey, 5, () -> {
+            // 通过业务readerId查找读者
+            Reader reader = readerMapper.findByReaderId(readerIdString);
+            if (reader == null) {
+                throw new BusinessException("读者不存在");
             }
-            // 理论上不会到这里，但以防万一
-            throw new OptimisticLockException("库存不足，借书失败，请重试");
-        }
 
-        // 创建借阅记录
-        int defaultDays = Integer.parseInt(getConfigValue("library.borrowing.default-days", "30"));
-        Borrowing borrowing = new Borrowing();
-        borrowing.setReaderId(reader.getId());
-        borrowing.setBookId(bookId);
-        borrowing.setBorrowDate(LocalDateTime.now());
-        borrowing.setDueDate(LocalDateTime.now().plusDays(defaultDays));
-        borrowing.setRenewCount(0);
-        borrowing.setStatus(1); // 1: 借阅中
-        borrowingMapper.insert(borrowing);
+            // 检查读者账号状态：status != 1 表示已禁用
+            if (reader.getStatus() == null || reader.getStatus() != 1) {
+                throw new BusinessException("读者账号已被禁用，无法借书");
+            }
 
-        // 使用原子更新读者当前借阅数量
-        readerMapper.incrementBorrowCount(reader.getId());
+            // 检查黑名单
+            if (blacklistService.isBlacklisted(reader.getId())) {
+                throw new BusinessException("您在黑名单中，无法借书");
+            }
 
-        // 初始化读者等级记录并加积分
-        readerLevelService.initReaderLevel(reader.getId());
-        readerLevelService.addPoints(reader.getId(), 10);
-        readerLevelService.incrementBorrowCount(reader.getId());
+            // 检查图书是否存在
+            Book book = bookMapper.findById(bookId);
+            if (book == null) {
+                throw new BusinessException("图书不存在");
+            }
 
-        return borrowing;
+            // 检查读者借阅数量限制
+            if (reader.getCurrentBorrowCount() >= reader.getMaxBorrowCount()) {
+                throw new BusinessException("已达到最大借阅数量限制");
+            }
+
+            // 检查是否有未缴纳的罚款
+            if (reader.getFineAmount() != null && reader.getFineAmount().compareTo(BigDecimal.ZERO) > 0) {
+                throw new BusinessException("您有未缴纳的罚款（¥" + reader.getFineAmount() + "），请先缴清后再借书");
+            }
+
+            // 乐观锁：原子扣减可用数量，若返回0则说明库存不足（可能被并发借走）
+            // WHERE available_count > 0 保证不会借出负数库存
+            int affected = bookMapper.decrementAvailableCount(bookId);
+            if (affected == 0) {
+                // 重新查询最新库存，给用户更精确的提示
+                Book latestBook = bookMapper.findById(bookId);
+                if (latestBook.getAvailableCount() == 0) {
+                    throw new OptimisticLockException("图书已借完，请稍后重试");
+                }
+                // 理论上不会到这里，但以防万一
+                throw new OptimisticLockException("库存不足，借书失败，请重试");
+            }
+
+            // 创建借阅记录
+            int defaultDays = Integer.parseInt(getConfigValue("library.borrowing.default-days", "30"));
+            Borrowing borrowing = new Borrowing();
+            borrowing.setReaderId(reader.getId());
+            borrowing.setBookId(bookId);
+            borrowing.setBorrowDate(LocalDateTime.now());
+            borrowing.setDueDate(LocalDateTime.now().plusDays(defaultDays));
+            borrowing.setRenewCount(0);
+            borrowing.setStatus(1); // 1: 借阅中
+            borrowingMapper.insert(borrowing);
+
+            // 使用原子更新读者当前借阅数量
+            readerMapper.incrementBorrowCount(reader.getId());
+
+            // 初始化读者等级记录并加积分
+            readerLevelService.initReaderLevel(reader.getId());
+            readerLevelService.addPoints(reader.getId(), 10);
+            readerLevelService.incrementBorrowCount(reader.getId());
+
+            return borrowing;
+        });
     }
 
     @Override
@@ -146,11 +154,11 @@ public class BorrowingServiceImpl implements BorrowingService {
     public Borrowing returnBook(Integer borrowingId) {
         Borrowing borrowing = borrowingMapper.findById(borrowingId);
         if (borrowing == null) {
-            throw new RuntimeException("借阅记录不存在");
+            throw new BusinessException("借阅记录不存在");
         }
 
         if (borrowing.getStatus() != 1) {
-            throw new RuntimeException("该借阅记录不是借阅状态");
+            throw new BusinessException("该借阅记录不是借阅状态");
         }
 
         // 更新借阅记录
@@ -201,22 +209,22 @@ public class BorrowingServiceImpl implements BorrowingService {
     public Borrowing renewBook(Integer borrowingId) {
         Borrowing borrowing = borrowingMapper.findById(borrowingId);
         if (borrowing == null) {
-            throw new RuntimeException("借阅记录不存在");
+            throw new BusinessException("借阅记录不存在");
         }
 
         if (borrowing.getStatus() != 1) {
-            throw new RuntimeException("该借阅记录不是借阅状态");
+            throw new BusinessException("该借阅记录不是借阅状态");
         }
 
         // 检查是否已续借过
         int maxRenewCount = Integer.parseInt(getConfigValue("library.borrowing.max-renew-count", "2"));
         if (borrowing.getRenewCount() >= maxRenewCount) {
-            throw new RuntimeException("已达到最大续借次数");
+            throw new BusinessException("已达到最大续借次数");
         }
 
         // 检查是否已逾期，逾期的图书不能续借
         if (borrowing.getDueDate().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("图书已逾期，无法续借");
+            throw new BusinessException("图书已逾期，无法续借");
         }
 
         // 续借窗口限制：只能在到期前 X 天内操作（默认7天）
@@ -240,7 +248,7 @@ public class BorrowingServiceImpl implements BorrowingService {
     public void payFine(Integer borrowingId) {
         Borrowing borrowing = borrowingMapper.findById(borrowingId);
         if (borrowing == null) {
-            throw new RuntimeException("借阅记录不存在");
+            throw new BusinessException("借阅记录不存在");
         }
 
         // 记录需要支付的罚款金额

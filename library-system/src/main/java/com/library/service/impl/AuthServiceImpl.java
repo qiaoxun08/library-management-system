@@ -55,6 +55,11 @@ public class AuthServiceImpl implements AuthService {
         String username = request.getUsername();
         String password = request.getPassword();
 
+        // 校验角色参数合法性
+        if (!"admin".equals(role) && !"librarian".equals(role) && !"reader".equals(role)) {
+            throw new BusinessException("无效的角色类型");
+        }
+
         // 验证码校验
         if (request.getCaptcha() != null && request.getCaptchaKey() != null) {
             String redisKey = "captcha:" + request.getCaptchaKey();
@@ -89,7 +94,7 @@ public class AuthServiceImpl implements AuthService {
             }
         }
 
-        throw new RuntimeException("用户名或密码错误");
+        throw new BusinessException("用户名或密码错误");
     }
 
     @Override
@@ -97,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
         // Check if reader already exists
         Reader existingReader = readerMapper.findByReaderId(reader.getReaderId());
         if (existingReader != null) {
-            throw new RuntimeException("该读者ID已存在");
+            throw new BusinessException("该读者ID已存在");
         }
 
         // Encode password

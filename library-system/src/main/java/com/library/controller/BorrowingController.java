@@ -91,14 +91,18 @@ public class BorrowingController {
     @Operation(summary = "还书", description = "归还已借阅的图书")
     public Result<Borrowing> returnBook(
             @Parameter(description = "借阅记录ID") @PathVariable Integer id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        boolean isReader = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
-        if (isReader) {
-            borrowingService.validateOwnership(id, auth.getName());
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isReader = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+            if (isReader) {
+                borrowingService.validateOwnership(id, auth.getName());
+            }
+            Borrowing borrowing = borrowingService.returnBook(id);
+            return Result.success(borrowing);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
-        Borrowing borrowing = borrowingService.returnBook(id);
-        return Result.success(borrowing);
     }
 
     @PostMapping("/renew/{id}")
@@ -107,14 +111,18 @@ public class BorrowingController {
     @Operation(summary = "续借图书", description = "对已借阅的图书进行续借")
     public Result<Borrowing> renewBook(
             @Parameter(description = "借阅记录ID") @PathVariable Integer id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        boolean isReader = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
-        if (isReader) {
-            borrowingService.validateOwnership(id, auth.getName());
+        try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isReader = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+            if (isReader) {
+                borrowingService.validateOwnership(id, auth.getName());
+            }
+            Borrowing borrowing = borrowingService.renewBook(id);
+            return Result.success(borrowing);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
         }
-        Borrowing borrowing = borrowingService.renewBook(id);
-        return Result.success(borrowing);
     }
 
     @PutMapping("/{id}/payFine")

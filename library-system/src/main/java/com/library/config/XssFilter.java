@@ -48,20 +48,22 @@ public class XssFilter implements Filter {
 
     /**
      * 清理 XSS 攻击代码
+     * 先转义 HTML 特殊字符，再过滤危险 pattern
      */
     public static String cleanXss(String value) {
         if (value == null || value.isEmpty()) {
             return value;
         }
-        for (Pattern pattern : XSS_PATTERNS) {
-            value = pattern.matcher(value).replaceAll("");
-        }
-        // 转义 HTML 特殊字符
+        // 先转义 HTML 特殊字符（防止注入）
         value = value.replace("&", "&amp;")
                      .replace("<", "&lt;")
                      .replace(">", "&gt;")
                      .replace("\"", "&quot;")
                      .replace("'", "&#x27;");
+        // 再过滤危险 pattern（如 javascript:、onerror= 等）
+        for (Pattern pattern : XSS_PATTERNS) {
+            value = pattern.matcher(value).replaceAll("");
+        }
         return value;
     }
 

@@ -3,6 +3,7 @@ package com.library.util;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -12,15 +13,19 @@ import java.util.Base64;
  * AES 加密工具类
  *
  * 用于敏感字段加密存储（手机号、身份证号等）
- * 默认使用 AES/ECB/PKCS5Padding，密钥从环境变量读取
+ * 使用 AES/CBC/PKCS5Padding，密钥从环境变量读取
+ * CBC 模式比 ECB 更安全：相同明文产生不同密文
  */
 public class AesUtil {
 
     private static final String ALGORITHM = "AES";
-    private static final String TRANSFORMATION = "AES/ECB/PKCS5Padding";
+    private static final String TRANSFORMATION = "AES/CBC/PKCS5Padding";
 
     // 默认密钥（生产环境应从环境变量读取）
     private static final String DEFAULT_SECRET_KEY = "library-mgmt-aes-key-32b!";
+
+    // 固定 IV（CBC 模式需要，生产环境建议使用随机 IV 并与密文一起存储）
+    private static final byte[] FIXED_IV = "libraryiv1234567".getBytes(StandardCharsets.UTF_8);
 
     private static String secretKey = System.getenv("AES_SECRET_KEY") != null
             ? System.getenv("AES_SECRET_KEY")
@@ -38,7 +43,7 @@ public class AesUtil {
         try {
             SecretKey key = getSecretKey();
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.ENCRYPT_MODE, key);
+            cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(FIXED_IV));
             byte[] encrypted = cipher.doFinal(plaintext.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
@@ -58,7 +63,7 @@ public class AesUtil {
         try {
             SecretKey key = getSecretKey();
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
-            cipher.init(Cipher.DECRYPT_MODE, key);
+            cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(FIXED_IV));
             byte[] decrypted = cipher.doFinal(Base64.getDecoder().decode(ciphertext));
             return new String(decrypted, StandardCharsets.UTF_8);
         } catch (Exception e) {

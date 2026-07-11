@@ -82,6 +82,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public Reservation addReservation(Reservation reservation) {
         // 转换 readerId（学号）为数据库 ID
         if (reservation.getReaderId() != null) {
@@ -147,6 +148,7 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     @Override
+    @Transactional
     public void deleteReservation(Integer id) {
         ReservationDTO reservation = reservationMapper.findById(id);
         if (reservation == null) {

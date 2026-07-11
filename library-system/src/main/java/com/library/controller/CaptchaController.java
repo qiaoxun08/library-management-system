@@ -13,8 +13,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -34,7 +34,7 @@ public class CaptchaController {
     @Operation(summary = "获取图形验证码", description = "返回验证码图片，Captcha-Key通过响应头返回")
     public void getCaptcha(HttpServletResponse response) throws IOException {
         // 生成4位随机验证码
-        String code = String.format("%04d", new Random().nextInt(10000));
+        String code = String.format("%04d", ThreadLocalRandom.current().nextInt(10000));
         String key = UUID.randomUUID().toString();
 
         // 存入Redis，5分钟过期
@@ -58,7 +58,7 @@ public class CaptchaController {
         g.fillRect(0, 0, width, height);
 
         // 画干扰线
-        Random random = new Random();
+        ThreadLocalRandom random = ThreadLocalRandom.current();
         g.setColor(new Color(180, 180, 180));
         for (int i = 0; i < 20; i++) {
             int x1 = random.nextInt(width);

@@ -48,6 +48,9 @@ class BorrowingServiceTest {
     @Mock
     private BlacklistService blacklistService;
 
+    @Mock
+    private RedisLockService redisLockService;
+
     @InjectMocks
     private BorrowingServiceImpl borrowingService;
 
@@ -76,6 +79,13 @@ class BorrowingServiceTest {
         lenient().when(systemConfigService.getConfigValue("library.borrowing.renew-window-days")).thenReturn("7");
         lenient().when(systemConfigService.getConfigValue("library.fine.daily-rate")).thenReturn("0.10");
         lenient().when(systemConfigService.getConfigValue("library.fine.grace-days")).thenReturn("3");
+
+        // 模拟分布式锁：直接执行传入的action，不真正加锁
+        lenient().when(redisLockService.executeWithLock(anyString(), anyLong(), any(RedisLockService.LockAction.class)))
+                .thenAnswer(invocation -> {
+                    RedisLockService.LockAction<?> action = invocation.getArgument(2);
+                    return action.execute();
+                });
     }
 
     // ==================== 借书测试 ====================

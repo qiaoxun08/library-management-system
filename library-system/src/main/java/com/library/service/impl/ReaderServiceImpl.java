@@ -1,6 +1,7 @@
 package com.library.service.impl;
 
 import com.library.entity.Reader;
+import com.library.exception.BusinessException;
 import com.library.mapper.ReaderMapper;
 import com.library.service.ReaderService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,20 +64,22 @@ public class ReaderServiceImpl implements ReaderService {
     public void payFine(Integer id) {
         Reader reader = readerMapper.findById(id);
         if (reader == null) {
-            throw new RuntimeException("读者不存在");
+            throw new BusinessException("读者不存在");
         }
-        reader.setFineAmount(new BigDecimal("0.00"));
-        readerMapper.update(reader);
+        // 使用原子操作清除罚款，避免并发竞态
+        if (reader.getFineAmount() != null && reader.getFineAmount().compareTo(BigDecimal.ZERO) > 0) {
+            readerMapper.decrementFineAmount(id, reader.getFineAmount());
+        }
     }
 
     @Override
     public void changePassword(String readerId, String oldPassword, String newPassword) {
         Reader reader = readerMapper.findByReaderId(readerId);
         if (reader == null) {
-            throw new RuntimeException("读者不存在");
+            throw new BusinessException("读者不存在");
         }
         if (!passwordEncoder.matches(oldPassword, reader.getPassword())) {
-            throw new RuntimeException("原密码错误");
+            throw new BusinessException("原密码错误");
         }
         reader.setPassword(passwordEncoder.encode(newPassword));
         readerMapper.update(reader);
@@ -86,7 +89,7 @@ public class ReaderServiceImpl implements ReaderService {
     public void resetPassword(String readerId, String newPassword) {
         Reader reader = readerMapper.findByReaderId(readerId);
         if (reader == null) {
-            throw new RuntimeException("读者不存在");
+            throw new BusinessException("读者不存在");
         }
         reader.setPassword(passwordEncoder.encode(newPassword));
         readerMapper.update(reader);
@@ -96,7 +99,7 @@ public class ReaderServiceImpl implements ReaderService {
     public Reader updateProfile(String readerId, Reader profileData) {
         Reader existing = readerMapper.findByReaderId(readerId);
         if (existing == null) {
-            throw new RuntimeException("读者不存在");
+            throw new BusinessException("读者不存在");
         }
         // 白名单：只允许读者自行修改基本资料字段
         if (profileData.getRealName() != null) existing.setRealName(profileData.getRealName());

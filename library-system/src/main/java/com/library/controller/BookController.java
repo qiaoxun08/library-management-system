@@ -1,5 +1,6 @@
 package com.library.controller;
 
+import com.library.annotation.RequirePermission;
 import com.library.dto.Result;
 import com.library.entity.Book;
 import com.library.service.BookService;
@@ -78,6 +79,7 @@ public class BookController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    @RequirePermission("book:create")
     @Operation(summary = "新增图书")
     public Result<Book> addBook(@RequestBody Book book) {
         try {
@@ -90,6 +92,7 @@ public class BookController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    @RequirePermission("book:update")
     @Operation(summary = "更新图书信息")
     public Result<Book> updateBook(
             @Parameter(description = "图书ID") @PathVariable Integer id,
@@ -105,6 +108,7 @@ public class BookController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
+    @RequirePermission("book:delete")
     @Operation(summary = "删除图书")
     public Result<Void> deleteBook(
             @Parameter(description = "图书ID") @PathVariable Integer id) {
@@ -138,6 +142,7 @@ public class BookController {
      */
     @GetMapping("/export")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    @RequirePermission("book:export")
     @Operation(summary = "导出图书列表", description = "导出所有图书数据")
     public Result<List<Book>> exportBooks() {
         try {
@@ -153,6 +158,7 @@ public class BookController {
      */
     @PostMapping("/import")
     @PreAuthorize("hasRole('ADMIN')")
+    @RequirePermission("book:import")
     @Operation(summary = "批量导入图书", description = "批量导入图书数据")
     public Result<Void> importBooks(@RequestBody List<Book> books) {
         try {
