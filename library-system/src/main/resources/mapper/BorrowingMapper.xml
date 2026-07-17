@@ -10,7 +10,7 @@
     </select>
 
     <select id="findAllWithBook" resultType="com.library.dto.BorrowingDTO">
-        SELECT b.*, bk.title as bookTitle, r.real_name as readerName
+        SELECT b.*, bk.title as bookTitle, bk.author as bookAuthor, r.real_name as readerName
         FROM borrowing b
         LEFT JOIN book bk ON b.book_id = bk.id
         LEFT JOIN reader r ON b.reader_id = r.id
@@ -22,6 +22,14 @@
 
     <select id="findByReaderIdString" resultType="com.library.entity.Borrowing">
         SELECT * FROM borrowing WHERE reader_id = (SELECT id FROM reader WHERE reader_id = #{readerId})
+    </select>
+
+    <select id="findByReaderIdWithBook" resultType="com.library.dto.BorrowingDTO">
+        SELECT b.*, bk.title as bookTitle, bk.author as bookAuthor
+        FROM borrowing b
+        LEFT JOIN book bk ON b.book_id = bk.id
+        WHERE b.reader_id = (SELECT id FROM reader WHERE reader_id = #{readerId})
+        ORDER BY b.borrow_date DESC
     </select>
 
     <select id="findByBookId" resultType="com.library.entity.Borrowing">
@@ -204,5 +212,41 @@
         WHERE r.reader_id = #{readerId} AND r.status = 3
         ORDER BY time DESC
         LIMIT 20
+    </select>
+
+    <!-- 今日借阅量按小时分布 -->
+    <select id="countTodayByHour" resultType="java.util.Map">
+        SELECT
+            HOUR(borrow_date) AS hour,
+            COUNT(*) AS count
+        FROM borrowing
+        WHERE DATE(borrow_date) = CURDATE()
+        GROUP BY HOUR(borrow_date)
+        ORDER BY hour
+    </select>
+
+    <!-- 借阅分类分布（最近30天） -->
+    <select id="countByCategoryDistribution" resultType="java.util.Map">
+        SELECT
+            b.category AS name,
+            COUNT(*) AS value
+        FROM borrowing br
+        JOIN book b ON br.book_id = b.id
+        WHERE br.borrow_date &gt;= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        AND b.category IS NOT NULL AND b.category != ''
+        GROUP BY b.category
+        ORDER BY value DESC
+    </select>
+
+    <!-- 本月逾期率趋势（按天） -->
+    <select id="countOverdueTrendByDay" resultType="java.util.Map">
+        SELECT
+            DATE(borrow_date) AS date,
+            COUNT(*) AS total,
+            SUM(CASE WHEN status = 1 AND due_date &lt; NOW() THEN 1 ELSE 0 END) AS overdue
+        FROM borrowing
+        WHERE borrow_date &gt;= DATE_FORMAT(CURDATE(), '%Y-%m-01')
+        GROUP BY DATE(borrow_date)
+        ORDER BY date
     </select>
 </mapper>

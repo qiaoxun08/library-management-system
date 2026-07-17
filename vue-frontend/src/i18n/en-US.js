@@ -170,6 +170,15 @@ export default {
       loadFailed: 'Failed to load logs',
       noDataToExport: 'No data to export'
     },
+    loginLogs: {
+      title: 'Login Logs',
+      status: 'Status',
+      success: 'Success',
+      failed: 'Failed',
+      failReason: 'Failure Reason',
+      userAgent: 'Browser',
+      loadFailed: 'Failed to load login logs'
+    },
     readers: {
       title: 'Reader Management',
       addReader: 'Add Reader',
@@ -382,6 +391,7 @@ export default {
       fineManagement: 'Fine Management',
       home: 'Home',
       logs: 'Operation Logs',
+      loginLogs: 'Login Logs',
       myReservations: 'My Reservations',
       notifications: 'Notifications',
       profile: 'Profile',
@@ -438,6 +448,7 @@ export default {
     },
     text: {
       all: 'All',
+      changePassword: 'Change Password',
       createTime: 'Created At',
       hint: 'Hint',
       librarianPanel: 'Librarian Panel',

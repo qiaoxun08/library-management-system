@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -74,5 +75,19 @@ public class ExportController {
             @Parameter(description = "导出格式，xlsx或csv") @RequestParam(defaultValue = "xlsx") String format,
             HttpServletResponse response) throws Exception {
         exportService.exportOperationLogs(format, response);
+    }
+
+    /**
+     * 导出我的借阅记录（读者端）
+     */
+    @GetMapping("/my-borrowings")
+    @PreAuthorize("hasRole('READER') or hasRole('ADMIN') or hasRole('SUPER_ADMIN')")
+    @Operation(summary = "导出我的借阅记录", description = "读者导出自己的借阅记录为Excel/CSV文件")
+    public void exportMyBorrowings(
+            @Parameter(description = "导出格式，xlsx或csv") @RequestParam(defaultValue = "xlsx") String format,
+            Authentication authentication,
+            HttpServletResponse response) throws Exception {
+        String readerId = authentication.getName();
+        exportService.exportMyBorrowings(readerId, format, response);
     }
 }

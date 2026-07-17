@@ -66,11 +66,24 @@ public class BookController {
 
     @GetMapping("/search")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
-    @Operation(summary = "搜索图书", description = "根据关键词搜索图书")
+    @Operation(summary = "搜索图书", description = "根据关键词搜索图书，支持高级搜索：分类、出版社、出版年份、ISBN、库存状态")
     public Result<List<Book>> searchBooks(
-            @Parameter(description = "搜索关键词") @RequestParam String keyword) {
+            @Parameter(description = "搜索关键词") @RequestParam(required = false) String keyword,
+            @Parameter(description = "图书分类") @RequestParam(required = false) String category,
+            @Parameter(description = "出版社（模糊搜索）") @RequestParam(required = false) String publisher,
+            @Parameter(description = "出版年份") @RequestParam(required = false) Integer year,
+            @Parameter(description = "ISBN（精确匹配）") @RequestParam(required = false) String isbn,
+            @Parameter(description = "库存状态：available-只显示可借") @RequestParam(required = false) String status) {
         try {
-            List<Book> books = bookService.searchBooks(keyword);
+            // 判断是否为高级搜索（有额外筛选条件）
+            boolean isAdvanced = category != null || publisher != null || year != null || isbn != null || status != null;
+            List<Book> books;
+            if (isAdvanced || keyword != null) {
+                books = bookService.advancedSearch(keyword, category, publisher, year, isbn, status);
+            } else {
+                // 无任何搜索条件时返回所有图书
+                books = bookService.getAllBooks();
+            }
             return Result.success(books);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -163,6 +176,47 @@ public class BookController {
     public Result<Void> importBooks(@RequestBody List<Book> books) {
         try {
             bookService.importBooks(books);
+            return Result.success();
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 批量更新图书状态
+     */
+    @PostMapping("/batch-status")
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequirePermission("book:update")
+    @Operation(summary = "批量更新图书状态", description = "批量上架/下架图书")
+    public Result<Void> batchUpdateStatus(@RequestBody Map<String, Object> body) {
+        try {
+            @SuppressWarnings("unchecked")
+            List<Integer> ids = ((List<?>) body.get("ids")).stream()
+                    .map(id -> Integer.parseInt(id.toString()))
+                    .collect(java.util.stream.Collectors.toList());
+            Integer status = Integer.parseInt(body.get("status").toString());
+            bookService.batchUpdateStatus(ids, status);
+            return Result.success();
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 批量删除图书
+     */
+    @DeleteMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    @RequirePermission("book:delete")
+    @Operation(summary = "批量删除图书", description = "批量删除图书")
+    public Result<Void> batchDelete(@RequestBody Map<String, Object> body) {
+        try {
+            @SuppressWarnings("unchecked")
+            List<Integer> ids = ((List<?>) body.get("ids")).stream()
+                    .map(id -> Integer.parseInt(id.toString()))
+                    .collect(java.util.stream.Collectors.toList());
+            bookService.batchDelete(ids);
             return Result.success();
         } catch (Exception e) {
             return Result.error(e.getMessage());

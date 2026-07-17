@@ -130,4 +130,19 @@ public class StatisticsController {
             return Result.error(e.getMessage());
         }
     }
+
+    /**
+     * 获取实时统计数据（数据大屏使用）
+     */
+    @GetMapping("/realtime")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "获取实时统计数据", description = "数据大屏使用的实时统计接口")
+    public Result<Map<String, Object>> getRealtimeStatistics() {
+        try {
+            Map<String, Object> data = statisticsService.getRealtimeStatistics();
+            return Result.success(data);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
 }

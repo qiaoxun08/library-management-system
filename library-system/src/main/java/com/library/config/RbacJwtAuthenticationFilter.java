@@ -54,19 +54,37 @@ public class RbacJwtAuthenticationFilter extends OncePerRequestFilter {
                 String userType = claims.get("userType", String.class);
                 Integer userId = claims.get("userId", Integer.class);
 
-                if (username != null && userType != null && userId != null) {
-                    // 加载 RBAC 权限
-                    List<SimpleGrantedAuthority> authorities = loadAuthorities(userType, userId);
+                if (username != null) {
+                    List<SimpleGrantedAuthority> authorities;
+
+                    if (userType != null && userId != null) {
+                        // 新版 Token：从 RBAC 表加载权限
+                        authorities = loadAuthorities(userType, userId);
+                    } else {
+                        // 兼容旧版 Token（只有 role 字段）：直接用 role 构建权限
+                        String role = claims.get("role", String.class);
+                        userType = role; // 用于 fallback
+                        authorities = new ArrayList<>();
+                        if (role != null) {
+                            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
+                            // admin 自动获得 ROLE_ADMIN（兼容 SUPER_ADMIN）
+                            if ("admin".equalsIgnoreCase(role)) {
+                                authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                                authorities.add(new SimpleGrantedAuthority("ROLE_SUPER_ADMIN"));
+                            }
+                        }
+                        log.info("旧版 Token 兼容: user={}, role={}, 请重新登录获取完整 RBAC 权限", username, role);
+                    }
 
                     // 构建认证对象
                     UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(username, null, authorities);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                    log.debug("RBAC 认证成功: user={}, type={}, perms={}", username, userType, authorities.size());
+                    log.debug("认证成功: user={}, type={}, perms={}", username, userType, authorities.size());
                 }
             } catch (Exception e) {
-                log.warn("RBAC 认证失败: {}", e.getMessage());
+                log.warn("认证失败: {}", e.getMessage());
                 SecurityContextHolder.clearContext();
             }
         }
@@ -91,22 +109,55 @@ public class RbacJwtAuthenticationFilter extends OncePerRequestFilter {
      * 将 RBAC 权限转换为 Spring Security 的 Authority：
      * - 角色 → ROLE_xxx（保持向后兼容）
      * - 权限 → perm_key（细粒度权限）
+     *
+     * 如果 RBAC 表无数据（sys_user_role 未初始化），自动 fallback 到 userType 对应的默认角色
      */
     private List<SimpleGrantedAuthority> loadAuthorities(String userType, Integer userId) {
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 
-        // 1. 添加角色（保持向后兼容，如 ROLE_ADMIN, ROLE_READER）
-        var roles = rbacService.getUserRoles(userType, userId);
-        for (var role : roles) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getRoleKey()));
+        try {
+            // 1. 从 RBAC 表加载角色
+            var roles = rbacService.getUserRoles(userType, userId);
+            for (var role : roles) {
+                String roleKey = role.getRoleKey();
+                authorities.add(new SimpleGrantedAuthority("ROLE_" + roleKey));
+                // SUPER_ADMIN 向下兼容：自动添加 ROLE_ADMIN，避免大量 @PreAuthorize 修改
+                if ("SUPER_ADMIN".equals(roleKey)) {
+                    authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+                }
+            }
+
+            // 2. 从 RBAC 表加载细粒度权限
+            var permissions = rbacService.getUserPermissions(userType, userId);
+            for (SysPermission perm : permissions) {
+                authorities.add(new SimpleGrantedAuthority(perm.getPermKey()));
+            }
+        } catch (Exception e) {
+            log.warn("RBAC 表查询失败，将使用默认角色: {}", e.getMessage());
         }
 
-        // 2. 添加细粒度权限（如 book:create, borrow:return）
-        var permissions = rbacService.getUserPermissions(userType, userId);
-        for (SysPermission perm : permissions) {
-            authorities.add(new SimpleGrantedAuthority(perm.getPermKey()));
+        // 3. Fallback：如果 RBAC 表无数据，根据 userType 添加默认角色
+        if (authorities.isEmpty()) {
+            String defaultRole = mapDefaultRole(userType);
+            if (defaultRole != null) {
+                authorities.add(new SimpleGrantedAuthority(defaultRole));
+                log.info("RBAC fallback: user={}, type={}, assigned default role={}", userId, userType, defaultRole);
+            }
         }
 
         return authorities;
+    }
+
+    /**
+     * userType → 默认 ROLE 映射（RBAC 表无数据时的 fallback）
+     */
+    private String mapDefaultRole(String userType) {
+        if (userType == null) return null;
+        return switch (userType.toUpperCase()) {
+            case "ADMIN" -> "ROLE_ADMIN";
+            case "LIBRARIAN" -> "ROLE_LIBRARIAN";
+            case "READER" -> "ROLE_READER";
+            default -> null;
+        };
     }
 }

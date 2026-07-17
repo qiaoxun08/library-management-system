@@ -54,3 +54,12 @@ export function checkinSeat(seatId, reservationId) {
 export function checkoutSeat(checkinId) {
   return axios.post('/seats/checkout', { checkinId })
 }
+
+/**
+ * 获取座位时间轴视图数据
+ * @param {string} date - 日期，格式 yyyy-MM-dd
+ * @returns {Promise}
+ */
+export function getSeatTimeline(date) {
+  return axios.get('/seats/timeline', { params: { date } })
+}

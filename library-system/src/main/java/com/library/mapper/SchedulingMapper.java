@@ -17,4 +17,5 @@ public interface SchedulingMapper {
     int update(Scheduling scheduling);
     int delete(@Param("id") Integer id);
     int updateStatus(@Param("id") Integer id, @Param("status") Integer status);
+    List<Scheduling> findByDate(@Param("date") String date);
 }

@@ -1,7 +1,9 @@
 package com.library.service.impl;
 
 import com.library.entity.Seat;
+import com.library.entity.Scheduling;
 import com.library.mapper.SeatMapper;
+import com.library.mapper.SchedulingMapper;
 import com.library.service.SeatService;
 import com.library.service.RedisCacheService;
 import com.library.exception.BusinessException;
@@ -10,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class SeatServiceImpl implements SeatService {
@@ -21,6 +25,9 @@ public class SeatServiceImpl implements SeatService {
 
     @Autowired
     private SeatMapper seatMapper;
+
+    @Autowired
+    private SchedulingMapper schedulingMapper;
 
     @Autowired
     private RedisCacheService redisCacheService;
@@ -123,5 +130,66 @@ public class SeatServiceImpl implements SeatService {
             case 2 -> "已预约";
             default -> "未知";
         };
+    }
+
+    @Override
+    public List<Map<String, Object>> getSeatTimeline(String date) {
+        // 1. 查询所有座位
+        List<Seat> seats = seatMapper.findAll();
+        // 2. 查询指定日期的所有排期记录
+        List<Scheduling> schedulings = schedulingMapper.findByDate(date);
+
+        // 3. 构建座位 x 时段矩阵（8:00 ~ 22:00，共14个时段）
+        List<Map<String, Object>> result = new ArrayList<>();
+        LocalDate queryDate = LocalDate.parse(date);
+        LocalDateTime now = LocalDateTime.now();
+
+        for (Seat seat : seats) {
+            Map<String, Object> seatData = new LinkedHashMap<>();
+            seatData.put("seatId", seat.getId());
+            seatData.put("seatNumber", seat.getSeatNumber());
+            seatData.put("area", seat.getArea());
+
+            // 构建每个时段的状态
+            List<Map<String, Object>> timeSlots = new ArrayList<>();
+            for (int hour = 8; hour <= 21; hour++) {
+                Map<String, Object> slot = new LinkedHashMap<>();
+                slot.put("hour", hour);
+
+                // 判断该时段是否已过
+                LocalDateTime slotTime = queryDate.atTime(hour, 0);
+                if (slotTime.isBefore(now)) {
+                    slot.put("status", "past");
+                } else {
+                    // 查找该座位在该时段是否有排期记录
+                    String slotStatus = "free";
+                    for (Scheduling s : schedulings) {
+                        if (!s.getSeatId().equals(seat.getId())) {
+                            continue;
+                        }
+                        LocalDateTime start = s.getStartTime();
+                        LocalDateTime end = s.getEndTime();
+                        // 排期覆盖该时段：start <= hour:00 < end
+                        if (!start.isAfter(slotTime) && end.isAfter(slotTime)) {
+                            // status: 0-待确认/已预约, 1-使用中, 2-已完成/已取消
+                            if (s.getStatus() != null && s.getStatus() == 1) {
+                                slotStatus = "occupied";
+                                break;
+                            } else if (s.getStatus() != null && (s.getStatus() == 0 || s.getStatus() == 2)) {
+                                slotStatus = "reserved";
+                                // 不break，继续查找是否有occupied的覆盖
+                            }
+                        }
+                    }
+                    slot.put("status", slotStatus);
+                }
+                timeSlots.add(slot);
+            }
+
+            seatData.put("timeSlots", timeSlots);
+            result.add(seatData);
+        }
+
+        return result;
     }
 }

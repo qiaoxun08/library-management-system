@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import router from '@/router'
 import i18n from '../i18n'
 
@@ -144,22 +144,32 @@ service.interceptors.response.use(
           // Token 过期或无效，清除登录信息并跳转
           if (!isRedirecting) {
             isRedirecting = true
-            localStorage.removeItem('token')
-            localStorage.removeItem('role')
-            localStorage.removeItem('username')
-            localStorage.removeItem('realName')
-            localStorage.removeItem('id')
-            ElMessage.error(t('messages.error.loginExpired'))
+            ElNotification({
+              title: '登录已过期',
+              message: '您的登录状态已失效，请重新登录。',
+              type: 'warning',
+              duration: 3000
+            })
             setTimeout(() => {
+              localStorage.removeItem('token')
+              localStorage.removeItem('role')
+              localStorage.removeItem('username')
+              localStorage.removeItem('realName')
+              localStorage.removeItem('id')
               router.push('/student/login').catch(() => {
                 window.location.href = '/student/login'
               })
               setTimeout(() => { isRedirecting = false }, 2000)
-            }, 1000)
+            }, 1500)
           }
           break
         case 403:
-          ElMessage.error(t('messages.error.noPermission'))
+          ElNotification({
+            title: '权限不足',
+            message: '您没有权限执行此操作，请联系管理员开通相应权限。',
+            type: 'warning',
+            duration: 5000
+          })
           break
         case 422:
           // 参数校验失败，显示具体的校验错误信息
@@ -190,7 +200,12 @@ service.interceptors.response.use(
           ElMessage.error(t('messages.error.notFound'))
           break
         case 500:
-          ElMessage.error(t('messages.error.serverError'))
+          ElNotification({
+            title: '服务器错误',
+            message: '服务器处理请求时出错，请稍后重试。如问题持续，请联系管理员。',
+            type: 'error',
+            duration: 8000
+          })
           break
         default: {
           // 尝试从后端响应体中提取具体错误消息
@@ -203,9 +218,21 @@ service.interceptors.response.use(
         }
       }
     } else if (error.code === 'ECONNABORTED') {
-      ElMessage.error(t('messages.error.timeout'))
+      // 网络超时
+      ElNotification({
+        title: '请求失败',
+        message: '网络异常，请检查网络连接后重试。',
+        type: 'error',
+        duration: 8000
+      })
     } else {
-      ElMessage.error(t('messages.error.networkFailed'))
+      // 网络断开或其他无响应错误
+      ElNotification({
+        title: '请求失败',
+        message: '网络异常，请检查网络连接后重试。',
+        type: 'error',
+        duration: 8000
+      })
     }
     return Promise.reject(error)
   }

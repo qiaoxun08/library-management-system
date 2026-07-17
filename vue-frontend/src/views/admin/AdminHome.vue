@@ -10,7 +10,7 @@
 
     <div class="stats-row">
       <div class="stat-card" @click="$router.push('/admin/books')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea, #764ba2)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #2C3E50, #3D5A80)">
           <el-icon :size="28"><Reading /></el-icon>
         </div>
         <div class="stat-info">
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/admin/readers')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6B8F71, #8FB396)">
           <el-icon :size="28"><User /></el-icon>
         </div>
         <div class="stat-info">
@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/admin/borrowing-records')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #C0785C, #D4956B)">
           <el-icon :size="28"><Document /></el-icon>
         </div>
         <div class="stat-info">
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/admin/reservation-approval')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #5A7D9A, #8BABC4)">
           <el-icon :size="28"><Calendar /></el-icon>
         </div>
         <div class="stat-info">
@@ -46,7 +46,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #fa709a, #fee140)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #D4A84B, #E8C878)">
           <el-icon :size="28"><Connection /></el-icon>
         </div>
         <div class="stat-info">
@@ -60,35 +60,35 @@
       <h3>{{ $t('admin.dashboard.quickActions') }}</h3>
       <div class="action-grid">
         <div class="action-item" @click="$router.push('/admin/books')">
-          <el-icon :size="24" color="#667eea"><Reading /></el-icon>
+          <el-icon :size="24" color="#2C3E50"><Reading /></el-icon>
           <span>{{ $t('common.menu.books') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/readers')">
-          <el-icon :size="24" color="#43e97b"><User /></el-icon>
+          <el-icon :size="24" color="#6B8F71"><User /></el-icon>
           <span>{{ $t('common.menu.readers') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/seats')">
-          <el-icon :size="24" color="#e6a23c"><Place /></el-icon>
+          <el-icon :size="24" color="#D4A84B"><Place /></el-icon>
           <span>{{ $t('common.menu.seats') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/statistics')">
-          <el-icon :size="24" color="#f56c6c"><DataLine /></el-icon>
+          <el-icon :size="24" color="#A85454"><DataLine /></el-icon>
           <span>{{ $t('common.menu.statistics') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/borrowing-records')">
-          <el-icon :size="24" color="#909399"><Document /></el-icon>
+          <el-icon :size="24" color="#7A8599"><Document /></el-icon>
           <span>{{ $t('common.menu.borrowingRecords') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/reservation-approval')">
-          <el-icon :size="24" color="#409eff"><Calendar /></el-icon>
+          <el-icon :size="24" color="#C0785C"><Calendar /></el-icon>
           <span>{{ $t('common.menu.reservationApproval') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/fine-management')">
-          <el-icon :size="24" color="#f56c6c"><Money /></el-icon>
+          <el-icon :size="24" color="#A85454"><Money /></el-icon>
           <span>{{ $t('common.menu.fineManagement') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/admin/accounts')">
-          <el-icon :size="24" color="#764ba2"><UserFilled /></el-icon>
+          <el-icon :size="24" color="#3D5A80"><UserFilled /></el-icon>
           <span>{{ $t('common.menu.accounts') }}</span>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default {
 }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
   border-radius: 12px;
   padding: 24px 30px;
   color: white;
@@ -205,14 +205,14 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 6px 20px rgba(44,62,80,0.1);
 }
 
 .stat-icon {
@@ -229,12 +229,12 @@ export default {
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #303133;
+  color: #2C3440;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #909399;
+  color: #7A8599;
   margin-top: 2px;
 }
 
@@ -242,12 +242,12 @@ export default {
   background: white;
   border-radius: 10px;
   padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04);
 }
 
 .quick-actions h3 {
   margin: 0 0 16px 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 16px;
 }
 
@@ -267,11 +267,11 @@ export default {
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 13px;
-  color: #606266;
+  color: #4A5568;
 }
 
 .action-item:hover {
-  background-color: #f5f7fa;
-  color: #409eff;
+  background-color: #F8F5F0;
+  color: #C0785C;
 }
 </style>

@@ -258,7 +258,7 @@ export default {
 <style scoped>
 .reader-management {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: #F8F5F0;
   min-height: calc(100vh - 60px);
 }
 
@@ -268,12 +268,12 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 24px;
 }
 
@@ -284,7 +284,7 @@ export default {
   background: white;
   padding: 15px 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
   margin-bottom: 20px;
 }
 
@@ -305,21 +305,21 @@ export default {
 .el-table {
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
 }
 
 .el-table :deep(.el-table__header-wrapper) {
-  background-color: #409eff;
+  background-color: #C0785C;
 }
 
 .el-table :deep(.el-table__header-wrapper th) {
-  background-color: #409eff;
+  background-color: #C0785C;
   color: white;
   font-weight: 600;
 }
 
 .el-table :deep(.el-table__body-wrapper tr:hover) {
-  background-color: #ecf5ff;
+  background-color: #F5F0E8;
 }
 
 .pagination-wrapper {

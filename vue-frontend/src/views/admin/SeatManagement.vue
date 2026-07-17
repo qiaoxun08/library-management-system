@@ -44,7 +44,7 @@
           <div class="seat-actions">
             <el-button size="small" type="text" @click.stop="editSeat(seat)">{{ $t('common.action.edit') }}</el-button>
             <el-button size="small" type="text" @click.stop="changeSeatStatus(seat)">{{ $t('admin.seats.toggleStatus') }}</el-button>
-            <el-button size="small" type="text" style="color: #f56c6c;" @click.stop="deleteSeat(seat.id)">{{ $t('common.action.delete') }}</el-button>
+            <el-button size="small" type="text" style="color: #A85454;" @click.stop="deleteSeat(seat.id)">{{ $t('common.action.delete') }}</el-button>
           </div>
         </div>
         <div class="seat-area">{{ seat.area }}</div>
@@ -218,7 +218,7 @@ export default {
 <style scoped>
 .seat-management {
   padding: 20px;
-  background-color: #f5f7fa;
+  background-color: #F8F5F0;
   min-height: calc(100vh - 60px);
 }
 
@@ -228,12 +228,12 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 24px;
 }
 
@@ -244,7 +244,7 @@ export default {
   background: white;
   padding: 15px 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
   margin-bottom: 20px;
 }
 
@@ -265,7 +265,7 @@ export default {
   padding: 20px;
   background: white;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
 }
 
 .seat-item {
@@ -283,7 +283,7 @@ export default {
 
 .seat-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 12px rgba(44,62,80,0.12);
 }
 
 .seat-header {
@@ -314,19 +314,19 @@ export default {
 }
 
 .seat-item.available {
-  background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  background: linear-gradient(135deg, #6B8F71 0%, #85ce61 100%);
   color: white;
   border: 2px solid #529b2e;
 }
 
 .seat-item.occupied {
-  background: linear-gradient(135deg, #f56c6c 0%, #f78989 100%);
+  background: linear-gradient(135deg, #A85454 0%, #f78989 100%);
   color: white;
   border: 2px solid #dd6161;
 }
 
 .seat-item.reserved {
-  background: linear-gradient(135deg, #e6a23c 0%, #ebb563 100%);
+  background: linear-gradient(135deg, #D4A84B 0%, #ebb563 100%);
   color: white;
   border: 2px solid #cf9236;
 }

@@ -178,12 +178,12 @@ export default {
 
 <style scoped>
 .data-export-view { padding: 20px; }
-.page-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #409eff; }
-.page-header h2 { margin: 0; color: #303133; font-size: 22px; }
+.page-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #C0785C; }
+.page-header h2 { margin: 0; color: #2C3440; font-size: 22px; }
 .export-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; }
 .export-card { border-radius: 10px; }
 .card-header { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; }
-.card-desc { color: #909399; font-size: 13px; margin-bottom: 16px; }
+.card-desc { color: #7A8599; font-size: 13px; margin-bottom: 16px; }
 .card-form { display: flex; flex-direction: column; gap: 12px; }
 .card-actions { display: flex; gap: 8px; }
 </style>

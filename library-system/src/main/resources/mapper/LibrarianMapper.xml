@@ -31,4 +31,12 @@
     <delete id="delete">
         DELETE FROM librarian WHERE id = #{id}
     </delete>
+
+    <select id="findPasswordById" resultType="java.lang.String">
+        SELECT password FROM librarian WHERE id = #{id}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE librarian SET password = #{password}, update_time = NOW() WHERE id = #{id}
+    </update>
 </mapper>

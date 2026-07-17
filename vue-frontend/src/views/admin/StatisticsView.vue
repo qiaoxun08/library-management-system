@@ -164,7 +164,7 @@ export default {
           data: data,
           smooth: true,
           itemStyle: {
-            color: '#409eff'
+            color: '#C0785C'
           },
           areaStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -344,7 +344,7 @@ export default {
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', data: areas },
         yAxis: { type: 'value', name: this.$t('admin.statistics.predictedOccupancy'), max: 100 },
-        series: [{ type: 'bar', data: values, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#667eea' }, { offset: 1, color: '#764ba2' }]), borderRadius: [4, 4, 0, 0] } }],
+        series: [{ type: 'bar', data: values, itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#2C3E50' }, { offset: 1, color: '#3D5A80' }]), borderRadius: [4, 4, 0, 0] } }],
         grid: { left: '3%', right: '4%', bottom: '10%', containLabel: true }
       })
     },
@@ -368,7 +368,7 @@ export default {
         tooltip: { trigger: 'axis' },
         xAxis: { type: 'category', data: categories, axisLabel: { rotate: 30 } },
         yAxis: { type: 'value', name: this.$t('admin.statistics.borrowCount') },
-        series: [{ type: 'bar', data: values, itemStyle: { color: '#409eff', borderRadius: [4, 4, 0, 0] } }],
+        series: [{ type: 'bar', data: values, itemStyle: { color: '#C0785C', borderRadius: [4, 4, 0, 0] } }],
         grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true }
       })
     }
@@ -392,7 +392,7 @@ export default {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.08);
   text-align: center;
 }
 
@@ -405,7 +405,7 @@ export default {
 .stat-value {
   font-size: 28px;
   font-weight: bold;
-  color: #409eff;
+  color: #C0785C;
 }
 
 .charts-section {
@@ -413,7 +413,7 @@ export default {
   background: white;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.08);
 }
 
 .chart-container {

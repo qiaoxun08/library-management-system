@@ -21,8 +21,8 @@
                 >
                   <template #default="{ item }">
                     <span style="font-weight: 600;">{{ item.readerId }}</span>
-                    <span style="margin-left: 8px; color: #909399;">{{ item.realName }}</span>
-                    <span style="float: right; color: #909399; font-size: 12px;">{{ item.department }}</span>
+                    <span style="margin-left: 8px; color: #7A8599;">{{ item.realName }}</span>
+                    <span style="float: right; color: #7A8599; font-size: 12px;">{{ item.department }}</span>
                   </template>
                 </el-autocomplete>
               </el-form-item>
@@ -39,8 +39,8 @@
                 >
                   <template #default="{ item }">
                     <span style="font-weight: 600;">{{ item.title }}</span>
-                    <span style="margin-left: 8px; color: #909399;">ISBN: {{ item.isbn }}</span>
-                    <span style="float: right; color: #67c23a; font-size: 12px;">{{ $t('librarian.availableCount', { count: item.availableCount }) }}</span>
+                    <span style="margin-left: 8px; color: #7A8599;">ISBN: {{ item.isbn }}</span>
+                    <span style="float: right; color: #6B8F71; font-size: 12px;">{{ $t('librarian.availableCount', { count: item.availableCount }) }}</span>
                   </template>
                 </el-autocomplete>
               </el-form-item>
@@ -222,12 +222,12 @@ export default {
 .page-header {
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: var(--el-text-color-primary);
   font-size: 22px;
 }
 

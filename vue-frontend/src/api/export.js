@@ -43,3 +43,14 @@ export function exportOperationLogs(params = {}) {
     responseType: 'blob'
   })
 }
+
+/**
+ * 导出我的借阅记录（读者端）
+ * @param {object} params - { format }
+ */
+export function exportMyBorrowings(params = {}) {
+  return axios.get('/export/my-borrowings', {
+    params,
+    responseType: 'blob'
+  })
+}

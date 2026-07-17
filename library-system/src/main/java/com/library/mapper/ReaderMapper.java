@@ -24,4 +24,5 @@ public interface ReaderMapper {
     int updateStatus(@Param("id") Integer id, @Param("status") int status);
     int updatePreferredCategories(@Param("id") Integer id, @Param("preferredCategories") String preferredCategories);
     int updateLanguage(@Param("id") Integer id, @Param("language") String language);
+    int updatePassword(@Param("id") Integer id, @Param("password") String password);
 }

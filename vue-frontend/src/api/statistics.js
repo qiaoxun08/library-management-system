@@ -31,3 +31,11 @@ export function getOverdueRateByMonth() {
 export function getBorrowingsByDepartment() {
   return axios.get('/statistics/borrowings/department')
 }
+
+/**
+ * 获取实时统计数据（数据大屏使用）
+ * @returns {Promise}
+ */
+export function getRealtimeStatistics() {
+  return axios.get('/statistics/realtime')
+}

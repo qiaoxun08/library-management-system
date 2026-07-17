@@ -43,4 +43,11 @@
     <update id="updateStatus">
         UPDATE scheduling SET status = #{status} WHERE id = #{id}
     </update>
+
+    <!-- 查询指定日期的所有排期记录 -->
+    <select id="findByDate" resultType="com.library.entity.Scheduling">
+        SELECT id, seat_id, reader_id, start_time, end_time, status
+        FROM scheduling
+        WHERE DATE(start_time) = #{date}
+    </select>
 </mapper>

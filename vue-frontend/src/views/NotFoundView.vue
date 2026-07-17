@@ -39,7 +39,7 @@ export default {
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: var(--el-bg-color-page);
 }
 
 .not-found-content {
@@ -49,7 +49,8 @@ export default {
 .error-code {
   font-size: 120px;
   font-weight: 900;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: var(--font-serif);
+  background: linear-gradient(135deg, #2C3E50 0%, #C0785C 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -59,21 +60,22 @@ export default {
 
 .error-divider {
   width: 60px;
-  height: 4px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: 3px;
+  background: linear-gradient(90deg, #C0785C, #D4956B);
   margin: 0 auto 20px;
   border-radius: 2px;
 }
 
 .not-found h2 {
   font-size: 24px;
-  color: #333;
+  font-family: var(--font-serif);
+  color: var(--el-text-color-primary);
   margin-bottom: 10px;
 }
 
 .not-found p {
   font-size: 14px;
-  color: #999;
+  color: var(--el-text-color-secondary);
   margin-bottom: 30px;
 }
 </style>

@@ -33,4 +33,11 @@ public interface ExportService {
      * @param format 格式：xlsx / csv
      */
     void exportOperationLogs(String format, HttpServletResponse response) throws Exception;
+
+    /**
+     * 导出我的借阅记录（读者端）
+     * @param readerId 读者学号
+     * @param format 格式：xlsx / csv
+     */
+    void exportMyBorrowings(String readerId, String format, HttpServletResponse response) throws Exception;
 }

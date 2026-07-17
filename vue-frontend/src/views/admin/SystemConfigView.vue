@@ -99,6 +99,7 @@
 
 <script>
 import { getConfig, updateConfig } from '@/api/system'
+import { ElNotification } from 'element-plus'
 
 export default {
   name: 'SystemConfigView',
@@ -157,7 +158,12 @@ export default {
           'library.reservation.hold-hours': String(this.config.reservationHoldHours)
         }
         await updateConfig(configMap)
-        this.$message.success(this.$t('admin.config.saveSuccess'))
+        ElNotification({
+          title: '配置已保存',
+          message: '系统配置已更新并立即生效，无需重启服务。',
+          type: 'success',
+          duration: 4000
+        })
       } catch (error) {
         console.error('保存配置失败:', error)
         this.$message.error(this.$t('admin.config.saveFailed') + error.message)
@@ -183,7 +189,7 @@ export default {
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
 }
 
 .config-form {
@@ -200,12 +206,12 @@ export default {
   gap: 8px;
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
 }
 
 .form-tip {
   margin-left: 12px;
-  color: #909399;
+  color: #7A8599;
   font-size: 13px;
 }
 

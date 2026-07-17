@@ -10,11 +10,26 @@
     </div>
 
     <div class="toolbar">
-      <el-select v-model="filterArea" :placeholder="$t('reader.seatReservation.areaFilter')" clearable style="width: 160px;">
+      <!-- 视图切换 -->
+      <el-radio-group v-model="viewMode" size="default">
+        <el-radio-button label="grid">网格视图</el-radio-button>
+        <el-radio-button label="timeline">时间轴视图</el-radio-button>
+      </el-radio-group>
+      <el-select v-model="filterArea" :placeholder="$t('reader.seatReservation.areaFilter')" clearable style="width: 160px;" v-if="viewMode === 'grid'">
         <el-option :label="$t('admin.seats.roomA')" value="阅览室A"></el-option>
         <el-option :label="$t('admin.seats.roomB')" value="阅览室B"></el-option>
         <el-option :label="$t('admin.seats.studyRoomC')" value="自习室C"></el-option>
       </el-select>
+      <el-date-picker
+        v-if="viewMode === 'timeline'"
+        v-model="timelineDate"
+        type="date"
+        placeholder="选择日期"
+        value-format="YYYY-MM-DD"
+        :clearable="false"
+        @change="loadTimeline"
+        style="width: 160px;"
+      />
       <el-button type="primary" @click="smartRecommend" :loading="recommendLoading" style="margin-left: 12px;">
         <el-icon><MagicStick /></el-icon> {{ $t('reader.seatReservation.smartRecommend') }}
       </el-button>
@@ -135,7 +150,7 @@
     <!-- 扫码签到对话框 -->
     <el-dialog v-model="scanCheckinVisible" :title="$t('reader.seatReservation.scanCheckinTitle')" width="400px">
       <div class="scan-checkin-form">
-        <p style="color: #606266; margin-bottom: 16px;">{{ $t('reader.seatReservation.scanCheckinDesc') }}</p>
+        <p style="color: #4A5568; margin-bottom: 16px;">{{ $t('reader.seatReservation.scanCheckinDesc') }}</p>
         <el-form label-width="80px">
           <el-form-item :label="$t('reader.seatReservation.seatNumber')">
             <el-input v-model="scanSeatNumber" :placeholder="$t('reader.seatReservation.seatNumberPlaceholder')" @keyup.enter="handleScanCheckin" />
@@ -148,7 +163,8 @@
       </template>
     </el-dialog>
 
-    <div class="seat-grid" v-loading="loading">
+    <!-- 网格视图（现有功能） -->
+    <div v-if="viewMode === 'grid'" class="seat-grid" v-loading="loading">
       <div
         v-for="seat in filteredSeats"
         :key="seat.id"
@@ -175,7 +191,46 @@
       </div>
     </div>
 
-    <el-empty v-if="!loading && seats.length === 0" :description="$t('reader.seatReservation.noSeats')"></el-empty>
+    <!-- 时间轴视图 -->
+    <div v-if="viewMode === 'timeline'" class="timeline-container" v-loading="timelineLoading">
+      <div v-if="timelineData.length > 0" class="timeline-table-wrapper">
+        <table class="timeline-table">
+          <thead>
+            <tr>
+              <th class="timeline-header-seat">座位号</th>
+              <th class="timeline-header-area">区域</th>
+              <th v-for="h in timelineHours" :key="h" class="timeline-header-hour">{{ h }}:00</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="seat in filteredTimelineData" :key="seat.seatId" class="timeline-row">
+              <td class="timeline-cell-seat">{{ seat.seatNumber }}</td>
+              <td class="timeline-cell-area">{{ seat.area }}</td>
+              <td
+                v-for="(slot, idx) in seat.timeSlots"
+                :key="idx"
+                class="timeline-cell"
+                :class="{
+                  'slot-free': slot.status === 'free',
+                  'slot-occupied': slot.status === 'occupied',
+                  'slot-reserved': slot.status === 'reserved',
+                  'slot-past': slot.status === 'past'
+                }"
+                @click="handleTimelineSlotClick(seat, slot)"
+              >
+                <span v-if="slot.status === 'free'" class="slot-icon">&#10003;</span>
+                <span v-else-if="slot.status === 'occupied'" class="slot-icon">&#10005;</span>
+                <span v-else-if="slot.status === 'reserved'" class="slot-icon">&#9679;</span>
+                <span v-else class="slot-icon">&#8212;</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <el-empty v-else-if="!timelineLoading" description="暂无座位数据" :image-size="60" />
+    </div>
+
+    <el-empty v-if="viewMode === 'grid' && !loading && seats.length === 0" :description="$t('reader.seatReservation.noSeats')"></el-empty>
 
     <!-- 预约成功倒计时提示 -->
     <div v-if="countdown > 0" class="countdown-banner">
@@ -186,7 +241,7 @@
 </template>
 
 <script>
-import { getSeats, checkinSeat, checkoutSeat } from '@/api/seat'
+import { getSeats, checkinSeat, checkoutSeat, getSeatTimeline } from '@/api/seat'
 import { addReservation } from '@/api/reservation'
 import { getMyBuddyProfile, saveBuddyProfile, getMatchedBuddies, deleteMyBuddyProfile } from '@/api/studyBuddy'
 import { Clock, MagicStick, User, Iphone } from '@element-plus/icons-vue'
@@ -223,13 +278,30 @@ export default {
       // 扫码签到
       scanCheckinVisible: false,
       scanCheckinLoading: false,
-      scanSeatNumber: ''
+      scanSeatNumber: '',
+      // 时间轴视图
+      viewMode: 'grid',
+      timelineDate: new Date().toISOString().split('T')[0],
+      timelineData: [],
+      timelineLoading: false,
+      timelineHours: [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
     }
   },
   computed: {
     filteredSeats() {
       if (!this.filterArea) return this.seats
       return this.seats.filter(seat => seat.area === this.filterArea)
+    },
+    filteredTimelineData() {
+      if (!this.filterArea) return this.timelineData
+      return this.timelineData.filter(seat => seat.area === this.filterArea)
+    }
+  },
+  watch: {
+    viewMode(newVal) {
+      if (newVal === 'timeline' && this.timelineData.length === 0) {
+        this.loadTimeline()
+      }
     }
   },
   mounted() {
@@ -494,6 +566,51 @@ export default {
       }
       return map[slot] || slot
     },
+    // 加载时间轴数据
+    async loadTimeline() {
+      this.timelineLoading = true
+      try {
+        const data = await getSeatTimeline(this.timelineDate)
+        this.timelineData = Array.isArray(data) ? data : []
+      } catch (error) {
+        this.$message.error('加载时间轴数据失败: ' + error.message)
+      } finally {
+        this.timelineLoading = false
+      }
+    },
+    // 处理时间轴格子点击（仅空闲格子可预约）
+    handleTimelineSlotClick(seat, slot) {
+      if (slot.status !== 'free') return
+      const hourStr = String(slot.hour).padStart(2, '0')
+      this.$confirm(
+        `确认预约座位 ${seat.seatNumber}（${seat.area}）${hourStr}:00 - ${String(slot.hour + 1).padStart(2, '0')}:00 时段？`,
+        '预约确认',
+        {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'info'
+        }
+      ).then(async () => {
+        try {
+          const startTime = `${this.timelineDate}T${hourStr}:00:00`
+          const endTime = `${this.timelineDate}T${String(slot.hour + 1).padStart(2, '0')}:00:00`
+          await addReservation({
+            seatId: seat.seatId,
+            bookId: null,
+            reservationDate: new Date(),
+            status: 0,
+            expiryDate: new Date(Date.now() + 3600000)
+          })
+          this.$message.success('预约成功')
+          this.loadTimeline()
+          this.loadSeats()
+          localStorage.setItem('seatReservationTime', Date.now())
+          this.startCountdown(3600)
+        } catch (error) {
+          this.$message.error('预约失败: ' + error.message)
+        }
+      }).catch(() => {})
+    },
     async reserveRecommendedSeat(seat) {
       this.$confirm(this.$t('reader.seatReservation.confirmReserve', { number: seat.seatNumber, area: seat.area }), this.$t('reader.seatReservation.reserveConfirm'), {
         confirmButtonText: this.$t('common.button.confirm'),
@@ -540,13 +657,14 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 22px;
+  font-family: var(--font-serif);
 }
 
 .seat-legend {
@@ -568,9 +686,9 @@ export default {
   border-radius: 50%;
 }
 
-.dot.available { background-color: #67c23a; }
-.dot.occupied { background-color: #f56c6c; }
-.dot.reserved { background-color: #e6a23c; }
+.dot.available { background-color: #6B8F71; }
+.dot.occupied { background-color: #A85454; }
+.dot.reserved { background-color: #D4A84B; }
 
 .seat-grid {
   display: grid;
@@ -592,30 +710,30 @@ export default {
 
 .seat-item:hover {
   transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(44,62,80,0.12);
 }
 
 .seat-item.available {
-  background: linear-gradient(135deg, #67c23a 0%, #85ce61 100%);
+  background: linear-gradient(135deg, #6B8F71 0%, #8FB396 100%);
   color: white;
 }
 
 .seat-item.occupied {
-  background: linear-gradient(135deg, #f56c6c 0%, #f78989 100%);
+  background: linear-gradient(135deg, #A85454 0%, #C06B6B 100%);
   color: white;
   cursor: not-allowed;
   opacity: 0.8;
 }
 
 .seat-item.reserved {
-  background: linear-gradient(135deg, #e6a23c 0%, #ebb563 100%);
+  background: linear-gradient(135deg, #D4A84B 0%, #E8C878 100%);
   color: white;
   cursor: pointer;
   opacity: 0.9;
 }
 
 .seat-item.checked-in {
-  background: linear-gradient(135deg, #409eff 0%, #66b1ff 100%);
+  background: linear-gradient(135deg, #C0785C 0%, #D4956B 100%);
   color: white;
   cursor: pointer;
 }
@@ -652,11 +770,11 @@ export default {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
   color: white;
   padding: 12px 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(44,62,80,0.12);
   display: flex;
   align-items: center;
   gap: 8px;
@@ -673,19 +791,19 @@ export default {
 .recommend-list { max-height: 400px; overflow-y: auto; }
 .recommend-seat-item {
   display: flex; align-items: center; gap: 12px;
-  padding: 12px; border: 1px solid #f0f0f0; border-radius: 8px;
+  padding: 12px; border: 1px solid #EAE6E0; border-radius: 10px;
   margin-bottom: 8px; transition: all 0.3s;
 }
-.recommend-seat-item:hover { border-color: #409eff; background: #ecf5ff; }
+.recommend-seat-item:hover { border-color: #C0785C; background: #F5F0E8; }
 .recommend-rank {
   width: 28px; height: 28px; border-radius: 50%;
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #2C3E50, #3D5A80);
   color: white; display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: bold; flex-shrink: 0;
 }
 .recommend-seat-info { flex: 1; }
-.recommend-seat-number { font-weight: 600; color: #303133; }
-.recommend-seat-area { font-size: 12px; color: #909399; }
+.recommend-seat-number { font-weight: 600; color: #2C3440; }
+.recommend-seat-area { font-size: 12px; color: #7A8599; }
 .recommend-seat-reason { margin-top: 4px; }
 
 /* 学习伙伴面板 */
@@ -705,7 +823,8 @@ export default {
 .buddy-panel-header h3 {
   margin: 0;
   font-size: 16px;
-  color: #303133;
+  color: #2C3440;
+  font-family: var(--font-serif);
 }
 .buddy-profile-card {
   background: white;
@@ -716,22 +835,22 @@ export default {
 .buddy-profile-item {
   font-size: 14px;
   line-height: 1.8;
-  color: #606266;
+  color: #4A5568;
 }
 .buddy-label {
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
 }
 .buddy-empty {
   text-align: center;
   padding: 16px;
-  color: #909399;
+  color: #7A8599;
   font-size: 14px;
 }
 .buddy-match-section h4 {
   margin: 0 0 8px 0;
   font-size: 14px;
-  color: #303133;
+  color: #2C3440;
 }
 .buddy-match-list {
   display: flex;
@@ -747,18 +866,143 @@ export default {
 }
 .buddy-match-name {
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
   font-size: 14px;
 }
 .buddy-match-area {
   font-size: 12px;
-  color: #67c23a;
+  color: #6B8F71;
   margin-top: 2px;
 }
 .buddy-match-slot {
   font-size: 12px;
-  color: #909399;
+  color: #7A8599;
   margin-top: 2px;
+}
+
+/* ---- 时间轴视图样式 ---- */
+.timeline-container {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.timeline-table-wrapper {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid #EAE6E0;
+}
+
+.timeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  min-width: 800px;
+}
+
+.timeline-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.timeline-table th {
+  padding: 10px 6px;
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%);
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.timeline-header-seat {
+  min-width: 80px;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%) !important;
+}
+
+.timeline-header-area {
+  min-width: 80px;
+  position: sticky;
+  left: 80px;
+  z-index: 3;
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%) !important;
+}
+
+.timeline-header-hour {
+  min-width: 52px;
+}
+
+.timeline-row:nth-child(even) {
+  background: #F9F6F0;
+}
+
+.timeline-row:hover {
+  background: #F0EBE3;
+}
+
+.timeline-cell-seat,
+.timeline-cell-area {
+  padding: 8px 10px;
+  font-weight: 600;
+  color: #2C3440;
+  text-align: center;
+  position: sticky;
+  z-index: 1;
+  background: inherit;
+}
+
+.timeline-cell-seat {
+  left: 0;
+}
+
+.timeline-cell-area {
+  left: 80px;
+  font-weight: 400;
+  color: #7A8599;
+  font-size: 12px;
+}
+
+.timeline-cell {
+  padding: 8px 4px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 52px;
+}
+
+.timeline-cell.slot-free {
+  background: #E8F5E9;
+  color: #4CAF50;
+}
+
+.timeline-cell.slot-free:hover {
+  background: #C8E6C9;
+  transform: scale(1.05);
+}
+
+.timeline-cell.slot-occupied {
+  background: #FFEBEE;
+  color: #EF5350;
+  cursor: not-allowed;
+}
+
+.timeline-cell.slot-reserved {
+  background: #FFF8E1;
+  color: #FFA726;
+  cursor: not-allowed;
+}
+
+.timeline-cell.slot-past {
+  background: #ECEFF1;
+  color: #B0BEC5;
+  cursor: not-allowed;
+}
+
+.slot-icon {
+  font-size: 14px;
+  font-weight: bold;
 }
 
 /* ---- 移动端响应式 ---- */

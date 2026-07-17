@@ -34,7 +34,7 @@
           <el-input-number v-model="profileForm.currentBorrowCount" disabled></el-input-number>
         </el-form-item>
         <el-form-item :label="$t('reader.profile.pendingFine')">
-          <span :style="{ color: fineAmount > 0 ? '#f56c6c' : '#67c23a', fontWeight: '600', fontSize: '16px' }">
+          <span :style="{ color: fineAmount > 0 ? '#A85454' : '#6B8F71', fontWeight: '600', fontSize: '16px' }">
             ¥{{ fineAmount.toFixed(2) }}
           </span>
           <el-tag v-if="fineAmount > 0" type="danger" size="small" style="margin-left: 10px">{{ $t('reader.profile.hasFine') }}</el-tag>
@@ -313,13 +313,14 @@ export default {
 .page-header {
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 22px;
+  font-family: var(--font-serif);
 }
 
 .profile-card {
@@ -327,7 +328,7 @@ export default {
   background: white;
   padding: 30px;
   border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04);
   margin-bottom: 20px;
 }
 
@@ -335,12 +336,12 @@ export default {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04);
 }
 
 .review-item {
   padding: 12px 0;
-  border-bottom: 1px solid #f5f7fa;
+  border-bottom: 1px solid #F8F5F0;
 }
 
 .review-item:last-child {
@@ -356,18 +357,18 @@ export default {
 
 .review-book {
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
 }
 
 .review-time {
-  color: #909399;
+  color: #7A8599;
   font-size: 12px;
   margin-left: auto;
 }
 
 .review-content {
   font-size: 14px;
-  color: #606266;
+  color: #4A5568;
   line-height: 1.6;
 }
 
@@ -380,7 +381,7 @@ export default {
   align-items: center;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid #f5f7fa;
+  border-bottom: 1px solid #F8F5F0;
 }
 
 .follow-item:last-child {
@@ -389,11 +390,11 @@ export default {
 
 .follow-name {
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
 }
 
 .follow-id {
-  color: #909399;
+  color: #7A8599;
   font-size: 13px;
 }
 </style>

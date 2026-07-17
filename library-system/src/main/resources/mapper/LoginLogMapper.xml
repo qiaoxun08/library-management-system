@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.library.mapper.LoginLogMapper">
+
+    <resultMap id="loginLogResultMap" type="com.library.entity.LoginLog">
+        <id property="id" column="id"/>
+        <result property="username" column="username"/>
+        <result property="role" column="role"/>
+        <result property="loginTime" column="login_time"/>
+        <result property="ip" column="ip"/>
+        <result property="userAgent" column="user_agent"/>
+        <result property="status" column="status"/>
+        <result property="failReason" column="fail_reason"/>
+    </resultMap>
+
+    <select id="findPaged" resultMap="loginLogResultMap">
+        SELECT id, username, role, login_time, ip, user_agent, status, fail_reason
+        FROM login_log
+        ORDER BY login_time DESC
+        LIMIT #{offset}, #{size}
+    </select>
+
+    <select id="countAll" resultType="int">
+        SELECT COUNT(*) FROM login_log
+    </select>
+
+    <insert id="insert" parameterType="com.library.entity.LoginLog">
+        INSERT INTO login_log (username, role, login_time, ip, user_agent, status, fail_reason)
+        VALUES (#{username}, #{role}, #{loginTime}, #{ip}, #{userAgent}, #{status}, #{failReason})
+    </insert>
+
+</mapper>

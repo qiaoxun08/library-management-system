@@ -16,11 +16,47 @@
       <el-select v-model="selectedCategory" :placeholder="$t('reader.bookSearch.categoryFilter')" clearable style="width: 160px; margin-left: 12px;" @change="handleCategoryChange">
         <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat"></el-option>
       </el-select>
+      <el-button style="margin-left: 12px;" @click="showAdvanced = !showAdvanced">
+        {{ showAdvanced ? '收起高级搜索' : '高级搜索' }}
+        <el-icon style="margin-left: 4px;"><ArrowDown v-if="!showAdvanced" /><ArrowUp v-else /></el-icon>
+      </el-button>
     </div>
+
+    <!-- 搜索历史 -->
+    <div class="search-history" v-if="searchHistory.length > 0 && !showAdvanced">
+      <span class="history-label">搜索历史：</span>
+      <el-tag
+        v-for="item in searchHistory"
+        :key="item"
+        closable
+        size="small"
+        style="margin-right: 8px; margin-bottom: 8px; cursor: pointer;"
+        @click="applyHistory(item)"
+        @close="removeHistory(item)"
+      >{{ item }}</el-tag>
+      <el-button link type="danger" size="small" @click="clearHistory">清空</el-button>
+    </div>
+
+    <!-- 高级搜索区域 -->
+    <el-collapse-transition>
+      <div v-show="showAdvanced" class="advanced-search">
+        <div class="advanced-fields">
+          <el-input v-model="advancedParams.publisher" placeholder="出版社" clearable style="width: 200px;" />
+          <el-input v-model="advancedParams.year" placeholder="出版年份（如 2024）" clearable style="width: 180px;" />
+          <el-input v-model="advancedParams.isbn" placeholder="ISBN（精确匹配）" clearable style="width: 200px;" />
+          <el-select v-model="advancedParams.status" placeholder="库存状态" clearable style="width: 140px;">
+            <el-option label="全部" value="" />
+            <el-option label="可借" value="available" />
+          </el-select>
+          <el-button type="primary" @click="searchBooks" :loading="loading">搜索</el-button>
+          <el-button @click="resetAdvanced">重置</el-button>
+        </div>
+      </div>
+    </el-collapse-transition>
 
     <div class="book-list" v-loading="loading">
       <!-- 始终显示搜索结果统计 -->
-      <div v-if="!loading" style="margin-bottom: 10px; color: #909399; font-size: 14px;">
+      <div v-if="!loading" style="margin-bottom: 10px; color: #7A8599; font-size: 14px;">
         {{ $t('reader.bookSearch.foundCount', { count: totalCount }) }}
       </div>
       <div v-for="book in paginatedBooks" :key="book.id" class="book-item">
@@ -45,7 +81,7 @@
               {{ book.availableCount > 0 ? $t('reader.bookSearch.available', { count: book.availableCount }) : $t('reader.bookSearch.noAvailable') }}
             </el-tag>
             <span class="book-rating" v-if="bookRatings[book.id]">
-              <el-icon color="#e6a23c"><Star /></el-icon>
+              <el-icon color="#D4A84B"><Star /></el-icon>
               {{ bookRatings[book.id].avgRating.toFixed(1) }}
               <span class="review-count">({{ bookRatings[book.id].reviewCount }}{{ $t('reader.bookSearch.reviewsUnit') }})</span>
             </span>
@@ -93,7 +129,7 @@
             <div class="detail-row"><span class="detail-label">{{ $t('reader.bookSearch.price') }}</span><span>¥{{ (detailBook.price || 0).toFixed(2) }}</span></div>
             <div class="detail-row" v-if="detailBook.description" style="flex-direction: column; align-items: flex-start;">
               <span class="detail-label">{{ $t('reader.bookSearch.description') }}</span>
-              <span style="margin-top: 6px; line-height: 1.6; color: #606266;">{{ detailBook.description }}</span>
+              <span style="margin-top: 6px; line-height: 1.6; color: #4A5568;">{{ detailBook.description }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">{{ $t('reader.bookSearch.stockStatus') }}</span>
@@ -190,12 +226,12 @@
 <script>
 import { getBooks, searchBooks } from '../../api/book'
 import { addReservation } from '../../api/reservation'
-import { User, Document, Search, Star, ChatDotRound, Delete } from '@element-plus/icons-vue'
+import { User, Document, Search, Star, ChatDotRound, Delete, ArrowDown, ArrowUp } from '@element-plus/icons-vue'
 
 export default {
   name: 'BookSearchView',
   setup() {
-    return { User, Document, Search, Star, ChatDotRound, Delete }
+    return { User, Document, Search, Star, ChatDotRound, Delete, ArrowDown, ArrowUp }
   },
   data() {
     return {
@@ -215,7 +251,17 @@ export default {
       reviewSubmitting: false,
       similarBooks: [],
       similarLoading: false,
-      bookRatings: {} // { bookId: { avgRating, reviewCount } }
+      bookRatings: {}, // { bookId: { avgRating, reviewCount } }
+      // 高级搜索
+      showAdvanced: false,
+      advancedParams: {
+        publisher: '',
+        year: '',
+        isbn: '',
+        status: ''
+      },
+      // 搜索历史
+      searchHistory: JSON.parse(localStorage.getItem('searchHistory') || '[]')
     }
   },
   computed: {
@@ -297,8 +343,24 @@ export default {
       this.loading = true
       this.currentPage = 1
       try {
-        if (this.searchKeyword || this.selectedCategory) {
-          this.books = await searchBooks(this.searchKeyword, this.selectedCategory)
+        // 构建搜索参数
+        const params = {}
+        if (this.searchKeyword) params.keyword = this.searchKeyword
+        if (this.selectedCategory) params.category = this.selectedCategory
+        if (this.showAdvanced) {
+          if (this.advancedParams.publisher) params.publisher = this.advancedParams.publisher
+          if (this.advancedParams.year) params.year = this.advancedParams.year
+          if (this.advancedParams.isbn) params.isbn = this.advancedParams.isbn
+          if (this.advancedParams.status) params.status = this.advancedParams.status
+        }
+
+        // 有搜索条件时调用搜索接口，否则加载全部
+        if (Object.keys(params).length > 0) {
+          this.books = await searchBooks(params)
+          // 保存搜索历史（只保存关键词）
+          if (this.searchKeyword) {
+            this.saveHistory(this.searchKeyword)
+          }
         } else {
           await this.loadBooks()
         }
@@ -310,6 +372,34 @@ export default {
     },
     handleCategoryChange() {
       this.searchBooks()
+    },
+    // 保存搜索关键词到历史记录
+    saveHistory(keyword) {
+      if (!keyword || !keyword.trim()) return
+      const history = this.searchHistory.filter(item => item !== keyword)
+      history.unshift(keyword)
+      // 最多保留 10 条
+      this.searchHistory = history.slice(0, 10)
+      localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory))
+    },
+    // 点击历史标签自动填入并搜索
+    applyHistory(keyword) {
+      this.searchKeyword = keyword
+      this.searchBooks()
+    },
+    // 移除单条历史记录
+    removeHistory(keyword) {
+      this.searchHistory = this.searchHistory.filter(item => item !== keyword)
+      localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory))
+    },
+    // 清空所有历史记录
+    clearHistory() {
+      this.searchHistory = []
+      localStorage.removeItem('searchHistory')
+    },
+    // 重置高级搜索条件
+    resetAdvanced() {
+      this.advancedParams = { publisher: '', year: '', isbn: '', status: '' }
     },
     reserveBook(book) {
       this.$confirm(this.$t('reader.bookSearch.confirmReserve', { title: book.title }), this.$t('reader.bookSearch.reserveConfirm'), {
@@ -496,17 +586,50 @@ export default {
 .page-header {
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 22px;
+  font-family: var(--font-serif);
 }
 
 .search-bar {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+/* 搜索历史样式 */
+.search-history {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.history-label {
+  font-size: 13px;
+  color: #7A8599;
+  margin-right: 4px;
+}
+
+/* 高级搜索样式 */
+.advanced-search {
+  margin-bottom: 16px;
+  padding: 16px 20px;
+  background: #F8F5F0;
+  border-radius: 10px;
+}
+
+.advanced-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 }
 
 .book-list {
@@ -522,13 +645,13 @@ export default {
   padding: 18px 20px;
   background: white;
   border-radius: 10px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04);
   transition: all 0.3s ease;
 }
 
 .book-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px rgba(44,62,80,0.08);
 }
 
 .book-info {
@@ -538,7 +661,7 @@ export default {
 .book-title {
   font-size: 17px;
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
   margin-bottom: 8px;
 }
 
@@ -547,7 +670,7 @@ export default {
   align-items: center;
   gap: 16px;
   font-size: 13px;
-  color: #909399;
+  color: #7A8599;
   margin-bottom: 8px;
 }
 
@@ -569,12 +692,12 @@ export default {
   align-items: center;
   gap: 3px;
   font-size: 13px;
-  color: #e6a23c;
+  color: #D4A84B;
   font-weight: 600;
 }
 
 .review-count {
-  color: #909399;
+  color: #7A8599;
   font-weight: 400;
   font-size: 12px;
 }
@@ -587,7 +710,7 @@ export default {
   display: flex;
   justify-content: space-between;
   padding: 10px 0;
-  border-bottom: 1px solid #f5f7fa;
+  border-bottom: 1px solid #F8F5F0;
   font-size: 14px;
 }
 
@@ -596,7 +719,7 @@ export default {
 }
 
 .detail-label {
-  color: #909399;
+  color: #7A8599;
   min-width: 80px;
 }
 
@@ -608,7 +731,7 @@ export default {
   margin-right: 16px;
   border-radius: 6px;
   overflow: hidden;
-  background: #f5f7fa;
+  background: #F8F5F0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -631,32 +754,32 @@ export default {
 /* 书评样式 */
 .review-form { margin-bottom: 12px; }
 .review-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; }
-.review-item { padding: 12px 0; border-bottom: 1px solid #f5f7fa; }
+.review-item { padding: 12px 0; border-bottom: 1px solid #F8F5F0; }
 .review-item:last-child { border-bottom: none; }
 .review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.reviewer-name { font-weight: 600; color: #303133; font-size: 14px; }
-.review-time { color: #909399; font-size: 12px; margin-left: auto; }
-.review-content { font-size: 14px; color: #606266; line-height: 1.6; margin-bottom: 6px; }
+.reviewer-name { font-weight: 600; color: #2C3440; font-size: 14px; }
+.review-time { color: #7A8599; font-size: 12px; margin-left: auto; }
+.review-content { font-size: 14px; color: #4A5568; line-height: 1.6; margin-bottom: 6px; }
 .review-actions { display: flex; gap: 12px; }
 
 /* 回复区域样式 */
-.reply-section { margin-top: 10px; padding: 10px 12px; background: #f9fafc; border-radius: 6px; }
-.reply-item { padding: 6px 0; font-size: 13px; border-bottom: 1px solid #ebeef5; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.reply-section { margin-top: 10px; padding: 10px 12px; background: #F8F5F0; border-radius: 6px; }
+.reply-item { padding: 6px 0; font-size: 13px; border-bottom: 1px solid #DDD8D0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .reply-item:last-child { border-bottom: none; }
-.reply-author { font-weight: 600; color: #303133; }
-.reply-to { color: #409eff; }
-.reply-content { color: #606266; flex: 1; }
-.reply-time { color: #c0c4cc; font-size: 12px; }
+.reply-author { font-weight: 600; color: #2C3440; }
+.reply-to { color: #C0785C; }
+.reply-content { color: #4A5568; flex: 1; }
+.reply-time { color: #A0A8B8; font-size: 12px; }
 .reply-input { display: flex; gap: 8px; margin-top: 8px; }
 
 /* 相似图书样式 */
 .similar-books { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-.similar-item { display: flex; gap: 10px; padding: 10px; border: 1px solid #f0f0f0; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
-.similar-item:hover { border-color: #409eff; box-shadow: 0 2px 8px rgba(64,158,255,0.15); }
-.similar-cover { width: 50px; height: 70px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #f5f7fa; }
+.similar-item { display: flex; gap: 10px; padding: 10px; border: 1px solid #EAE6E0; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+.similar-item:hover { border-color: #C0785C; box-shadow: 0 2px 8px rgba(192,120,92,0.15); }
+.similar-cover { width: 50px; height: 70px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #F8F5F0; }
 .similar-cover img { width: 100%; height: 100%; object-fit: cover; }
-.similar-title { font-size: 13px; font-weight: 600; color: #303133; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.similar-author { font-size: 12px; color: #909399; margin-bottom: 4px; }
+.similar-title { font-size: 13px; font-weight: 600; color: #2C3440; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.similar-author { font-size: 12px; color: #7A8599; margin-bottom: 4px; }
 
 /* ---- 移动端响应式 ---- */
 @media (max-width: 767px) {
@@ -672,6 +795,10 @@ export default {
   .search-bar { display: flex; flex-direction: column; gap: 8px; }
   .search-bar .el-input { width: 100% !important; }
   .search-bar .el-select { width: 100% !important; margin-left: 0 !important; }
+  .search-bar .el-button { margin-left: 0 !important; }
+  .advanced-fields { flex-direction: column; }
+  .advanced-fields .el-input,
+  .advanced-fields .el-select { width: 100% !important; }
   .review-header { flex-wrap: wrap; }
   .reply-input { flex-direction: column; }
   .similar-books { grid-template-columns: repeat(2, 1fr); }

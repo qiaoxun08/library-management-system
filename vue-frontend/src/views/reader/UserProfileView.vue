@@ -170,28 +170,28 @@ export default {
 
 <style scoped>
 .user-profile-view { padding: 20px; }
-.page-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #409eff; }
-.page-header h2 { margin: 0; color: #303133; font-size: 22px; }
+.page-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #C0785C; }
+.page-header h2 { margin: 0; color: #2C3440; font-size: 22px; font-family: var(--font-serif); }
 
 .profile-info {
   background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 20px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 20px;
   display: flex; justify-content: space-between; align-items: center;
 }
 .info-card { display: flex; flex-direction: column; gap: 8px; }
 .info-row { display: flex; gap: 12px; font-size: 14px; }
-.info-row .label { color: #909399; min-width: 50px; }
+.info-row .label { color: #7A8599; min-width: 50px; }
 
-.content-tabs { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.content-tabs { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 12px rgba(44,62,80,0.04); }
 
-.review-item { padding: 12px 0; border-bottom: 1px solid #f5f7fa; }
+.review-item { padding: 12px 0; border-bottom: 1px solid #F8F5F0; }
 .review-item:last-child { border-bottom: none; }
 .review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-.review-time { color: #909399; font-size: 12px; margin-left: auto; }
-.review-content { font-size: 14px; color: #606266; line-height: 1.6; }
+.review-time { color: #7A8599; font-size: 12px; margin-left: auto; }
+.review-content { font-size: 14px; color: #4A5568; line-height: 1.6; }
 
-.follow-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f5f7fa; }
+.follow-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #F8F5F0; }
 .follow-item:last-child { border-bottom: none; }
-.follow-name { font-weight: 600; color: #303133; }
-.follow-id { color: #909399; font-size: 13px; }
+.follow-name { font-weight: 600; color: #2C3440; }
+.follow-id { color: #7A8599; font-size: 13px; }
 </style>

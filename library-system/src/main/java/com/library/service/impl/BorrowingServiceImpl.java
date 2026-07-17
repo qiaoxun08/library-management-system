@@ -2,6 +2,7 @@ package com.library.service.impl;
 
 import com.library.entity.Borrowing;
 import com.library.entity.Book;
+import com.library.entity.Notification;
 import com.library.entity.Reader;
 import com.library.dto.BorrowingDTO;
 import com.library.mapper.BorrowingMapper;
@@ -10,10 +11,13 @@ import com.library.mapper.ReaderMapper;
 import com.library.service.BorrowingService;
 import com.library.exception.BusinessException;
 import com.library.exception.OptimisticLockException;
+import com.library.service.NotificationService;
 import com.library.service.ReaderLevelService;
 import com.library.service.RedisLockService;
 import com.library.service.SystemConfigService;
 import com.library.service.BlacklistService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +29,8 @@ import java.util.List;
 
 @Service
 public class BorrowingServiceImpl implements BorrowingService {
+
+    private static final Logger log = LoggerFactory.getLogger(BorrowingServiceImpl.class);
 
     @Autowired
     private BorrowingMapper borrowingMapper;
@@ -43,6 +49,9 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     @Autowired
     private BlacklistService blacklistService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private RedisLockService redisLockService;
@@ -183,6 +192,17 @@ public class BorrowingServiceImpl implements BorrowingService {
         // 原子累加读者罚款金额（避免并发竞态）
         if (fineAmount.compareTo(BigDecimal.ZERO) > 0) {
             readerMapper.incrementFineAmount(borrowing.getReaderId(), fineAmount);
+            // 发送罚款通知
+            try {
+                Notification notif = new Notification();
+                notif.setReaderId(borrowing.getReaderId());
+                notif.setType("fine");
+                notif.setTitle("逾期罚款通知");
+                notif.setContent("您归还的图书已逾期，产生罚款 ¥" + fineAmount.toPlainString() + "，请及时缴纳。");
+                notificationService.sendNotification(notif);
+            } catch (Exception e) {
+                log.warn("发送罚款通知失败: {}", e.getMessage());
+            }
         }
 
         // 原子增加图书可用数量

@@ -74,13 +74,13 @@
     top: 10px;
     left: 10px;
     z-index: 200;
-    background: #409eff;
+    background: #2C3E50;
     color: white;
     border: none;
     border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(44, 62, 80, 0.2);
   }
 }
 

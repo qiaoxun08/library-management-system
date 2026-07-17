@@ -30,7 +30,25 @@
       </div>
     </div>
 
-    <el-table :data="pagedBooks" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+    <!-- 批量操作栏 -->
+    <div class="batch-actions" v-if="selectedBooks.length > 0">
+      <span class="selected-count">已选中 <strong>{{ selectedBooks.length }}</strong> 本图书</span>
+      <el-button type="success" size="small" @click="batchOnShelf" icon="Top">批量上架</el-button>
+      <el-button type="warning" size="small" @click="batchOffShelf" icon="Bottom">批量下架</el-button>
+      <el-button type="danger" size="small" @click="batchDelete" icon="Delete">批量删除</el-button>
+      <el-button size="small" @click="clearSelection" icon="Close">取消选择</el-button>
+    </div>
+
+    <el-table
+      ref="bookTable"
+      :data="pagedBooks"
+      style="width: 100%; margin-top: 15px;"
+      v-loading="loading"
+      stripe
+      border
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column type="selection" width="50" align="center"></el-table-column>
       <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
       <el-table-column prop="isbn" label="ISBN" width="140"></el-table-column>
       <el-table-column prop="title" :label="$t('common.field.title')" min-width="150" show-overflow-tooltip></el-table-column>
@@ -129,7 +147,7 @@
 </template>
 
 <script>
-import { getAllBooksWithStatus, addBook, updateBook, deleteBook, searchBooks, exportBooks, importBooks } from '../../api/book'
+import { getAllBooksWithStatus, addBook, updateBook, deleteBook, searchBooks, exportBooks, importBooks, batchUpdateBookStatus, batchDeleteBooks } from '../../api/book'
 
 export default {
   name: 'BookManagement',
@@ -137,6 +155,7 @@ export default {
     return {
       books: [],
       searchKeyword: '',
+      selectedBooks: [],
       dialogVisible: false,
       dialogTitle: '添加图书',
       loading: false,
@@ -192,7 +211,7 @@ export default {
       }
       this.loading = true
       try {
-        this.books = await searchBooks(this.searchKeyword)
+        this.books = await searchBooks({ keyword: this.searchKeyword })
       } catch (error) {
         this.$message.error(this.$t('admin.books.searchFailed') + error.message)
       } finally {
@@ -308,6 +327,75 @@ export default {
         this.importing = false
       }
       return false
+    },
+    // 表格选择变化
+    handleSelectionChange(selection) {
+      this.selectedBooks = selection
+    },
+    // 清除选择
+    clearSelection() {
+      this.$refs.bookTable.clearSelection()
+    },
+    // 批量上架
+    async batchOnShelf() {
+      const ids = this.selectedBooks.map(book => book.id)
+      try {
+        await this.$confirm(`确定要批量上架选中的 ${ids.length} 本图书吗？`, '批量上架', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'info'
+        })
+        await batchUpdateBookStatus({ ids, status: 1 })
+        this.$message.success('批量上架成功')
+        this.clearSelection()
+        this.loadBooks()
+      } catch (error) {
+        if (error !== 'cancel') {
+          this.$message.error('批量上架失败: ' + (error.message || error))
+        }
+      }
+    },
+    // 批量下架
+    async batchOffShelf() {
+      const ids = this.selectedBooks.map(book => book.id)
+      try {
+        await this.$confirm(`确定要批量下架选中的 ${ids.length} 本图书吗？`, '批量下架', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        await batchUpdateBookStatus({ ids, status: 0 })
+        this.$message.success('批量下架成功')
+        this.clearSelection()
+        this.loadBooks()
+      } catch (error) {
+        if (error !== 'cancel') {
+          this.$message.error('批量下架失败: ' + (error.message || error))
+        }
+      }
+    },
+    // 批量删除
+    async batchDelete() {
+      const ids = this.selectedBooks.map(book => book.id)
+      try {
+        await this.$confirm(
+          `确定要删除选中的 ${ids.length} 本图书吗？此操作不可恢复！`,
+          '批量删除',
+          {
+            confirmButtonText: '确定删除',
+            cancelButtonText: '取消',
+            type: 'error'
+          }
+        )
+        await batchDeleteBooks(ids)
+        this.$message.success('批量删除成功')
+        this.clearSelection()
+        this.loadBooks()
+      } catch (error) {
+        if (error !== 'cancel') {
+          this.$message.error('批量删除失败: ' + (error.message || error))
+        }
+      }
     }
   }
 }
@@ -324,12 +412,12 @@ export default {
   align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
   font-size: 22px;
 }
 
@@ -346,12 +434,33 @@ export default {
   background: white;
   padding: 15px 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px 0 rgba(44,62,80,0.04);
 }
 
 .text-danger {
-  color: #f56c6c;
+  color: #A85454;
   font-weight: bold;
+}
+
+.batch-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 15px;
+  padding: 12px 20px;
+  background: #FFF8F0;
+  border: 1px solid #E8C4AC;
+  border-radius: 8px;
+}
+
+.selected-count {
+  font-size: 14px;
+  color: #2C3440;
+}
+
+.selected-count strong {
+  color: #C0785C;
+  font-size: 16px;
 }
 
 .pagination-wrapper {

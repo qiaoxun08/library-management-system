@@ -8,7 +8,7 @@
           <span @click="switchLanguage('en-US')" :class="{ active: currentLang === 'en-US' }">EN</span>
         </div>
         <div class="header-icon">
-          <el-icon :size="36"><Reading /></el-icon>
+          <el-icon :size="32"><Reading /></el-icon>
         </div>
         <h2>{{ $t('auth.libraryTitle') }}</h2>
         <p class="subtitle">{{ $t('auth.readerEntry') }}</p>
@@ -264,17 +264,58 @@ export default {
   align-items: center;
   height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 40%, #C0785C 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -8%;
+  width: 450px;
+  height: 450px;
+  border-radius: 50%;
+  background: rgba(192, 120, 92, 0.06);
+  pointer-events: none;
+}
+
+.login-container::after {
+  content: '';
+  position: absolute;
+  bottom: -12%;
+  right: -6%;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  pointer-events: none;
 }
 
 .login-box {
   width: 440px;
   padding: 40px;
-  background: white;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 16px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 60px rgba(44, 62, 80, 0.2);
   max-height: 90vh;
   overflow-y: auto;
+  position: relative;
+  z-index: 1;
+}
+
+.login-box::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #C0785C, #D4956B, #C0785C, transparent);
+  border-radius: 0 0 16px 16px;
 }
 
 .login-header {
@@ -288,22 +329,24 @@ export default {
   top: 0;
   right: 0;
   font-size: 13px;
-  color: #909399;
+  color: #7A8599;
 }
 
 .lang-switch span {
   cursor: pointer;
-  padding: 2px 4px;
-  transition: color 0.2s;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
 }
 
 .lang-switch span:hover,
 .lang-switch span.active {
-  color: #409eff;
+  color: #C0785C;
+  background: rgba(192, 120, 92, 0.06);
 }
 
 .lang-switch .divider {
-  color: #dcdfe6;
+  color: #DDD8D0;
   cursor: default;
   padding: 0 2px;
 }
@@ -314,21 +357,24 @@ export default {
   align-items: center;
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #2C3E50, #3D5A80);
   color: white;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .login-header h2 {
-  margin: 0 0 4px 0;
-  color: #333;
+  margin: 0 0 6px 0;
+  color: #2C3440;
+  font-family: var(--font-serif);
   font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 .subtitle {
   margin: 0;
-  color: #43e97b;
+  color: #C0785C;
   font-size: 14px;
   font-weight: 500;
 }
@@ -337,18 +383,18 @@ export default {
   text-align: center;
   margin-top: 20px;
   padding-top: 16px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--el-border-color-lighter);
 }
 
 .login-footer a {
-  color: #909399;
+  color: #7A8599;
   font-size: 13px;
   text-decoration: none;
-  transition: color 0.3s;
+  transition: color 0.25s;
 }
 
 .login-footer a:hover {
-  color: #43e97b;
+  color: #C0785C;
 }
 
 .captcha-row {
@@ -361,10 +407,15 @@ export default {
 .captcha-img {
   width: 120px;
   height: 36px;
-  border-radius: 4px;
+  border-radius: 6px;
   cursor: pointer;
   flex-shrink: 0;
-  border: 1px solid #dcdfe6;
+  border: 1px solid var(--el-border-color);
+  transition: border-color 0.2s;
+}
+
+.captcha-img:hover {
+  border-color: #C0785C;
 }
 
 .captcha-placeholder {
@@ -372,7 +423,7 @@ export default {
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  color: #909399;
-  background: #f5f7fa;
+  color: #7A8599;
+  background: var(--el-fill-color-lighter);
 }
 </style>

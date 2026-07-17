@@ -280,6 +280,57 @@ public class ExportServiceImpl implements ExportService {
 
     // ==================== 工具方法 ====================
 
+    @Override
+    public void exportMyBorrowings(String readerId, String format, HttpServletResponse response) throws Exception {
+        List<BorrowingDTO> borrowings = borrowingMapper.findByReaderIdWithBook(readerId);
+        String[] headers = {"借阅ID", "书名", "作者", "借阅日期", "应还日期", "归还日期", "状态", "罚款金额"};
+        String fileName = "我的借阅记录_" + readerId;
+
+        if ("csv".equalsIgnoreCase(format)) {
+            response.setContentType("text/csv;charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName + ".csv", StandardCharsets.UTF_8));
+            try (CSVWriter writer = new CSVWriter(new OutputStreamWriter(response.getOutputStream(), StandardCharsets.UTF_8))) {
+                writer.writeNext(headers);
+                for (BorrowingDTO b : borrowings) {
+                    writer.writeNext(new String[]{
+                            String.valueOf(b.getId()),
+                            b.getBookTitle() != null ? b.getBookTitle() : "",
+                            b.getBookAuthor() != null ? b.getBookAuthor() : "",
+                            formatDateTime(b.getBorrowDate()),
+                            formatDateTime(b.getDueDate()),
+                            formatDateTime(b.getReturnDate()),
+                            borrowStatusText(b.getStatus()),
+                            b.getFineAmount() != null ? b.getFineAmount().toPlainString() : "0.00"
+                    });
+                }
+            }
+        } else {
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fileName + ".xlsx", StandardCharsets.UTF_8));
+            try (SXSSFWorkbook workbook = new SXSSFWorkbook(100)) {
+                Sheet sheet = workbook.createSheet("借阅记录");
+                writeHeader(sheet, headers);
+                int rowIdx = 1;
+                for (BorrowingDTO b : borrowings) {
+                    Row row = sheet.createRow(rowIdx++);
+                    row.createCell(0).setCellValue(b.getId());
+                    row.createCell(1).setCellValue(b.getBookTitle() != null ? b.getBookTitle() : "");
+                    row.createCell(2).setCellValue(b.getBookAuthor() != null ? b.getBookAuthor() : "");
+                    row.createCell(3).setCellValue(formatDateTime(b.getBorrowDate()));
+                    row.createCell(4).setCellValue(formatDateTime(b.getDueDate()));
+                    row.createCell(5).setCellValue(formatDateTime(b.getReturnDate()));
+                    row.createCell(6).setCellValue(borrowStatusText(b.getStatus()));
+                    row.createCell(7).setCellValue(b.getFineAmount() != null ? b.getFineAmount().doubleValue() : 0.0);
+                }
+                for (int i = 0; i < headers.length; i++) sheet.autoSizeColumn(i);
+                OutputStream out = response.getOutputStream();
+                workbook.write(out);
+                out.flush();
+            }
+        }
+        log.info("导出我的借阅记录: readerId={}, format={}, count={}", readerId, format, borrowings.size());
+    }
+
     private void writeHeader(Sheet sheet, String[] headers) {
         Row headerRow = sheet.createRow(0);
         CellStyle headerStyle = sheet.getWorkbook().createCellStyle();

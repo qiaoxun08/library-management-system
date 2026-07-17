@@ -20,4 +20,7 @@ public interface SeatMapper {
     int countTotalSeats();
     int countAvailableSeats();
     int countByAreaAndStatus(@Param("area") String area, @Param("status") Integer status);
+
+    /** 获取座位热力图数据（按区域统计占用率） */
+    java.util.Map<String, Object> getSeatHeatmapData();
 }

@@ -189,12 +189,12 @@ export default {
 .page-header {
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: var(--el-text-color-primary);
   font-size: 22px;
 }
 
@@ -204,7 +204,7 @@ export default {
   background: white;
   padding: 12px 16px;
   border-radius: 8px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px 0 rgba(44, 62, 80, 0.04);
 }
 
 .stats {

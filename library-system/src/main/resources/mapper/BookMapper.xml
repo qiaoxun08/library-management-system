@@ -120,6 +120,31 @@
         </if>
     </select>
 
+    <!-- 高级搜索：支持关键词、分类、出版社、出版年份、ISBN、库存状态组合查询 -->
+    <select id="advancedSearch" resultType="com.library.entity.Book">
+        SELECT * FROM book WHERE 1=1
+        <if test="keyword != null and keyword != ''">
+            AND (title LIKE CONCAT('%', #{keyword}, '%')
+                OR author LIKE CONCAT('%', #{keyword}, '%')
+                OR isbn LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="category != null and category != ''">
+            AND category = #{category}
+        </if>
+        <if test="publisher != null and publisher != ''">
+            AND publisher LIKE CONCAT('%', #{publisher}, '%')
+        </if>
+        <if test="year != null">
+            AND YEAR(publish_date) = #{year}
+        </if>
+        <if test="isbn != null and isbn != ''">
+            AND isbn = #{isbn}
+        </if>
+        <if test="status == 'available'">
+            AND available_count &gt; 0
+        </if>
+    </select>
+
     <!-- 同分类相似图书推荐，排除指定ID -->
     <select id="findSimilarByCategory" resultType="com.library.entity.Book">
         SELECT * FROM book
@@ -134,4 +159,35 @@
         ORDER BY RAND()
         LIMIT #{limit}
     </select>
+
+    <!-- 热门图书TOP10（按借阅次数） -->
+    <select id="findHotBooksTop10" resultType="java.util.Map">
+        SELECT
+            b.title AS title,
+            COUNT(br.id) AS count
+        FROM book b
+        LEFT JOIN borrowing br ON b.id = br.book_id
+        WHERE b.status = 1
+        GROUP BY b.id, b.title
+        ORDER BY count DESC
+        LIMIT 10
+    </select>
+
+    <!-- 批量更新图书状态 -->
+    <update id="batchUpdateStatus">
+        UPDATE book SET status = #{status}, update_time = NOW()
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!-- 批量删除图书 -->
+    <delete id="batchDelete">
+        DELETE FROM book
+        WHERE id IN
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

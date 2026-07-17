@@ -5,7 +5,7 @@
     <!-- 借阅统计卡片 -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea, #764ba2)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #2C3E50, #3D5A80)">
           <el-icon :size="28"><Document /></el-icon>
         </div>
         <div class="stat-info">
@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6B8F71, #8FB396)">
           <el-icon :size="28"><Check /></el-icon>
         </div>
         <div class="stat-info">
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #C0785C, #A85454)">
           <el-icon :size="28"><Clock /></el-icon>
         </div>
         <div class="stat-info">
@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #5A7D9A, #8BABC4)">
           <el-icon :size="28"><Calendar /></el-icon>
         </div>
         <div class="stat-info">
@@ -186,8 +186,8 @@ export default {
           data: data,
           itemStyle: {
             color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#667eea' },
-              { offset: 1, color: '#764ba2' }
+              { offset: 0, color: '#2C3E50' },
+              { offset: 1, color: '#3D5A80' }
             ]),
             borderRadius: [4, 4, 0, 0]
           }
@@ -213,7 +213,7 @@ export default {
         value
       }))
 
-      const colors = ['#667eea', '#43e97b', '#f093fb', '#4facfe', '#f5576c', '#e6a23c']
+      const colors = ['#2C3E50', '#6B8F71', '#C0785C', '#5A7D9A', '#A85454', '#D4A84B']
 
       const option = {
         tooltip: {
@@ -266,7 +266,8 @@ export default {
 
 .borrowing-history-view h2 {
   margin: 0 0 24px 0;
-  color: #303133;
+  color: #2C3440;
+  font-family: var(--font-serif);
 }
 
 .stats-row {
@@ -283,7 +284,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 16px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04);
 }
 
 .stat-icon {
@@ -300,12 +301,12 @@ export default {
 .stat-value {
   font-size: 28px;
   font-weight: 700;
-  color: #303133;
+  color: #2C3440;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #909399;
+  color: #7A8599;
   margin-top: 2px;
 }
 
@@ -323,7 +324,7 @@ export default {
 .card-title {
   font-size: 16px;
   font-weight: 600;
-  color: #303133;
+  color: #2C3440;
 }
 
 .chart-container {

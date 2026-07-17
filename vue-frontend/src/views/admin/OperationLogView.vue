@@ -162,7 +162,7 @@ export default {
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
 }
 
 .header-actions {

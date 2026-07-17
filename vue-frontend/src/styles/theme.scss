@@ -1,0 +1,105 @@
+// ========================================
+// 「书香」主题 — Element Plus CSS 变量覆盖
+// 在 element-plus CSS 之后引入，通过 CSS 自定义属性覆盖默认主题
+// ========================================
+
+:root {
+  // ---- 品牌色 ----
+  --el-color-primary: #2C3E50;
+  --el-color-primary-light-3: #4A6580;
+  --el-color-primary-light-5: #6A8BA8;
+  --el-color-primary-light-7: #9BB5CA;
+  --el-color-primary-light-8: #B8CCDB;
+  --el-color-primary-light-9: #D8E4EC;
+  --el-color-primary-dark-2: #233240;
+
+  --el-color-success: #6B8F71;
+  --el-color-success-light-3: #8FB396;
+  --el-color-success-light-5: #AAC8AE;
+  --el-color-success-light-7: #C5DBC8;
+  --el-color-success-light-8: #D8E9DA;
+  --el-color-success-light-9: #EBF5EC;
+  --el-color-success-dark-2: #557260;
+
+  --el-color-warning: #D4A84B;
+  --el-color-warning-light-3: #E0BE72;
+  --el-color-warning-light-5: #EAD19E;
+  --el-color-warning-light-7: #F0DFC0;
+  --el-color-warning-light-8: #F5EAD5;
+  --el-color-warning-light-9: #FAF5EA;
+  --el-color-warning-dark-2: #AA863C;
+
+  --el-color-danger: #A85454;
+  --el-color-danger-light-3: #C07878;
+  --el-color-danger-light-5: #D49E9E;
+  --el-color-danger-light-7: #E4C0C0;
+  --el-color-danger-light-8: #EED5D5;
+  --el-color-danger-light-9: #F8EBEB;
+  --el-color-danger-dark-2: #864343;
+
+  --el-color-info: #5A7D9A;
+  --el-color-info-light-3: #7D9CB4;
+  --el-color-info-light-5: #A0BBC9;
+  --el-color-info-light-7: #C0D4DE;
+  --el-color-info-light-8: #D5E2EA;
+  --el-color-info-light-9: #EAF1F5;
+  --el-color-info-dark-2: #48647B;
+
+  // ---- 文字 ----
+  --el-text-color-primary: #2C3440;
+  --el-text-color-regular: #4A5568;
+  --el-text-color-secondary: #7A8599;
+  --el-text-color-placeholder: #A0A8B8;
+  --el-text-color-disabled: #C0C8D4;
+
+  // ---- 边框 ----
+  --el-border-color: #DDD8D0;
+  --el-border-color-light: #EAE6E0;
+  --el-border-color-lighter: #F0EBE3;
+  --el-border-color-extra-light: #F5F2ED;
+  --el-border-color-dark: #C8C2B8;
+
+  // ---- 背景 ----
+  --el-bg-color: #FFFFFF;
+  --el-bg-color-page: #F8F5F0;
+  --el-bg-color-overlay: #FFFFFF;
+
+  // ---- 填充 ----
+  --el-fill-color: #F0EBE3;
+  --el-fill-color-light: #F5F0E8;
+  --el-fill-color-lighter: #F8F5F0;
+  --el-fill-color-extra-light: #FAFAF8;
+  --el-fill-color-blank: #FFFFFF;
+  --el-fill-color-dark: #E0DBD2;
+
+  // ---- 阴影 ----
+  --el-box-shadow: 0 2px 12px rgba(44, 62, 80, 0.06);
+  --el-box-shadow-light: 0 1px 6px rgba(44, 62, 80, 0.04);
+  --el-box-shadow-lighter: 0 1px 3px rgba(44, 62, 80, 0.03);
+  --el-box-shadow-dark: 0 4px 24px rgba(44, 62, 80, 0.1);
+
+  // ---- 圆角 ----
+  --el-border-radius-base: 8px;
+  --el-border-radius-small: 6px;
+  --el-border-radius-round: 20px;
+
+  // ---- 字体 ----
+  --font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Noto Serif SC', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+
+  // ---- 品牌变量 ----
+  --color-accent: #C0785C;
+  --color-accent-light: #D4956B;
+  --color-accent-lighter: #E8C4AC;
+  --color-accent-bg: rgba(192, 120, 92, 0.08);
+  --color-warm-bg: #F0EBE3;
+  --color-warm-hover: #F5F0E8;
+
+  // ---- 侧边栏 ----
+  --sidebar-bg: #2C3E50;
+  --sidebar-title-bg: #233040;
+  --sidebar-text: rgba(255, 255, 255, 0.85);
+  --sidebar-text-active: #D4956B;
+  --sidebar-hover: rgba(255, 255, 255, 0.06);
+}

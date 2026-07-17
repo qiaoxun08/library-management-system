@@ -37,6 +37,7 @@ export default {
         { index: '/admin/accounts', icon: 'UserFilled', label: this.$t('common.menu.accounts') },
         { index: '/admin/config', icon: 'Setting', label: this.$t('common.menu.config') },
         { index: '/admin/logs', icon: 'Notebook', label: this.$t('common.menu.logs') },
+        { index: '/admin/login-logs', icon: 'Monitor', label: this.$t('common.menu.loginLogs') },
         { index: '/admin/blacklist', icon: 'Warning', label: this.$t('common.menu.blacklist') },
         { index: '/admin/export', icon: 'Download', label: this.$t('common.menu.dataExport') }
       ]
@@ -65,43 +66,8 @@ export default {
 
 .dashboard-container :deep(.el-main) {
   margin-left: 200px;
-  background-color: #f5f7fa;
+  background-color: var(--el-bg-color-page);
   min-height: 100vh;
-}
-
-.menu-title {
-  padding: 20px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #434a50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.title-icon {
-  display: flex;
-  align-items: center;
-}
-
-.user-info {
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #ffd04b;
-  font-size: 13px;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.menu-divider {
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.1);
-  margin: 8px 16px;
 }
 
 .fade-enter-active,

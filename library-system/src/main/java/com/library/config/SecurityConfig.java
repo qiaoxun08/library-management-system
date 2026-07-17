@@ -45,17 +45,17 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/login", "/auth/register", "/auth/captcha").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/librarian/**").hasRole("LIBRARIAN")
-                .requestMatchers("/reader/**").hasRole("READER")
+                .requestMatchers("/admin/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/librarian/**").hasAnyRole("LIBRARIAN", "ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/reader/**").hasAnyRole("READER", "ADMIN", "SUPER_ADMIN")
                 .requestMatchers("/books/**").authenticated()
                 .requestMatchers("/borrowings/**").authenticated()
                 .requestMatchers("/seats/**").authenticated()
                 .requestMatchers("/reservations/**").authenticated()
                 .requestMatchers("/readers/**").authenticated()
-                .requestMatchers("/config/**").hasRole("ADMIN")
-                .requestMatchers("/logs/**").hasRole("ADMIN")
-                .requestMatchers("/blacklist/**").hasRole("ADMIN")
+                .requestMatchers("/config/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/logs/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
+                .requestMatchers("/blacklist/**").hasAnyRole("ADMIN", "SUPER_ADMIN")
                 .anyRequest().authenticated()
             );
 

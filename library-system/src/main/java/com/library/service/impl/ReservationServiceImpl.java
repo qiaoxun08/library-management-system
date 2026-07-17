@@ -1,6 +1,7 @@
 package com.library.service.impl;
 
 import com.library.dto.ReservationDTO;
+import com.library.entity.Notification;
 import com.library.entity.Reservation;
 import com.library.mapper.ReservationMapper;
 import com.library.mapper.ReaderMapper;
@@ -8,6 +9,7 @@ import com.library.service.ReservationService;
 import com.library.service.SeatService;
 import com.library.service.BorrowingService;
 import com.library.service.BlacklistService;
+import com.library.service.NotificationService;
 import com.library.service.RedisLockService;
 import com.library.mapper.BookMapper;
 import com.library.mapper.BorrowingMapper;
@@ -47,6 +49,9 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
     private BlacklistService blacklistService;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private RedisLockService redisLockService;
@@ -181,6 +186,24 @@ public class ReservationServiceImpl implements ReservationService {
                 com.library.entity.Reader reader = readerMapper.findById(reservation.getReaderId());
                 if (reader != null) {
                     borrowingService.borrowBook(reader.getReaderId(), reservation.getBookId());
+                }
+            }
+            // 发送审批通过通知
+            if (reservation.getReaderId() != null) {
+                try {
+                    Notification notif = new Notification();
+                    notif.setReaderId(reservation.getReaderId());
+                    notif.setType("reservation_approved");
+                    if (reservation.getBookId() != null) {
+                        notif.setTitle("图书预约已通过");
+                        notif.setContent("您预约的图书已被审批通过，请及时借阅。");
+                    } else if (reservation.getSeatId() != null) {
+                        notif.setTitle("座位预约已通过");
+                        notif.setContent("您预约的座位已被审批通过，请在规定时间内签到。");
+                    }
+                    notificationService.sendNotification(notif);
+                } catch (Exception e) {
+                    log.warn("发送预约审批通知失败: {}", e.getMessage());
                 }
             }
         }

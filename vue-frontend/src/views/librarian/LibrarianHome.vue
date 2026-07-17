@@ -10,7 +10,7 @@
 
     <div class="stats-row">
       <div class="stat-card" @click="$router.push('/librarian/borrow')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b, #38f9d7)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #6B8F71, #8FB396)">
           <el-icon :size="28"><Reading /></el-icon>
         </div>
         <div class="stat-info">
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/librarian/records')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #667eea, #764ba2)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #2C3E50, #3D5A80)">
           <el-icon :size="28"><Document /></el-icon>
         </div>
         <div class="stat-info">
@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/librarian/reservations')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #C0785C, #D4956B)">
           <el-icon :size="28"><Calendar /></el-icon>
         </div>
         <div class="stat-info">
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/librarian/fines')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #f56c6c, #f78989)">
+        <div class="stat-icon" style="background: linear-gradient(135deg, #A85454, #C06B6B)">
           <el-icon :size="28"><Money /></el-icon>
         </div>
         <div class="stat-info">
@@ -51,19 +51,19 @@
       <h3>{{ $t('librarian.quickActions') }}</h3>
       <div class="action-grid">
         <div class="action-item primary" @click="$router.push('/librarian/borrow')">
-          <el-icon :size="28" color="#409eff"><Reading /></el-icon>
+          <el-icon :size="28" color="#C0785C"><Reading /></el-icon>
           <span>{{ $t('librarian.borrowReturnTitle') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/librarian/records')">
-          <el-icon :size="24" color="#667eea"><Document /></el-icon>
+          <el-icon :size="24" color="#3D5A80"><Document /></el-icon>
           <span>{{ $t('common.menu.borrowingRecords') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/librarian/reservations')">
-          <el-icon :size="24" color="#f56c6c"><Calendar /></el-icon>
+          <el-icon :size="24" color="#A85454"><Calendar /></el-icon>
           <span>{{ $t('common.menu.reservationApproval') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/librarian/fines')">
-          <el-icon :size="24" color="#e6a23c"><Money /></el-icon>
+          <el-icon :size="24" color="#D4A84B"><Money /></el-icon>
           <span>{{ $t('common.menu.fineManagement') }}</span>
         </div>
       </div>
@@ -73,15 +73,15 @@
       <h3>{{ $t('librarian.tips') }}</h3>
       <div class="tip-list">
         <div class="tip-item">
-          <el-icon color="#67c23a"><CircleCheck /></el-icon>
+          <el-icon color="#6B8F71"><CircleCheck /></el-icon>
           <span>{{ $t('librarian.tipBorrow') }}</span>
         </div>
         <div class="tip-item">
-          <el-icon color="#e6a23c"><Warning /></el-icon>
+          <el-icon color="#D4A84B"><Warning /></el-icon>
           <span>{{ $t('librarian.tipReturn') }}</span>
         </div>
         <div class="tip-item">
-          <el-icon color="#409eff"><InfoFilled /></el-icon>
+          <el-icon color="#C0785C"><InfoFilled /></el-icon>
           <span>{{ $t('librarian.tipRenew') }}</span>
         </div>
       </div>
@@ -144,7 +144,7 @@ export default {
 .librarian-home { padding: 20px; }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  background: linear-gradient(135deg, #6B8F71 0%, #8FB396 100%);
   border-radius: 12px; padding: 24px 30px; color: white;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
@@ -162,11 +162,11 @@ export default {
 .stat-card {
   background: white; border-radius: 10px; padding: 20px;
   display: flex; align-items: center; gap: 16px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06); cursor: pointer;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); cursor: pointer;
   transition: all 0.3s ease;
 }
 
-.stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.12); }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(44,62,80,0.10); }
 
 .stat-icon {
   width: 56px; height: 56px; border-radius: 12px;
@@ -174,16 +174,16 @@ export default {
   color: white; flex-shrink: 0;
 }
 
-.stat-value { font-size: 28px; font-weight: 700; color: #303133; }
-.stat-label { font-size: 13px; color: #909399; margin-top: 2px; }
+.stat-value { font-size: 28px; font-weight: 700; color: var(--el-text-color-primary); }
+.stat-label { font-size: 13px; color: #7A8599; margin-top: 2px; }
 
 .quick-actions, .tips-section {
   background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
 }
 
 .quick-actions h3, .tips-section h3 {
-  margin: 0 0 16px 0; color: #303133; font-size: 16px;
+  margin: 0 0 16px 0; color: var(--el-text-color-primary); font-size: 16px;
 }
 
 .action-grid {
@@ -193,22 +193,22 @@ export default {
 .action-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   padding: 16px; border-radius: 8px; cursor: pointer;
-  transition: all 0.3s ease; font-size: 13px; color: #606266;
+  transition: all 0.3s ease; font-size: 13px; color: var(--el-text-color-regular);
 }
 
 .action-item.primary {
-  background: linear-gradient(135deg, #ecf5ff, #d9ecff);
-  color: #409eff; font-weight: 600;
+  background: linear-gradient(135deg, #F5F0E8, #EBE5DB);
+  color: #C0785C; font-weight: 600;
 }
 
-.action-item:hover { background-color: #f5f7fa; color: #409eff; }
+.action-item:hover { background-color: var(--el-fill-color-lighter); color: #C0785C; }
 
 .tip-list { display: flex; flex-direction: column; gap: 10px; }
 
 .tip-item {
   display: flex; align-items: center; gap: 10px;
-  font-size: 13px; color: #606266; padding: 8px 0;
-  border-bottom: 1px solid #f5f7fa;
+  font-size: 13px; color: var(--el-text-color-regular); padding: 8px 0;
+  border-bottom: 1px solid var(--el-fill-color-lighter);
 }
 
 .tip-item:last-child { border-bottom: none; }

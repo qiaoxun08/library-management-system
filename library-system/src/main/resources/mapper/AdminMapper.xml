@@ -30,4 +30,12 @@
     <delete id="delete">
         DELETE FROM admin WHERE id = #{id}
     </delete>
+
+    <select id="findPasswordById" resultType="java.lang.String">
+        SELECT password FROM admin WHERE id = #{id}
+    </select>
+
+    <update id="updatePassword">
+        UPDATE admin SET password = #{password}, update_time = NOW() WHERE id = #{id}
+    </update>
 </mapper>

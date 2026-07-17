@@ -29,7 +29,7 @@
       <div class="active-cards">
         <div v-for="res in activeReservations" :key="res.id" class="active-card" :class="{ 'seat-reservation': res.seatId, 'book-reservation': res.bookId }">
           <div class="active-card-header">
-            <el-icon :size="20" :color="res.seatId ? '#67c23a' : '#409eff'">
+            <el-icon :size="20" :color="res.seatId ? '#6B8F71' : '#C0785C'">
               <component :is="res.seatId ? 'Place' : 'Document'" />
             </el-icon>
             <span class="active-type">{{ res.seatId ? $t('reader.home.seatReserve') : $t('reader.home.bookReserve') }}</span>
@@ -71,23 +71,23 @@
       <h3>{{ $t('reader.home.quickActions') }}</h3>
       <div class="action-grid">
         <div class="action-item primary" @click="$router.push('/reader/books')">
-          <el-icon :size="28" color="#409eff"><Search /></el-icon>
+          <el-icon :size="28" color="#C0785C"><Search /></el-icon>
           <span>{{ $t('reader.home.bookSearch') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/reader/seat-reservations')">
-          <el-icon :size="24" color="#67c23a"><Place /></el-icon>
+          <el-icon :size="24" color="#6B8F71"><Place /></el-icon>
           <span>{{ $t('reader.home.seatReserve') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/reader/borrowings')">
-          <el-icon :size="24" color="#e6a23c"><Document /></el-icon>
+          <el-icon :size="24" color="#D4A84B"><Document /></el-icon>
           <span>{{ $t('reader.home.myBorrowings') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/reader/reservations')">
-          <el-icon :size="24" color="#f56c6c"><Calendar /></el-icon>
+          <el-icon :size="24" color="#A85454"><Calendar /></el-icon>
           <span>{{ $t('reader.home.myReservations') }}</span>
         </div>
         <div class="action-item" @click="$router.push('/reader/profile')">
-          <el-icon :size="24" color="#909399"><User /></el-icon>
+          <el-icon :size="24" color="#7A8599"><User /></el-icon>
           <span>{{ $t('reader.home.profile') }}</span>
         </div>
       </div>
@@ -98,7 +98,7 @@
       <h3>{{ $t('reader.home.followActivity') }}</h3>
       <div class="activity-list">
         <div v-for="(act, idx) in followActivity" :key="idx" class="activity-item">
-          <el-icon :size="16" color="#409eff"><ChatDotRound /></el-icon>
+          <el-icon :size="16" color="#C0785C"><ChatDotRound /></el-icon>
           <span class="activity-text">{{ act.text }}</span>
           <span class="activity-time">{{ formatTimeAgo(act.time) }}</span>
         </div>
@@ -109,19 +109,19 @@
       <h3>{{ $t('reader.home.borrowingGuide') }}</h3>
       <div class="tip-list">
         <div class="tip-item">
-          <el-icon color="#409eff"><InfoFilled /></el-icon>
+          <el-icon color="#5A7D9A"><InfoFilled /></el-icon>
           <span>{{ $t('reader.home.maxBooks', { count: profile.maxBorrowCount || 5 }) }}</span>
         </div>
         <div class="tip-item">
-          <el-icon color="#e6a23c"><Warning /></el-icon>
+          <el-icon color="#D4A84B"><Warning /></el-icon>
           <span>{{ $t('reader.home.borrowPeriod', { days: 30, rate: 0.1 }) }}</span>
         </div>
         <div class="tip-item">
-          <el-icon color="#67c23a"><CircleCheck /></el-icon>
+          <el-icon color="#6B8F71"><CircleCheck /></el-icon>
           <span>{{ $t('reader.home.renewPolicy', { count: 1, days: 7 }) }}</span>
         </div>
         <div class="tip-item">
-          <el-icon color="#f56c6c"><CircleClose /></el-icon>
+          <el-icon color="#A85454"><CircleClose /></el-icon>
           <span>{{ $t('reader.home.overdueWarning') }}</span>
         </div>
       </div>
@@ -277,33 +277,46 @@ export default {
 .reader-home { padding: 20px; }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 12px; padding: 24px 30px; color: white;
+  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
+  border-radius: 14px; padding: 24px 30px; color: white;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
+  position: relative; overflow: hidden;
 }
 
-.welcome-text h2 { margin: 0 0 6px 0; font-size: 22px; }
-.welcome-text p { margin: 0; opacity: 0.85; font-size: 14px; }
+.welcome-banner::after {
+  content: '';
+  position: absolute;
+  top: -20px; right: -20px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.welcome-text h2 { margin: 0 0 6px 0; font-size: 22px; font-family: var(--font-serif); letter-spacing: 0.5px; }
+.welcome-text p { margin: 0; opacity: 0.8; font-size: 14px; }
 
 .borrowing-summary {
   display: flex; align-items: center; gap: 20px;
-  background: rgba(255,255,255,0.15); border-radius: 10px; padding: 12px 24px;
+  background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 24px;
+  backdrop-filter: blur(10px);
 }
 
 .summary-item { text-align: center; }
-.summary-value { display: block; font-size: 22px; font-weight: 700; }
-.summary-label { font-size: 12px; opacity: 0.85; }
-.summary-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.3); }
-.summary-item.has-fine .summary-value { color: #ffd04b; }
+.summary-value { display: block; font-size: 22px; font-weight: 700; font-family: var(--font-mono); }
+.summary-label { font-size: 12px; opacity: 0.8; }
+.summary-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.2); }
+.summary-item.has-fine .summary-value { color: #D4A84B; }
 
 .quick-actions, .tips-section {
-  background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
+  background: white; border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  border: 1px solid var(--el-border-color-lighter);
 }
 
 .quick-actions h3, .tips-section h3 {
-  margin: 0 0 16px 0; color: #303133; font-size: 16px;
+  margin: 0 0 16px 0; color: var(--el-text-color-primary); font-size: 16px;
+  font-family: var(--font-serif);
 }
 
 .action-grid {
@@ -312,80 +325,85 @@ export default {
 
 .action-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 20px 12px; border-radius: 8px; cursor: pointer;
-  transition: all 0.3s ease; font-size: 13px; color: #606266;
+  padding: 20px 12px; border-radius: 10px; cursor: pointer;
+  transition: all 0.25s ease; font-size: 13px; color: var(--el-text-color-regular);
+  border: 1px solid transparent;
 }
 
 .action-item.primary {
-  background: linear-gradient(135deg, #ecf5ff, #d9ecff);
-  color: #409eff; font-weight: 600;
+  background: var(--color-accent-bg);
+  color: #C0785C; font-weight: 600;
+  border-color: rgba(192, 120, 92, 0.15);
 }
 
-.action-item:hover { background-color: #f5f7fa; color: #409eff; transform: translateY(-2px); }
+.action-item:hover { background-color: var(--el-fill-color-light); transform: translateY(-2px); }
 
 .tip-list { display: flex; flex-direction: column; gap: 10px; }
 
 .tip-item {
   display: flex; align-items: center; gap: 10px;
-  font-size: 13px; color: #606266; padding: 8px 0;
-  border-bottom: 1px solid #f5f7fa;
+  font-size: 13px; color: var(--el-text-color-regular); padding: 8px 0;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 }
 
 .tip-item:last-child { border-bottom: none; }
-.tip-item strong { color: #303133; }
+.tip-item strong { color: var(--el-text-color-primary); }
 
 .recommend-section {
-  background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
+  background: white; border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  border: 1px solid var(--el-border-color-lighter);
 }
-.recommend-section h3 { margin: 0 0 16px 0; color: #303133; font-size: 16px; }
+.recommend-section h3 { margin: 0 0 16px 0; color: var(--el-text-color-primary); font-size: 16px; font-family: var(--font-serif); }
 .recommend-grid {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;
 }
 .recommend-card {
-  border: 1px solid #f0f0f0; border-radius: 10px; padding: 12px;
-  cursor: pointer; transition: all 0.3s ease;
+  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 12px;
+  cursor: pointer; transition: all 0.25s ease;
 }
-.recommend-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
-.recover-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: #f5f7fa; margin-bottom: 8px; }
+.recommend-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(44,62,80,0.08); }
+.recommend-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: var(--el-fill-color-lighter); margin-bottom: 8px; }
 .recommend-cover img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; }
-.recommend-title { font-size: 14px; font-weight: 600; color: #303133; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.recommend-author { font-size: 12px; color: #909399; margin-bottom: 6px; }
+.recommend-title { font-size: 14px; font-weight: 600; color: var(--el-text-color-primary); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recommend-author { font-size: 12px; color: var(--el-text-color-secondary); margin-bottom: 6px; }
 .recommend-reason { font-size: 11px; }
 
 /* 当前预约状态卡片 */
 .active-section, .activity-section {
-  background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06); margin-bottom: 16px;
+  background: white; border-radius: 12px; padding: 20px;
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  border: 1px solid var(--el-border-color-lighter);
 }
 .active-section h3, .activity-section h3 {
-  margin: 0 0 16px 0; color: #303133; font-size: 16px;
+  margin: 0 0 16px 0; color: var(--el-text-color-primary); font-size: 16px;
+  font-family: var(--font-serif);
 }
 .active-cards {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
 }
 .active-card {
-  border: 1px solid #f0f0f0; border-radius: 10px; padding: 14px; transition: all 0.3s;
+  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 14px; transition: all 0.25s;
 }
-.active-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-.active-card.seat-reservation { border-left: 3px solid #67c23a; }
-.active-card.book-reservation { border-left: 3px solid #409eff; }
+.active-card:hover { box-shadow: 0 4px 12px rgba(44,62,80,0.06); }
+.active-card.seat-reservation { border-left: 3px solid #6B8F71; }
+.active-card.book-reservation { border-left: 3px solid #C0785C; }
 .active-card-header {
   display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
 }
-.active-type { font-weight: 600; font-size: 14px; color: #303133; flex: 1; }
+.active-type { font-weight: 600; font-size: 14px; color: var(--el-text-color-primary); flex: 1; }
 .active-card-body { margin-bottom: 10px; }
-.active-target { font-size: 15px; font-weight: 500; color: #303133; margin-bottom: 4px; }
-.active-time { font-size: 12px; color: #909399; }
+.active-target { font-size: 15px; font-weight: 500; color: var(--el-text-color-primary); margin-bottom: 4px; }
+.active-time { font-size: 12px; color: var(--el-text-color-secondary); }
 .active-card-actions { display: flex; justify-content: flex-end; }
 
 /* 关注动态 */
 .activity-list { display: flex; flex-direction: column; gap: 10px; }
 .activity-item {
   display: flex; align-items: center; gap: 10px;
-  padding: 8px 0; border-bottom: 1px solid #f5f7fa; font-size: 13px;
+  padding: 8px 0; border-bottom: 1px solid var(--el-border-color-lighter); font-size: 13px;
 }
 .activity-item:last-child { border-bottom: none; }
-.activity-text { flex: 1; color: #606266; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.activity-time { font-size: 12px; color: #c0c4cc; white-space: nowrap; }
+.activity-text { flex: 1; color: var(--el-text-color-regular); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.activity-time { font-size: 12px; color: var(--el-text-color-placeholder); white-space: nowrap; }
 </style>

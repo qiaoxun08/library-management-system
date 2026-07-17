@@ -170,6 +170,15 @@ export default {
       startDate: '开始日期',
       title: '操作日志'
     },
+    loginLogs: {
+      title: '登录日志',
+      status: '状态',
+      success: '成功',
+      failed: '失败',
+      failReason: '失败原因',
+      userAgent: '浏览器',
+      loadFailed: '加载登录日志失败'
+    },
     readers: {
       addReader: '新增读者',
       confirmDelete: '确定要删除这个读者吗？',
@@ -382,6 +391,7 @@ export default {
       fineManagement: '罚款管理',
       home: '首页',
       logs: '操作日志',
+      loginLogs: '登录日志',
       myReservations: '我的预约',
       notifications: '消息通知',
       profile: '个人资料',
@@ -438,6 +448,7 @@ export default {
     },
     text: {
       all: '全部',
+      changePassword: '修改密码',
       createTime: '创建时间',
       hint: '提示',
       librarianPanel: '图书管理员',

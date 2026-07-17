@@ -1,0 +1,73 @@
+// ========================================
+// Element Plus 主题变量覆盖
+// 通过 @forward 覆盖 element-plus 默认值
+// ========================================
+
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+  // 主色
+  $colors: (
+    'primary': (
+      'base': #2C3E50,
+    ),
+    'success': (
+      'base': #6B8F71,
+    ),
+    'warning': (
+      'base': #D4A84B,
+    ),
+    'danger': (
+      'base': #A85454,
+    ),
+    'info': (
+      'base': #5A7D9A,
+    ),
+  ),
+  // 字体
+  $font-family: ('Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif) !default,
+  // 圆角
+  $border-radius-base: 8px !default,
+  $border-radius-small: 6px !default,
+  $border-radius-round: 20px !default,
+  // 边框
+  $border-color: #DDD8D0 !default,
+  $border-color-light: #EAE6E0 !default,
+  $border-color-lighter: #F0EBE3 !default,
+  // 文字
+  $color-text-primary: #2C3440 !default,
+  $color-text-regular: #4A5568 !default,
+  $color-text-secondary: #7A8599 !default,
+  $color-text-placeholder: #A0A8B8 !default,
+  // 背景
+  $bg-color: #F8F5F0 !default,
+  $bg-color-page: #F8F5F0 !default,
+  $bg-color-overlay: #FFFFFF !default,
+  // 填充
+  $fill-color: #F0EBE3 !default,
+  $fill-color-light: #F5F0E8 !default,
+  $fill-color-lighter: #F8F5F0 !default,
+  $fill-color-blank: #FFFFFF !default,
+  // 阴影
+  $box-shadow: 0 2px 12px rgba(44, 62, 80, 0.06) !default,
+  $box-shadow-light: 0 1px 6px rgba(44, 62, 80, 0.04) !default,
+  // 菜单
+  $menu-bg-color: #2C3E50 !default,
+  $menu-text-color: rgba(255, 255, 255, 0.85) !default,
+  $menu-active-color: #D4956B !default,
+  $menu-hover-bg-color: rgba(255, 255, 255, 0.06) !default,
+  // 表格
+  $table-header-bg-color: #F0EBE3 !default,
+  $table-tr-bg-color: #FFFFFF !default,
+  $table-row-hover-bg-color: #F5F0E8 !default,
+  $table-border-color: #EAE6E0 !default,
+  // 输入框
+  $input-focus-border-color: #C0785C !default,
+  // 按钮
+  $button-border-radius: 8px !default,
+  // 卡片
+  $card-border-radius: 12px !default,
+  $card-border-color: #EAE6E0 !default,
+  // 弹窗
+  $dialog-border-radius: 14px !default,
+  // 标签
+  $tag-border-radius: 6px !default,
+);

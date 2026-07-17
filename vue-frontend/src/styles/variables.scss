@@ -1,0 +1,117 @@
+// ========================================
+// 「书香」设计系统变量
+// 灵感：纸、墨、光
+// ========================================
+
+// ---- 色彩系统 ----
+
+// 主色：暖墨色系
+$primary: #2C3E50;
+$primary-light: #3D5A80;
+$primary-lighter: #5B7EA8;
+$primary-bg: rgba(44, 62, 80, 0.06);
+
+// 强调色：赭石
+$accent: #C0785C;
+$accent-light: #D4956B;
+$accent-lighter: #E8C4AC;
+$accent-bg: rgba(192, 120, 92, 0.08);
+
+// 语义色
+$success: #6B8F71;
+$success-light: #8FB396;
+$success-bg: rgba(107, 143, 113, 0.08);
+
+$warning: #D4A84B;
+$warning-light: #E8C878;
+$warning-bg: rgba(212, 168, 75, 0.08);
+
+$danger: #A85454;
+$danger-light: #C87878;
+$danger-bg: rgba(168, 84, 84, 0.08);
+
+$info: #5A7D9A;
+$info-light: #8BABC4;
+$info-bg: rgba(90, 125, 154, 0.08);
+
+// 背景色
+$bg-page: #F8F5F0;
+$bg-card: #FFFFFF;
+$bg-warm: #F0EBE3;
+$bg-sidebar: #2C3E50;
+$bg-sidebar-title: #233040;
+$bg-hover: #F5F0E8;
+
+// 文字色
+$text-primary: #2C3440;
+$text-regular: #4A5568;
+$text-secondary: #7A8599;
+$text-placeholder: #A0A8B8;
+$text-on-dark: #FFFFFF;
+$text-on-dark-secondary: rgba(255, 255, 255, 0.65);
+
+// 边框色
+$border: #DDD8D0;
+$border-light: #EAE6E0;
+$border-dark: #C8C2B8;
+
+// 阴影（暖色调）
+$shadow-sm: 0 1px 4px rgba(44, 62, 80, 0.04);
+$shadow-md: 0 2px 12px rgba(44, 62, 80, 0.06);
+$shadow-lg: 0 4px 24px rgba(44, 62, 80, 0.08);
+$shadow-hover: 0 6px 28px rgba(44, 62, 80, 0.12);
+
+// ---- 字体 ----
+
+$font-sans: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+$font-serif: 'Noto Serif SC', 'Georgia', serif;
+$font-mono: 'JetBrains Mono', 'Menlo', monospace;
+
+// ---- 间距 ----
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// ---- 圆角 ----
+
+$radius-sm: 6px;
+$radius-md: 10px;
+$radius-lg: 14px;
+$radius-xl: 20px;
+$radius-full: 9999px;
+
+// ---- 过渡 ----
+
+$transition-fast: 0.15s ease;
+$transition-normal: 0.25s ease;
+$transition-slow: 0.35s ease;
+
+// ---- 侧边栏 ----
+
+$sidebar-width: 240px;
+$sidebar-collapsed: 64px;
+
+// ---- ECharts 暖色板 ----
+
+$chart-colors: (
+  $primary,
+  $accent,
+  $success,
+  $warning,
+  $info,
+  $danger,
+  $primary-lighter,
+  $accent-light
+);
+
+// ---- 借阅热度色阶 ----
+
+$heat-1: #DDD8D0;
+$heat-2: #D4956B;
+$heat-3: #C0785C;
+$heat-4: #A85454;
+$heat-5: #2C3E50;

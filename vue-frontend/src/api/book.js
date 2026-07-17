@@ -12,9 +12,7 @@ export function getBookById(id) {
   return axios.get(`/books/${id}`)
 }
 
-export function searchBooks(keyword, category) {
-  const params = { keyword }
-  if (category) params.category = category
+export function searchBooks(params) {
   return axios.get('/books/search', { params })
 }
 
@@ -40,4 +38,20 @@ export function importBooks(file) {
   return axios.post('/books/import', formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   })
+}
+
+/**
+ * 批量更新图书状态
+ * @param {Object} data - { ids: [1,2,3], status: 1 }
+ */
+export function batchUpdateBookStatus(data) {
+  return axios.post('/books/batch-status', data)
+}
+
+/**
+ * 批量删除图书
+ * @param {Array} ids - [1,2,3]
+ */
+export function batchDeleteBooks(ids) {
+  return axios.delete('/books/batch', { data: { ids } })
 }

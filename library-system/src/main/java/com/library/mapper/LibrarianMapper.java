@@ -13,4 +13,6 @@ public interface LibrarianMapper {
     int insert(Librarian librarian);
     int update(Librarian librarian);
     int delete(@Param("id") Integer id);
+    String findPasswordById(@Param("id") Integer id);
+    int updatePassword(@Param("id") Integer id, @Param("password") String password);
 }

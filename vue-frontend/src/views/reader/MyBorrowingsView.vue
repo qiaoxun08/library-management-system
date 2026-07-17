@@ -2,6 +2,17 @@
   <div class="my-borrowings-view">
     <div class="page-header">
       <h2>{{ $t('reader.borrowing.title') }}</h2>
+      <el-dropdown @command="handleExport">
+        <el-button type="primary" plain size="small">
+          <el-icon><Download /></el-icon> {{ $t('common.button.export') || '导出' }}
+        </el-button>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="xlsx">Excel (.xlsx)</el-dropdown-item>
+            <el-dropdown-item command="csv">CSV (.csv)</el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
     </div>
 
     <el-table :data="borrowings" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
@@ -55,6 +66,7 @@
 
 <script>
 import { getBorrowingsByReaderId, renewBook } from '@/api/borrowing'
+import { exportMyBorrowings } from '@/api/export'
 import { formatDate } from '@/utils/date'
 
 export default {
@@ -104,6 +116,21 @@ export default {
         ).catch(() => {})
       }
     },
+    async handleExport(format) {
+      try {
+        const data = await exportMyBorrowings({ format })
+        const blob = new Blob([data])
+        const url = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `我的借阅记录.${format === 'csv' ? 'csv' : 'xlsx'}`
+        link.click()
+        window.URL.revokeObjectURL(url)
+        this.$message.success('导出成功')
+      } catch (error) {
+        this.$message.error('导出失败: ' + error.message)
+      }
+    },
     handleRenew(id) {
       this.$confirm(this.$t('reader.borrowing.confirmRenew'), this.$t('reader.borrowing.renewConfirm'), {
         confirmButtonText: this.$t('common.button.confirm'),
@@ -138,19 +165,23 @@ export default {
 }
 
 .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
+  font-family: var(--font-serif);
   font-size: 22px;
 }
 
 .text-danger {
-  color: #f56c6c;
+  color: #A85454;
   font-weight: 600;
 }
 

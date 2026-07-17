@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/seats")
@@ -133,6 +134,19 @@ public class SeatController {
         try {
             seatService.updateSeatStatus(id, status);
             return Result.success();
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/timeline")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
+    @Operation(summary = "获取座位时间轴视图", description = "返回每个座位在各时段（8:00-22:00）的占用状态")
+    public Result<List<Map<String, Object>>> getSeatTimeline(
+            @Parameter(description = "日期，格式 yyyy-MM-dd") @RequestParam String date) {
+        try {
+            List<Map<String, Object>> timeline = seatService.getSeatTimeline(date);
+            return Result.success(timeline);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

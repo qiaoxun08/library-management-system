@@ -90,51 +90,8 @@ export default {
 
 .dashboard-container :deep(.el-main) {
   margin-left: 200px;
-  background-color: #f5f7fa;
+  background-color: var(--el-bg-color-page);
   min-height: 100vh;
-}
-
-.menu-title {
-  padding: 20px;
-  text-align: center;
-  font-size: 16px;
-  font-weight: bold;
-  color: #fff;
-  background-color: #434a50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.title-icon {
-  display: flex;
-  align-items: center;
-}
-
-.user-info {
-  padding: 12px 20px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #ffd04b;
-  font-size: 13px;
-  background-color: rgba(0, 0, 0, 0.1);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.menu-divider {
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.1);
-  margin: 8px 16px;
-}
-
-.menu-badge {
-  margin-left: 8px;
-}
-
-.menu-badge :deep(.el-badge__content) {
-  top: 2px;
 }
 
 .fade-enter-active,

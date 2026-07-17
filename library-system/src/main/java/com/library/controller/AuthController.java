@@ -1,11 +1,15 @@
 package com.library.controller;
 
+import com.library.annotation.OperLog;
 import com.library.dto.LoginRequest;
 import com.library.dto.LoginResponse;
+import com.library.dto.PasswordChangeRequest;
 import com.library.dto.Result;
 import com.library.entity.Reader;
+import com.library.exception.BusinessException;
 import com.library.service.AuthService;
 import com.library.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import java.util.Map;
@@ -43,8 +48,29 @@ public class AuthController {
     private JwtUtil jwtUtil;
 
     /**
-     * 刷新 Token：传入旧 Token，返回新 Token
+     * 修改密码：从 JWT Token 解析用户信息，验证旧密码后修改为新密码
      */
+    @PostMapping("/change-password")
+    @OperLog(module = "认证管理", action = "修改密码")
+    @Operation(summary = "修改密码", description = "验证旧密码后修改为新密码")
+    public Result<Void> changePassword(@Valid @RequestBody PasswordChangeRequest request,
+                                        HttpServletRequest httpRequest) {
+        // 从 Authorization 请求头解析 JWT Token
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            throw new BusinessException(401, "未登录或Token无效");
+        }
+        String token = authHeader.substring(7);
+        Claims claims = jwtUtil.getAllClaimsFromToken(token);
+        String userType = claims.get("userType", String.class);
+        Integer userId = claims.get("userId", Integer.class);
+        if (userType == null || userId == null) {
+            throw new BusinessException(401, "Token信息不完整，请重新登录");
+        }
+        authService.changePassword(userType, userId, request.getOldPassword(), request.getNewPassword());
+        return Result.success(null);
+    }
+
     @PostMapping("/refresh")
     @Operation(summary = "刷新Token", description = "传入旧Token获取新Token，用于无感续期")
     public Result<Map<String, String>> refreshToken(@RequestBody Map<String, String> body) {

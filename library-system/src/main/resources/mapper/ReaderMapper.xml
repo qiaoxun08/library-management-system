@@ -80,4 +80,8 @@
     <update id="updateLanguage">
         UPDATE reader SET language = #{language}, update_time = NOW() WHERE id = #{id}
     </update>
+
+    <update id="updatePassword">
+        UPDATE reader SET password = #{password}, update_time = NOW() WHERE id = #{id}
+    </update>
 </mapper>

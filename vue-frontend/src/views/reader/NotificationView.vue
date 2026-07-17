@@ -10,9 +10,9 @@
     <el-table :data="notifications" stripe border style="width: 100%">
       <el-table-column :label="$t('common.field.type')" width="70" align="center">
         <template #default="{ row }">
-          <el-icon v-if="row.type === 'review_like'" color="#e6a23c"><Star /></el-icon>
-          <el-icon v-else-if="row.type === 'new_follower'" color="#409eff"><User /></el-icon>
-          <el-icon v-else color="#909399"><Bell /></el-icon>
+          <el-icon v-if="row.type === 'review_like'" color="#D4A84B"><Star /></el-icon>
+          <el-icon v-else-if="row.type === 'new_follower'" color="#C0785C"><User /></el-icon>
+          <el-icon v-else color="#7A8599"><Bell /></el-icon>
         </template>
       </el-table-column>
       <el-table-column prop="title" :label="$t('reader.notifications.allNotifications')" min-width="150">
@@ -154,12 +154,13 @@ export default {
   align-items: center;
   margin-bottom: 24px;
   padding-bottom: 15px;
-  border-bottom: 2px solid #409eff;
+  border-bottom: 2px solid #C0785C;
 }
 
 .page-header h2 {
   margin: 0;
-  color: #303133;
+  color: #2C3440;
+  font-family: var(--font-serif);
   font-size: 22px;
 }
 </style>

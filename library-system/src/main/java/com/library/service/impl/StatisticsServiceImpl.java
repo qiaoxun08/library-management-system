@@ -12,6 +12,7 @@ import com.library.service.StatisticsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,5 +106,35 @@ public class StatisticsServiceImpl implements StatisticsService {
     @Override
     public int getActiveReaderCount() {
         return readerMapper.countActiveReaders();
+    }
+
+    @Override
+    public Map<String, Object> getRealtimeStatistics() {
+        Map<String, Object> result = new HashMap<>();
+
+        // 在线人数（活跃读者数）
+        result.put("onlineCount", readerMapper.countActiveReaders());
+
+        // 今日借阅量按小时分布
+        List<Map<String, Object>> todayBorrowingsByHour = borrowingMapper.countTodayByHour();
+        result.put("todayBorrowingsByHour", todayBorrowingsByHour);
+
+        // 热门图书TOP10
+        List<Map<String, Object>> hotBooks = bookMapper.findHotBooksTop10();
+        result.put("hotBooks", hotBooks);
+
+        // 座位占用率热力图数据
+        Map<String, Object> seatHeatmap = seatMapper.getSeatHeatmapData();
+        result.put("seatHeatmap", seatHeatmap);
+
+        // 借阅分类分布
+        List<Map<String, Object>> categoryDistribution = borrowingMapper.countByCategoryDistribution();
+        result.put("categoryDistribution", categoryDistribution);
+
+        // 本月逾期率趋势（按天）
+        List<Map<String, Object>> overdueTrend = borrowingMapper.countOverdueTrendByDay();
+        result.put("overdueTrend", overdueTrend);
+
+        return result;
     }
 }

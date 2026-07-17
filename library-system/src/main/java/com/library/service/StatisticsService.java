@@ -10,4 +10,10 @@ public interface StatisticsService {
     List<Integer> getBorrowingsByMonth();
     Map<Integer, Integer> getReservationsByStatus();
     int getActiveReaderCount();
+
+    /**
+     * 获取实时统计数据（数据大屏使用）
+     * 包含：在线人数、今日借阅量按小时分布、热门图书TOP10
+     */
+    Map<String, Object> getRealtimeStatistics();
 }

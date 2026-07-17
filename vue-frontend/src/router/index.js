@@ -46,7 +46,9 @@ const routes = [
       { path: 'config', name: 'SystemConfig', component: () => import('../views/admin/SystemConfigView.vue'), meta: { title: 'admin.config.title' } },
       { path: 'logs', name: 'OperationLogs', component: () => import('../views/admin/OperationLogView.vue'), meta: { title: 'admin.logs.title' } },
       { path: 'blacklist', name: 'Blacklist', component: () => import('../views/admin/BlacklistView.vue'), meta: { title: 'admin.blacklist.title' } },
+      { path: 'login-logs', name: 'LoginLogs', component: () => import('../views/admin/LoginLogView.vue'), meta: { title: 'admin.loginLogs.title' } },
       { path: 'export', name: 'DataExport', component: () => import('../views/admin/DataExportView.vue'), meta: { title: 'admin.dataExport.title' } },
+      { path: 'dashboard-screen', name: 'DashboardScreen', component: () => import('../views/admin/DataDashboard.vue'), meta: { title: '数据大屏' } },
       // 管理员也可以使用图书管理员的功能
       { path: 'borrowing-records', name: 'AdminBorrowingRecords', component: () => import('../views/librarian/BorrowingRecordsView.vue') },
       { path: 'reservation-approval', name: 'AdminReservationApproval', component: () => import('../views/librarian/ReservationApprovalView.vue') },
