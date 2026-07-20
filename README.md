@@ -1,324 +1,133 @@
-# 高校图书馆借阅与座位管理系统 v5.6
+# 高校图书馆借阅与座位管理系统
 
-一个基于 **Spring Boot 3.2 + Vue 3** 的前后端分离高校图书馆管理系统，实现图书管理、借阅管理、座位预约签到、罚款管理、数据统计、操作日志审计、黑名单管理、读者积分等级、催还通知等功能，支持三种角色（管理员、图书管理员、读者）的 RBAC 权限控制。
+一个大学生的课程实践项目，做着做着就堆了不少功能进去。前后端分离，Spring Boot + Vue，实现了图书借还、座位预约、书评社交这些图书馆常见的业务需求。
 
-**主要特性**：RBAC 五表权限控制、三种并发控制策略（分布式锁/悲观锁/乐观锁）、XSS 防护、AES 敏感字段加密、中英文国际化、PWA 支持
+说实话写这个项目之前对很多东西都是一知半解，边学边做的，肯定有不少地方写得不够好，欢迎指正。
 
-## 版本功能总览
+## 这个项目能干什么
 
-### v5.6 新增功能（最新）
+简单说就是三个角色：**管理员**、**图书管理员**、**读者**，各干各的事。
 
-| 方向 | 功能说明 | 状态 |
-|------|---------|------|
-| **体验优化** | 全局错误提示优化 —— 403 弹窗引导「联系管理员」、网络失败带重试提示 | ✅ 已完成 |
-| **功能** | 管理员/图书管理员修改密码 —— 侧边栏入口，旧密码验证 + 新密码确认 | ✅ 已完成 |
-| **体验优化** | 操作反馈闭环 —— 配置保存弹窗通知、导入图书结果摘要、删除二次确认 | ✅ 已完成 |
-| **功能** | 读者借阅记录导出 —— 支持 Excel/CSV 格式，读者端一键导出 | ✅ 已完成 |
-| **功能** | 通知增强 —— 预约审批通过通知、逾期罚款通知 | ✅ 已完成 |
-| **功能** | 高级搜索 —— 出版社/年份/ISBN/库存状态筛选 + 搜索历史记录 | ✅ 已完成 |
-| **功能** | 座位时间轴视图 —— 座位 × 时段矩阵，点击空闲格子直接预约 | ✅ 已完成 |
-| **功能** | 数据可视化大屏 —— 实时在馆人数、借阅趋势、热力图、热门图书 TOP10 | ✅ 已完成 |
-| **功能** | 批量操作 —— 图书批量上架/下架/删除，表格多选 + 批量操作栏 | ✅ 已完成 |
-| **安全** | 数据校验 —— ISBN-13 格式校验+重复检测、学号格式校验（8位数字） | ✅ 已完成 |
-| **架构** | PWA 支持 —— vite-plugin-pwa，可添加到主屏幕，离线缓存策略 | ✅ 已完成 |
-| **安全** | 登录审计日志 —— login_log 表记录每次登录（IP/UA/状态/失败原因） | ✅ 已完成 |
+**读者能做的事：**
+- 搜书、借书、还书、续借、预约图书
+- 预约座位、签到签退、看座位时间轴
+- 写书评、点赞、回复、关注别的读者
+- 看借阅历史、导出自己的借阅记录
+- 收催还通知、罚款通知、预约到书通知
+- 换中英文界面
 
-### v5.5 新增功能
+**管理员能做的事：**
+- 管图书（增删改查、批量上下架、导入导出）
+- 管读者（查看、编辑、禁用）
+- 管座位、审批预约、处理罚款
+- 看统计数据（仪表盘、热力图、借阅趋势）
+- 配置系统参数（借几天、罚多少钱、推荐权重等）
+- 查操作日志、登录日志、黑名单管理
 
-| 方向 | 功能说明 | 状态 |
-|------|---------|------|
-| **UI 重构** | 「书香」设计系统 —— 暖墨色系配色、思源宋体/黑体双字体、书脊装饰线、毛玻璃登录卡 | ✅ 已完成 |
-| **UI 重构** | Element Plus 主题覆盖 —— CSS 自定义属性全局替换默认蓝主题 | ✅ 已完成 |
-| **UI 重构** | 全站 24 个 Vue 组件颜色系统替换（渐变/文字/阴影/边框/图标） | ✅ 已完成 |
-| **UI 重构** | ECharts 暖色主题 —— 借阅热度色阶、暖色调图表配色 | ✅ 已完成 |
-| **UI 重构** | 侧边栏改造 —— 墨蓝底色、赭石激活竖条、宋体标题装饰线 | ✅ 已完成 |
-| **修复** | RBAC 权限 403 —— SUPER_ADMIN 角色向下兼容 ROLE_ADMIN，RBAC 表无数据时自动 fallback | ✅ 已完成 |
-| **修复** | SecurityConfig 角色匹配 —— hasRole 改 hasAnyRole 支持 ADMIN/SUPER_ADMIN 双角色 | ✅ 已完成 |
-
-### v5.4 新增功能
-
-| 方向 | 功能说明 | 状态 |
-|------|---------|------|
-| **并发安全** | 座位预约 Redis 分布式锁（SETNX + Lua）、积分悲观锁（SELECT FOR UPDATE）、借阅乐观锁 | ✅ 已完成 |
-| **RBAC 权限** | 五张表设计，URL级+方法级+数据级三层权限控制 | ✅ 已完成 |
-| **XSS 防护** | 请求参数过滤 script/onerror/event 等攻击代码 | ✅ 已完成 |
-| **字段加密** | 手机号/身份证 AES 加密存储，MyBatis TypeHandler 业务层无感 | ✅ 已完成 |
-| **异步化** | 操作日志异步写入（@Async + 线程池），主事务不阻塞 | ✅ 已完成 |
-| **缓存深化** | 座位详情/区域列表 Redis 缓存，状态变更自动失效 | ✅ 已完成 |
-| **测试升级** | Testcontainers 真实 MySQL 8.0 容器测试 | ✅ 已完成 |
-
-### v5.3 新增功能
-
-| 方向 | 功能说明 | 状态 |
-|------|---------|------|
-| **功能** | 管理员删除书评时自动通知读者（系统消息告知违反规则） | ✅ 已完成 |
-| **功能** | 补全图书导入/导出 Controller 端点（POST /books/import, GET /books/export） | ✅ 已完成 |
-| **功能** | 补全 Token 刷新端点（POST /auth/refresh），前端无感续期生效 | ✅ 已完成 |
-| **修复** | 统计热力图从 Mock 随机数据改为使用 AnalysisService 真实数据 | ✅ 已完成 |
-
-### v5.2 新增功能
-
-| 方向 | 功能说明 | 状态 |
-|------|---------|------|
-| **DTO + 参数校验** | 7 个弱类型 Map 接口改造为强类型 DTO + Jakarta Validation（@Valid） | ✅ 已完成 |
-| **测试框架** | 69 个单元测试（Mockito）+ 20 个集成测试（H2 内存库），核心 Service 全覆盖 | ✅ 已完成 |
-| **缓存迁移到 Redis** | 热门图书/座位预测缓存从静态变量迁移到 Redis（TTL 26h），Redis 不可用时自动降级 | ✅ 已完成 |
-| **IP 限流** | 登录（10次/分钟）和书评发布（5次/分钟）基于 Redis 的 IP 限流 | ✅ 已完成 |
-| **书评回复（楼中楼）** | review_reply 表、后端 CRUD + 分页、前端回复区域、书评删除级联软删除回复 | ✅ 已完成 |
-| **数据导出增强** | 借阅记录/逾期/积分排行/操作日志导出，支持 Excel（SXSSFWorkbook 流式）和 CSV | ✅ 已完成 |
-| **移动端响应式** | 基于 CSS Media Query + useScreenSize composable，移动端导航改抽屉、座位网格缩略 | ✅ 已完成 |
-| **Swagger API 文档** | springdoc-openapi 2.3.0，22 个 Controller 全覆盖 @Tag/@Operation 注解 | ✅ 已完成 |
-| **Docker 容器化** | 多阶段构建 Dockerfile + docker-compose（MySQL 8.0 + Redis 7 + Backend + Frontend） | ✅ 已完成 |
-
-### v5.1 新增功能
-
-| 方向 | 功能说明 | 状态 |
-|------|---------|------|
-| **基于用户行为的协同过滤推荐** | 基于读者借阅历史的个性化推荐，权重从 system_config 动态读取 | ✅ 已完成 |
-| **社交化阅读社区** | 书评发表/点赞、读者关注/粉丝系统、社交通知 | ✅ 已完成 |
-| **大数据分析与预测** | 座位占用预测、图书流通趋势、逾期风险预警、热力图 | ✅ 已完成 |
-| **国际化多语言支持** | 中英文双语界面，vue-i18n 即时切换 | ✅ 已完成 |
-| **智能座位预约优化** | 基于历史偏好的智能推荐、学习伙伴组队预约 | ✅ 已完成 |
-| **读者首页增效** | 当前预约状态卡片、一键签到、关注动态信息流 | ✅ 已完成 |
-| **图书评分露出** | 搜索页图书卡片显示平均评分和书评数 | ✅ 已完成 |
-| **黑名单违约明细** | 管理员可查看读者的违约详情 | ✅ 已完成 |
-
-
-## 系统架构
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        前端 (Vue 3)                         │
-│  ┌─────────┐  ┌─────────────┐  ┌─────────────────────────┐ │
-│  │ 管理员  │  │ 图书管理员  │  │         读者            │ │
-│  │ /login  │  │   /login    │  │   /student/login        │ │
-│  └─────────┘  └─────────────┘  └─────────────────────────┘ │
-│  Vue I18n(中英文) | ECharts(图表) | Element Plus | PWA     │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                         Axios HTTP
-                    (Token自动刷新+队列机制)
-                              │
-┌─────────────────────────────────────────────────────────────┐
-│                     后端 (Spring Boot 3.2)                  │
-│  Security(JWT+RBAC) | Controller(23) | Service(25)         │
-│  并发控制: Redis分布式锁 | 悲观锁 | 乐观锁                 │
-│  安全: XSS防护 | AES加密 | IP限流 | 操作审计               │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                      MyBatis (24个Mapper)
-                              │
-┌─────────────────────────────────────────────────────────────┐
-│              MySQL 8.0 + Redis                              │
-│                    25张表                                    │
-└─────────────────────────────────────────────────────────────┘
-```
+**图书管理员能做的事：**
+- 帮读者借书还书续借
+- 审批预约、处理罚款
 
 ## 技术栈
 
-### 后端
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Java | 17+ | 运行环境 |
-| Spring Boot | 3.2.5 | 基础框架 |
-| Spring Security | 6.2 | 安全框架 + RBAC 权限 |
-| JWT (jjwt) | 0.12.5 | 无状态认证 |
-| MyBatis | 3.0.3 | ORM 框架 |
-| MySQL | 8.0 | 关系型数据库 |
-| Redis | - | 验证码、缓存、分布式锁 |
-| Lombok | 1.18.32 | 简化 POJO |
-| Apache POI | 5.2.3 | Excel 导入导出 |
-| OpenCSV | 5.7.1 | CSV 导入导出 |
-| Spring AOP | - | 操作日志切面 |
-| Spring @Async | - | 异步任务（日志写入） |
-| Spring MessageSource | - | 国际化消息 |
-| SpringDoc OpenAPI | 2.3.0 | Swagger API 文档 |
-| H2 Database | - | 测试环境内存库 |
-| Testcontainers | 1.19.7 | 集成测试真实 MySQL |
-| AES 加密 | - | 敏感字段加密存储 |
+能列出来的东西，都是项目里实际用了的：
 
-### 前端
-| 技术 | 版本 | 说明 |
-|------|------|------|
-| Vue.js | 3.3.4 | 前端框架 |
-| Vue Router | 4.2.4 | 路由管理 |
-| Vuex | 4.0.2 | 状态管理 |
-| Element Plus | 2.3.8 | UI 组件库（含多语言包） |
-| ECharts | 5.4.3 | 数据可视化 |
-| Axios | 1.4.0 | HTTP 请求 |
-| Vite | 4.4.5 | 构建工具 |
-| Vue I18n | 9.x | 国际化 |
+**后端：**
+- Java 17 + Spring Boot 3.2.5
+- Spring Security 6 + JWT 认证
+- MyBatis + MySQL 8.0
+- Redis（验证码、缓存、分布式锁）
+- Apache POI / OpenCSV（导入导出）
+- springdoc-openapi（Swagger 文档）
+
+**前端：**
+- Vue 3 + Vue Router + Vuex
+- Element Plus（UI 组件库）
+- ECharts（图表）
+- vue-i18n（中英文切换）
+- Vite 构建 + PWA 支持
+
+**其他：**
+- Docker / docker-compose 部署
+- 11 个测试类（单元测试 + 集成测试，用的 Testcontainers）
 
 ## 项目结构
 
 ```
 library-management-system/
-├── README.md
-├── CHANGELOG.md                                       # 版本变更日志
-├── docker-compose.yml                                 # Docker 一键部署
+├── sql/                          # 8 个数据库脚本（建表 + 测试数据）
+├── library-system/               # 后端 Spring Boot
+│   ├── src/main/java/com/library/
+│   │   ├── config/               # 11 个配置类（Security、CORS、XSS过滤、IP限流等）
+│   │   ├── controller/           # 23 个 Controller
+│   │   ├── service/              # 25 个接口 + 实现
+│   │   ├── mapper/               # 24 个 MyBatis Mapper
+│   │   ├── entity/               # 24 个实体类
+│   │   ├── dto/                  # 19 个 DTO
+│   │   ├── annotation/           # 自定义注解（@OperLog、@RequirePermission）
+│   │   ├── aspect/               # AOP 切面
+│   │   ├── handler/              # AES 加密 TypeHandler
+│   │   └── util/                 # JwtUtil、AesUtil
+│   └── src/test/                 # 11 个测试类
 │
-├── sql/                                               # 数据库脚本 (8个)
-│   ├── init.sql                                       #   核心表 (admin/librarian/reader/book/seat等)
-│   ├── V2_new_tables.sql                              #   功能表 (system_config/operation_log/blacklist等)
-│   ├── V3_innovation.sql                              #   社交表 (book_review/reader_follow/study_buddy等)
-│   ├── V4_reply.sql                                   #   书评回复表 (review_reply)
-│   ├── V5_rbac.sql                                    #   RBAC权限表 (sys_role/sys_permission等)
-│   ├── V6_login_log.sql                               #   登录审计日志表
-│   ├── mock_data.sql                                  #   测试数据
-│   └── mock_data_v3.sql                               #   v5.0测试数据
-│
-├── library-system/                                    # 后端 Spring Boot 项目
-│   ├── pom.xml
-│   ├── Dockerfile
+├── vue-frontend/                 # 前端 Vue 3
 │   └── src/
-│       ├── main/java/com/library/
-│       │   ├── LibraryApplication.java                #   启动入口
-│       │   ├── config/           (11个)               #   配置类
-│       │   │   ├── SecurityConfig.java                #     Security + JWT + RBAC
-│       │   │   ├── RbacJwtAuthenticationFilter.java   #     JWT + RBAC 认证过滤器
-│       │   │   ├── XssFilter.java                     #     XSS 防护
-│       │   │   ├── RateLimitInterceptor.java          #     IP 限流
-│       │   │   ├── AsyncConfig.java                   #     异步线程池
-│       │   │   ├── GlobalExceptionHandler.java        #     全局异常处理(i18n)
-│       │   │   └── ...                                #     CorsConfig/I18nConfig/SwaggerConfig等
-│       │   ├── controller/       (23个)               #   REST 控制器
-│       │   ├── service/          (25个接口 + 23个实现) #   业务逻辑层
-│       │   ├── mapper/           (24个)               #   MyBatis 映射接口
-│       │   ├── entity/           (24个)               #   数据库实体
-│       │   ├── dto/              (19个)               #   数据传输对象
-│       │   ├── annotation/       (2个)                #   @OperLog / @RequirePermission
-│       │   ├── aspect/           (2个)                #   AOP 切面
-│       │   ├── exception/        (2个)                #   自定义异常
-│       │   ├── handler/          (1个)                #   AES 加密 TypeHandler
-│       │   └── util/             (2个)                #   JwtUtil / AesUtil
-│       ├── main/resources/
-│       │   ├── application.properties                 #   主配置
-│       │   ├── application-dev.properties             #   开发环境配置
-│       │   ├── application-prod.properties            #   生产环境配置
-│       │   ├── messages_zh_CN.properties              #   中文消息
-│       │   ├── messages_en_US.properties              #   英文消息
-│       │   └── mapper/           (24个XML)            #   MyBatis SQL 映射
-│       └── test/
-│           ├── java/com/library/
-│           │   ├── config/TestcontainersConfig.java   #   Testcontainers 基类
-│           │   ├── service/       (单元测试)          #   并发测试等
-│           │   └── integration/   (集成测试)          #   H2 内存库测试
-│           └── resources/
-│               ├── application-test.properties
-│               ├── schema-h2.sql
-│               └── schema-mysql.sql
+│       ├── api/                  # 21 个 API 接口封装
+│       ├── views/                # 32 个页面组件
+│       │   ├── admin/            #   13 个管理端页面
+│       │   ├── librarian/        #   6 个图书管理员页面
+│       │   └── reader/           #   10 个读者端页面
+│       ├── i18n/                 # 中英文语言包
+│       └── styles/               # 主题样式
 │
-└── vue-frontend/                                      # 前端 Vue 3 项目
-    ├── Dockerfile
-    ├── nginx.conf
-    ├── vite.config.js                                 #   Vite 构建配置 + PWA
-    └── src/
-        ├── main.js                                    #   入口 (Element Plus + 图标全局注册)
-        ├── App.vue                                    #   根组件 (ElConfigProvider + 全局样式)
-        ├── api/                (21个)                 #   API 接口封装
-        ├── components/         (1个)                  #   SideBar.vue 侧边栏
-        ├── composables/        (1个)                  #   useScreenSize.js
-        ├── i18n/               (3个)                  #   国际化配置 + 中英文语言包
-        ├── router/index.js                            #   路由 + 角色守卫
-        ├── store/index.js                             #   Vuex 状态管理
-        ├── utils/date.js                              #   日期格式化工具
-        ├── styles/             (5个)                  #   主题/变量/响应式
-        │   ├── variables.scss                         #     设计系统变量
-        │   ├── theme.scss                             #     Element Plus CSS 变量覆盖
-        │   ├── element-override.scss                  #     Element Plus SCSS 覆盖
-        │   ├── echarts-theme.js                       #     ECharts 暖色主题
-        │   └── responsive.css                         #     响应式样式
-        └── views/              (32个)                 #   页面组件
-            ├── LoginView.vue                          #     管理员/馆员登录
-            ├── StudentLoginView.vue                   #     读者登录/注册
-            ├── NotFoundView.vue                       #     404
-            ├── admin/           (13个)                #     管理员端
-            ├── librarian/       (6个)                 #     图书管理员端
-            └── reader/          (10个)                #     读者端
+├── docker-compose.yml            # 一键部署
+└── CHANGELOG.md                  # 版本记录
 ```
 
-## 快速开始
+数据库一共 **25 张表**，包括核心业务表、RBAC 权限表、社交功能表、审计日志表。
 
-### Docker 一键部署（推荐）
+## 怎么跑起来
+
+### 方式一：Docker（推荐，省事）
 
 ```bash
-# 克隆项目后，一键启动所有服务
 docker-compose up -d
-
-# 查看日志
-docker-compose logs -f
-
-# 停止服务
-docker-compose down
 ```
 
-启动后访问：
+启动后：
 - 前端：`http://localhost`
 - 后端 API：`http://localhost:8080/api`
-- Swagger 文档：`http://localhost:8080/swagger-ui.html`
+- Swagger：`http://localhost:8080/swagger-ui.html`
 
-### 手动部署
+### 方式二：手动启动
 
-### 环境要求
-- JDK 17+
-- Maven 3.6+
-- MySQL 8.0+
-- Redis 6.0+（验证码功能需要）
-- Node.js 16+
-
-### 1. 初始化数据库
+**环境要求：** JDK 17+、Maven 3.6+、MySQL 8.0+、Redis、Node.js 16+
 
 ```bash
-# 创建数据库和核心表
+# 1. 建数据库，按顺序导入脚本
 mysql -u root -p < sql/init.sql
-
-# 导入新增表（系统配置、操作日志、黑名单、积分、签到、通知）
 mysql -u root -p library_system < sql/V2_new_tables.sql
-
-# 导入 v5.0 创新功能表（书评、关注、学习伙伴等）
 mysql -u root -p library_system < sql/V3_innovation.sql
-
-# 可选：导入测试数据
+mysql -u root -p library_system < sql/V4_reply.sql
+mysql -u root -p library_system < sql/V5_rbac.sql
+mysql -u root -p library_system < sql/V6_login_log.sql
+# 测试数据（可选）
 mysql -u root -p library_system < sql/mock_data.sql
 mysql -u root -p library_system < sql/mock_data_v3.sql
-```
 
-### 2. 启动 Redis
-
-```bash
+# 2. 启动 Redis
 redis-server
-```
 
-### 3. 启动后端
-
-```bash
+# 3. 启动后端
 cd library-system
-
-# 设置数据库密码（或修改 application.properties 默认值）
-export DB_PASSWORD=your_mysql_password
-
-# 启动
+export DB_PASSWORD=你的mysql密码
 mvn spring-boot:run
-```
 
-后端运行在 `http://localhost:8080`，上下文路径 `/api`
-
-### 4. 启动前端
-
-```bash
+# 4. 启动前端
 cd vue-frontend
 npm install
 npm run dev
 ```
-
-前端运行在 `http://localhost:5173`
-
-## 登录入口
-
-| 入口 | 地址 | 适用角色 | 验证码 |
-|------|------|---------|--------|
-| 读者入口 | `http://localhost:5173/student/login` | 学生/读者 | 支持 |
-| 管理入口 | `http://localhost:5173/login` | 管理员、图书管理员 | 支持 |
 
 ### 测试账号
 
@@ -328,395 +137,88 @@ npm run dev
 | 图书管理员 | librarian | admin123 |
 | 读者 | 2024001 | admin123 |
 
-## API 文档（Swagger）
+读者登录入口：`/student/login`，管理员/图书管理员登录入口：`/login`
 
-后端启动后访问 Swagger UI：
+## 做了哪些安全方面的事
 
-```
-http://localhost:8080/swagger-ui.html
-```
+这部分是慢慢补上来的，一开始其实没考虑那么多：
 
-- 23 个 Controller 全覆盖 @Tag/@Operation 注解
-- 支持 JWT Bearer Token 认证（登录后在 Swagger 页面 Authorize 填入 Token）
-- 生产环境可通过 `springdoc.api-docs.enabled=false` 关闭
+- **JWT 认证**：登录后返回 Token，后续请求带上，无状态的
+- **RBAC 权限**：五张表，分角色控制接口访问权限
+- **并发处理**：座位预约用了 Redis 分布式锁防止抢座冲突，积分变动用了悲观锁，借阅库存用了乐观锁
+- **XSS 过滤**：拦截请求里的恶意脚本
+- **敏感字段加密**：手机号、身份证用 AES 加密存数据库
+- **IP 限流**：登录接口限制每分钟 10 次，书评发布限制每分钟 5 次
+- **操作日志**：AOP 切面自动记录关键操作，异步写入不影响主流程
+- **登录日志**：记录每次登录的 IP、浏览器、成功或失败
+- **数据校验**：ISBN-13 格式校验、学号格式校验
 
-## 功能模块
+## 关于推荐功能
 
-### 读者功能
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| **图书搜索** | 按书名/作者/ISBN搜索，分类筛选，**高级搜索（出版社/年份/ISBN/库存状态）**，搜索历史 | ✅ |
-| 智能荐书 | 首页"为你推荐"，基于权重评分（偏好分类+热门+借阅历史+同伴评分），权重可配置 | ✅ |
-| 书评系统 | 图书详情页书评选项卡，发表/删除/点赞/回复书评 | ✅ |
-| 相似推荐 | 图书详情页"相似图书"推荐（基于分类） | ✅ |
-| 图书预约 | 选择可借图书预约，重复预约检查，黑名单检查 | ✅ |
-| 智能座位推荐 | 根据历史偏好 + 学习伙伴偏好区域推荐最优座位 | ✅ |
-| 学习伙伴 | 发布学习偏好，系统匹配偏好区域相同的伙伴 | ✅ |
-| **座位预约** | 可视化座位网格 + **时间轴视图（座位×时段矩阵）**，自动刷新 | ✅ |
-| 座位签到 | 预约后签到/签退，超时未签到自动释放 | ✅ |
-| 借阅记录 | 查看借阅历史，逾期弹窗提醒，一键续借，**导出 Excel/CSV** | ✅ |
-| 借阅历史 | ECharts 可视化（按月柱状图+分类饼图） | ✅ |
-| 社交关注 | 关注/粉丝系统，查看他人主页和书评 | ✅ |
-| 消息通知 | 催还通知（4级梯度）+ 社交通知 + **预约到书通知** + **罚款通知** | ✅ |
-| 个人资料 | 修改信息、查看罚款、修改密码 | ✅ |
-| 读者积分 | 查看积分等级（普通/银牌/金牌/钻石） | ✅ |
-| 读者首页 | 当前预约状态卡片、一键签到、关注动态信息流 | ✅ |
-| 多语言切换 | 中英文即时切换，语言偏好持久化 | ✅ |
+说实话不是什么高深的算法。就是根据读者以前借过什么类型的书，结合图书热门程度和书评评分，按权重算个分排出来。权重可以在后台配置页面调整。
 
-### 管理员功能
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 图书管理 | 增删改查、上下架、批量导入导出、**批量上架/下架/删除** | ✅ |
-| 读者管理 | 查看、编辑、禁用、重置密码 | ✅ |
-| 座位管理 | 管理座位（状态机约束） | ✅ |
-| 账号管理 | 管理管理员/图书管理员/学生账号 | ✅ |
-| 借阅管理 | 查看所有借阅记录，处理罚款 | ✅ |
-| 预约审批 | 审批图书/座位预约 | ✅ |
-| 数据统计 | 仪表板+图表+座位热力图+在线人数 | ✅ |
-| **数据大屏** | 全屏可视化大屏（实时在馆人数、借阅趋势、热力图、热门TOP10） | ✅ |
-| 座位预测 | 基于历史数据的明日座位占用率预测 | ✅ |
-| 流通趋势 | 图书分类借阅趋势（7/30/90天） | ✅ |
-| 逾期统计 | 按月逾期率统计、借阅学院分布 | ✅ |
-| 系统配置 | 在线修改借阅规则、罚款规则、推荐权重等参数 | ✅ |
-| 操作日志 | 查看操作审计日志，支持导出CSV | ✅ |
-| **登录日志** | 查看登录审计记录（IP/浏览器/成功失败） | ✅ |
-| 黑名单管理 | 查看/添加/移出黑名单，违约明细弹窗 | ✅ |
-| **修改密码** | 侧边栏入口，旧密码验证+新密码确认 | ✅ |
+新读者没有借阅历史的话就直接推荐全校热门的书，不算什么个性化推荐。
 
-### 图书管理员功能
-| 功能 | 说明 | 状态 |
-|------|------|------|
-| 借还书处理 | 借书（自动补全）、还书、续借 | ✅ |
-| 借阅记录 | 查询所有借阅记录 | ✅ |
-| 预约审批 | 审批图书/座位预约 | ✅ |
-| 罚款管理 | 处理罚款缴纳 | ✅ |
-| 修改密码 | 侧边栏入口，旧密码验证+新密码确认 | ✅ |
+学习伙伴匹配也很简单——发布自己偏好在哪个区域学习，系统找同样偏好这个区域的人，就这些。
 
-## 数据库设计（25张表）
+## 关于数据统计
 
-### 核心表
-| 表名 | 用途 | 关键字段 |
-|------|------|----------|
-| admin | 管理员账号 | id, username, password, real_name |
-| librarian | 图书管理员账号 | id, username, password, real_name, status |
-| reader | 读者信息 | id, reader_id, password, real_name, gender, phone, email, department, preferred_categories, language |
-| book | 图书信息 | id, isbn, title, author, publisher, category, cover_url, available_count, title_en, author_en |
-| seat | 座位信息 | id, seat_number, area, status, device_id |
-| borrowing | 借阅记录 | id, reader_id, book_id, borrow_date, due_date, return_date, status, fine_amount, renew_count |
-| reservation | 预约记录 | id, reader_id, book_id, seat_id, status, expiry_date, preferred_time_slot |
-| scheduling | 座位排期 | seat_id, reader_id, start_time, end_time, status |
+后端写了一些统计接口，前端用 ECharts 画图表，包括：
 
-### 功能表
-| 表名 | 用途 | 关键字段 |
-|------|------|----------|
-| system_config | 系统参数配置 | config_key, config_value, description |
-| operation_log | 操作日志审计 | user_id, username, role, module, action, detail, ip |
-| blacklist | 读者黑名单 | reader_id, violation_count, reason, blacklisted, start_time, end_time |
-| reader_level | 读者等级积分 | reader_id, points, level, total_borrow_count |
-| seat_checkin | 座位签到记录 | seat_id, reader_id, reservation_id, checkin_time, checkout_time, status |
-| notification | 通知消息 | reader_id, title, content, type, is_read, create_time |
+- 仪表盘（借阅总数、在馆人数、逾期数这些）
+- 借阅趋势折线图
+- 座位热力图（哪些区域最受欢迎）
+- 热门图书排行
+- 逾期率按月统计
+- 借阅的学院分布
+- 座位占用率预测（根据历史数据简单算的）
 
-### 社交表
-| 表名 | 用途 | 关键字段 |
-|------|------|----------|
-| book_review | 书评 | book_id, reader_id, content, rating, status |
-| review_like | 书评点赞 | review_id, reader_id (唯一约束) |
-| reader_follow | 关注关系 | follower_id, followee_id (唯一约束) |
-| study_buddy | 学习伙伴 | reader_id, preferred_slot, preferred_area, study_goal, status |
-| review_reply | 书评回复 | review_id, reader_id, content, reply_to_reader_id, status |
+没有用什么大数据框架，就是 MySQL 查出来统计一下，ECharts 画个图。
 
-### RBAC 权限表（v5.4）
-| 表名 | 用途 | 关键字段 |
-|------|------|----------|
-| sys_role | 角色表 | role_key (SUPER_ADMIN/LIBRARIAN/READER), role_name |
-| sys_permission | 权限表 | perm_key (book:create, borrow:return), module |
-| sys_user_role | 用户-角色关联 | user_type (READER/ADMIN/LIBRARIAN), user_id, role_id |
-| sys_role_permission | 角色-权限关联 | role_id, permission_id |
+## 一些细节
 
-### 审计表（v5.6）
-| 表名 | 用途 | 关键字段 |
-|------|------|----------|
-| login_log | 登录审计日志 | username, role, login_time, ip, user_agent, status, fail_reason |
+**催还通知：** 每天早上 9 点自动扫描，分四个等级提醒：到期前 1 天温馨提醒、逾期 1-3 天一般提醒、4-7 天紧急催还、7 天以上严重警告。
 
-```
-┌──────────────┐     ┌──────────────────┐     ┌──────────────┐
-│   sys_role   │────<│ sys_role_permission│>────│sys_permission│
-│   角色表     │     │   角色-权限关联   │     │   权限表     │
-└──────────────┘     └──────────────────┘     └──────────────┘
-       ▲
-       │
-┌──────────────────┐
-│  sys_user_role   │
-│  用户-角色关联   │
-└──────────────────┘
-       ▲
-       │
-┌──────┴───────┐
-│ reader/admin │
-│  librarian   │
-└──────────────┘
-```
+**罚款规则：** 逾期每天 0.1 元，有 3 天宽限期。这些都可以在后台配置页面改。
 
-## API 接口概览
+**续借限制：** 到期前 7 天内才能续借，最多续借 2 次，已经逾期的不能续。
 
-### 基础接口
-| 模块 | 主要接口 | 权限 |
-|------|---------|------|
-| 认证 | POST /auth/login, /register, /refresh, /change-password, GET /auth/captcha | 公开(除change-password) |
-| 图书 | GET/POST/PUT/DELETE /books, GET /books/search, POST /books/batch-status, DELETE /books/batch | 登录用户 |
-| 借阅 | POST /borrowings/borrow, /return, /renew, PUT /payFine | 登录用户 |
-| 预约 | POST /reservations, PUT /{id}/status/{status}, DELETE /{id} | 登录用户 |
-| 座位 | GET /seats, GET /seats/timeline, POST /seat-checkin, PUT /{id}/checkout | 登录用户 |
-| 读者 | GET/PUT /readers, GET /readers/{readerId} | 管理员/图书管理员 |
-| 通知 | GET /notifications/mine, /reader/{id}, PUT /{id}/read | 登录用户 |
-| 配置 | GET/PUT /config | 管理员 |
-| 日志 | GET /logs (分页) | 管理员 |
-| 登录日志 | GET /login-logs (分页) | 管理员 |
-| 黑名单 | GET/POST/DELETE /blacklist | 管理员 |
-| 统计 | GET /statistics/dashboard, /online-count, /realtime | 管理员/图书管理员 |
-| 导出 | GET /export/my-borrowings | 读者 |
+**座位签到：** 预约后 30 分钟内不签到自动释放。超时未签退也会自动签退。
 
-### v5.0 社交与推荐接口
-| 模块 | 接口 | 权限 |
-|------|------|------|
-| 智能推荐 | GET /recommendation/mine, /recommendation/{readerId}, /books/{id}/similar | 登录用户 |
-| 书评 | POST /reviews, GET /reviews/book/{id}, GET /reviews/mine, /reviews/reader/{id} | 登录用户 |
-| 书评删除 | DELETE /reviews/{id}（readerId 从 JWT 获取） | 登录用户 |
-| 点赞 | POST/DELETE /reviews/{id}/like, GET /reviews/{id}/liked | 登录用户 |
-| 关注 | POST/DELETE /follows, GET /follows/followers/mine, /followees/mine | 登录用户 |
-| 关注检查 | GET /follows/check?followeeId | 登录用户 |
-| 数据分析 | GET /analysis/seat-prediction, /book-trend, /overdue-risk, /seat-heatmap | 管理员 |
-| 座位推荐 | GET /seats/recommend?date&timeSlot&limit | 登录用户 |
-| 学习伙伴 | GET/POST/DELETE /study-buddy/mine, GET /study-buddy/match | 读者 |
+**黑名单：** 违约次数累计达到阈值（默认 3 次）自动加入黑名单。
 
-### v5.1 新增接口
-| 模块 | 接口 | 权限 |
-|------|------|------|
-| 逾期统计 | GET /statistics/overdue-rate/monthly | 管理员 |
-| 学院分布 | GET /statistics/borrowings/department | 管理员 |
-| 违约明细 | GET /blacklist/violations/{readerId} | 管理员 |
+**书评：** 可以写书评、打分、点赞、回复（楼中楼），管理员可以删除违规书评并通知读者。
 
-### v5.2 新增接口
-| 模块 | 接口 | 权限 |
-|------|------|------|
-| 书评回复 | POST /reviews/{reviewId}/replies | 登录用户 |
-| 书评回复 | DELETE /replies/{replyId} | 登录用户 |
-| 书评回复 | GET /reviews/{reviewId}/replies | 登录用户 |
-| 数据导出 | GET /export/borrowings?startDate&endDate&format | 管理员/馆员 |
-| 数据导出 | GET /export/overdue?month&format | 管理员/馆员 |
-| 数据导出 | GET /export/reader-ranking?format | 管理员/馆员 |
-| 数据导出 | GET /export/operation-logs?format | 管理员 |
-| Swagger | GET /swagger-ui.html | 公开 |
-| Swagger | GET /v3/api-docs | 公开 |
+## 已知的不足
 
-### 安全说明
-所有写操作接口的 `readerId` 均从 JWT Token 中解析获取，不信前端传入。读者端通过 `/mine` 端点访问个人数据，管理员/馆员通过参数化端点访问任意用户数据。markAsRead/checkout 等操作增加 ownership 校验，读者只能操作自己的数据。
+说几个自己知道的问题：
 
-## 系统参数配置
+1. 前端没有做自动化测试，全靠手动点
+2. 代码里有些地方注释不够清楚
+3. 部分复杂业务的异常处理还可以更细致
+4. 移动端适配做了基础的响应式，但体验一般
+5. 没有做实际的压力测试，高并发场景下不确定表现如何
+6. 推荐算法比较简单，不是真正的协同过滤
 
-| 参数 | 默认值 | 说明 |
-|------|--------|------|
-| library.borrowing.default-days | 30 | 默认借阅天数 |
-| library.borrowing.renew-days | 30 | 续借天数 |
-| library.borrowing.max-renew-count | 2 | 最大续借次数 |
-| library.borrowing.renew-window-days | 7 | 续借窗口期（到期前X天内才可续借） |
-| library.fine.daily-rate | 0.10 | 日罚款率（元/天） |
-| library.fine.grace-days | 3 | 罚款宽限期（逾期X天内免罚） |
-| library.reader.max-borrow-count | 5 | 最大借阅数 |
-| library.blacklist.violation-threshold | 3 | 黑名单违约阈值 |
-| library.seat.checkin-timeout-minutes | 30 | 签到超时时间 |
-| library.default-language | zh_CN | 默认语言 |
-| library.blacklist.cancel-threshold | 3 | 一周取消预约次数阈值 |
-| library.seat.smart-recommend-top | 3 | 智能推荐座位数量 |
-| library.recommend.weight_borrow_history | 0.4 | 推荐算法：借阅历史权重（基于分类借阅次数） |
-| library.recommend.weight_preferred_categories | 0.3 | 推荐算法：偏好分类权重 |
-| library.recommend.weight_hot_books | 0.2 | 推荐算法：热门图书权重 |
-| library.recommend.weight_peer_rating | 0.1 | 推荐算法：同伴评分权重（基于书评平均评分） |
+## 快速了解 API
 
-## 定时任务
+启动后端后访问 `http://localhost:8080/swagger-ui.html`，Swagger 文档里列了所有接口，可以在线调试。
 
-| 任务 | 频率 | 说明 |
-|------|------|------|
-| releaseExpiredReservations | 每5分钟 | 释放过期预约 |
-| releaseUncheckinedReservations | 每5分钟 | 释放超时未签到预约 |
-| autoCheckout | 每5分钟 | 超时未签退自动签退 |
-| checkOverdueNotifications | 每天9:00 | 发送催还通知（4级梯度 + 去重） |
-| updatePopularBooksCache | 每天凌晨 | 更新热门图书缓存 |
-| cacheSeatPredictions | 每天凌晨 | 缓存次日座位预测 |
-| detectMaliciousCancels | 每天凌晨 | 检测恶意占座行为 |
+登录后在 Swagger 页面点 Authorize 填入 Token，就能测试需要认证的接口。
 
-## 安全机制
+## 更新记录
 
-### 认证与授权
-- **JWT 无状态认证**：BCrypt 密码加密，Token 包含 userId/userType/authorities
-- **RBAC 权限控制**：五张表设计（sys_role/sys_permission/sys_user_role/sys_role_permission），支持 URL 级 + @PreAuthorize 方法级 + 数据级三层权限
-- **验证码**：登录时图形验证码（Redis 存储，5分钟过期）
-- **数据权限**：readerId 从 JWT Token 获取，不信前端传入；读者通过 `/mine` 端点访问个人数据
-- **越权防护**：markAsRead/checkout 等写操作增加 ownership 校验
+详细的版本更新记录见 [CHANGELOG.md](./CHANGELOG.md)。
 
-### 并发控制（三种锁策略）
-| 场景 | 锁方案 | 实现 |
-|------|--------|------|
-| **座位预约抢座** | Redis 分布式锁 | `SETNX lock:seat:{seatId} 1 EX 5` + Lua 原子释放 |
-| **积分变动** | 悲观锁 | `SELECT ... FOR UPDATE` 锁定行，事务内串行 |
-| **借阅库存** | 乐观锁 | `WHERE available_count > 0`，SQL 原子性保证 |
+主要迭代：
+- **v5.6** — 错误提示优化、修改密码、高级搜索、座位时间轴、数据大屏、批量操作、PWA、登录日志
+- **v5.5** — 整了个"书香"设计系统，换了一套暖色系配色和字体
+- **v5.4** — 加了并发锁、RBAC 权限、XSS 防护、字段加密
+- **v5.3** — 补了一些接口和通知功能
+- **v5.2** — DTO 改造、写了一批测试、缓存迁移到 Redis、书评回复、数据导出、Docker 部署
+- **v5.1** — 书评社交、座位推荐、中英文切换
+- **v5.0** — 修复越权问题、催还通知梯度、续借/罚款规则
 
-### 防护措施
-- **XSS 防护**：`XssFilter` 过滤 `<script>`、`onerror=`、`javascript:` 等攻击代码
-- **字段加密**：手机号/身份证 AES 加密存储，MyBatis TypeHandler 业务层无感
-- **操作审计**：AOP + `@OperLog` 注解自动记录关键操作（异步写入）
-- **IP 限流**：Redis + `RateLimitInterceptor`（登录 10次/分钟、书评 5次/分钟）
-- **敏感配置**：环境变量外部化，不提交到 Git
+---
 
-## 国际化
-
-- **前端**：vue-i18n，~800 行中英文语言包，覆盖所有业务页面
-- **后端**：MessageSource + AcceptHeaderLocaleResolver，messages_zh_CN/en_US.properties（含异常处理 i18n）
-- **Element Plus**：ElConfigProvider 响应式切换（不刷新页面即可同步）
-- **通知 i18n**：社交通知/催还通知前端映射，切语言后自动翻译
-- **持久化**：reader.language 字段存储语言偏好，登录时返回，切语言时同步后端
-
-## 常见问题
-
-### Q: 启动后端报数据库连接错误？
-A: 设置 `export DB_PASSWORD=your_password`，确保 MySQL 已启动。
-
-### Q: 验证码不显示？
-A: 确保 Redis 已启动（默认 localhost:6379）。
-
-### Q: 系统配置修改后不生效？
-A: 配置已改为从数据库读取，修改后立即生效，无需重启。
-
-### Q: 借阅天数/罚款单价在哪里修改？
-A: 管理后台 → 系统配置 → 借阅规则/罚款规则。
-
-### Q: 黑名单如何自动加入？
-A: 读者违约（超时未签到/取消已批准预约）累计达到阈值（默认3次）自动加入。
-
-### Q: 催还通知什么时候发送？
-A: 每天上午9点自动扫描，按梯度发送：到期前1天温馨提醒、逾期1-3天一般提醒、4-7天紧急催还、7天以上严重警告。
-
-### Q: 如何切换语言？
-A: 登录页右上角或导航栏底部语言切换下拉框，支持简体中文/英文即时切换。Element Plus 组件语言同步切换。已登录用户的语言偏好会自动保存。
-
-### Q: 智能推荐如何工作？
-A: 系统根据读者借阅历史提取偏好分类，结合热门程度、偏好分类匹配度、同伴评分（基于书评平均评分）进行加权评分排序。权重可在系统配置中调整。新读者返回全校热门图书。
-
-### Q: 学习伙伴如何匹配？
-A: 读者发布学习偏好（时段/区域/目标），系统匹配偏好区域相同的伙伴。座位推荐时，与伙伴偏好区域一致的座位会额外加分（+15分）。
-
-### Q: 续借有什么限制？
-A: 只能在到期前7天内续借（可通过系统配置调整），已逾期的图书不能续借，最大续借次数2次。
-
-### Q: 罚款如何计算？
-A: 逾期每天0.1元（可在系统配置调整），有3天宽限期（逾期3天内免罚）。
-
-### Q: 如何扫码签到？
-A: 在座位预约页点击"扫码签到"按钮，输入座位上的编号即可快速签到。
-
-### Q: 如何查看黑名单违约原因？
-A: 管理员在黑名单管理页点击"违约明细"按钮，可查看读者的超时未签到和取消预约记录。
-
-## 更新日志
-
-### v5.6 (2026-07-17)
-- **体验**：全局错误提示优化 —— 403 弹窗引导联系管理员、网络失败 Notification 带重试提示、401 明确提示过期
-- **功能**：管理员/图书管理员修改密码 —— 侧边栏新增入口，旧密码验证 + 新密码确认，修改后自动登出
-- **体验**：操作反馈闭环 —— 系统配置保存弹 Notification 确认、导入图书结果摘要、删除操作统一二次确认
-- **功能**：读者借阅记录导出 —— 我的借阅页新增导出按钮，支持 Excel/CSV 格式
-- **功能**：通知增强 —— 预约审批通过自动通知读者、逾期归还产生罚款时自动通知
-- **功能**：高级搜索 —— 图书搜索新增出版社/年份/ISBN/库存状态筛选，搜索历史 localStorage 持久化
-- **功能**：座位时间轴视图 —— 座位 × 时段矩阵（8:00-22:00），点击空闲格子直接预约
-- **功能**：数据可视化大屏 —— 全屏深色主题，实时在馆人数、借阅趋势、热力图、热门图书 TOP10
-- **功能**：批量操作 —— 图书管理表格多选，批量上架/下架/删除
-- **安全**：ISBN-13 格式校验 —— 校验码验证 + 重复检测，导入时自动跳过无效/重复记录
-- **安全**：学号格式校验 —— 注册时校验8位数字格式
-- **架构**：PWA 支持 —— vite-plugin-pwa，可添加到主屏幕，API NetworkFirst + 静态资源 CacheFirst
-- **安全**：登录审计日志 —— login_log 表记录每次登录（IP/User-Agent/状态/失败原因），管理员可查看
-
-### v5.5 (2026-07-17)
-- **UI**：「书香」设计系统 —— 暖墨色系（#2C3E50/#C0785C/#6B8F71）、思源宋体标题+思源黑体正文、书脊装饰线
-- **UI**：登录页重做 —— 统一暖墨渐变背景、毛玻璃卡片、赭石底部装饰线，管理端和读者端风格统一
-- **UI**：侧边栏改造 —— 墨蓝底色 #2C3E50、赭石激活竖条 #C0785C、宋体标题 + 装饰线
-- **UI**：Element Plus 主题覆盖 —— CSS 自定义属性全局替换（主色/成功/警告/危险/文字/边框/背景/阴影）
-- **UI**：全站颜色系统替换 —— 24 个 Vue 组件的渐变/文字/阴影/边框/图标色值全部替换为暖色系
-- **UI**：ECharts 暖色主题 —— 8 色暖色板、借阅热度色阶、暖灰坐标轴和提示框
-- **UI**：引入 Noto Sans SC + Noto Serif SC 字体（Google Fonts CDN）
-- **修复**：RBAC 权限 403 —— RbacJwtAuthenticationFilter 添加 fallback 逻辑，RBAC 表无数据时根据 userType 自动分配默认角色
-- **修复**：RBAC SUPER_ADMIN 兼容 —— SecurityConfig hasRole 改 hasAnyRole，SUPER_ADMIN 自动获得 ROLE_ADMIN 权限
-- **修复**：残留旧颜色清理 —— template 内联样式、JS 中的 ECharts 颜色值全部替换
-
-### v5.4 (2026-07-10)
-- **安全**：座位预约分布式锁 —— Redis SETNX + Lua 原子释放，防止并发抢座脏数据
-- **安全**：积分原子性 —— SELECT FOR UPDATE 悲观锁，借书/还书/签到并发操作积分不丢失
-- **安全**：借阅乐观锁 —— WHERE available_count > 0，最后一本书并发借阅正确处理
-- **安全**：RBAC 权限控制 —— 五张表设计（sys_role/sys_permission/sys_user_role/sys_role_permission），URL级+方法级+数据级三层权限
-- **安全**：XSS 防护过滤器 —— 过滤 script/onerror/event 等攻击代码
-- **安全**：敏感字段 AES 加密 —— 手机号/身份证加密存储，MyBatis TypeHandler 业务层无感
-- **架构**：操作日志异步化 —— @Async + 线程池，日志写入不阻塞主业务
-- **性能**：座位状态缓存 —— Redis 缓存座位详情/区域列表，状态变更时自动失效
-- **测试**：Testcontainers 集成 —— 真实 MySQL 8.0 容器测试，避免 H2 语法兼容问题
-- **测试**：并发测试用例 —— 3 个测试类验证分布式锁/悲观锁/乐观锁有效性
-
-### v5.3 (2026-06-27)
-- **功能**：管理员删除书评时自动通知读者（系统消息告知违反规则）
-- **功能**：补全图书导入/导出 Controller 端点（POST /books/import, GET /books/export）
-- **功能**：补全 Token 刷新端点（POST /auth/refresh），前端无感续期生效
-- **修复**：统计热力图从 Mock 随机数据改为使用 AnalysisService 真实数据
-- **修复**：i18n 结构修复（reader 节下 profile/reservations/seatReservation/userProfile 嵌套恢复）
-
-### v5.2 (2026-06-27)
-- **代码质量**：7 个 @RequestBody Map 接口改造为强类型 DTO + @Valid 校验（阶段一）
-- **测试**：新增 69 个单元测试 + 20 个集成测试，核心 Service 覆盖率 100%（阶段二）
-- **安全**：热门图书/座位预测缓存从静态变量迁移到 Redis，带 ConcurrentHashMap 降级（阶段三）
-- **安全**：登录和书评发布接口新增 Redis IP 限流（10次/分钟、5次/分钟）（阶段三）
-- **安全**：6 个 Mapper XML insert 添加 useGeneratedKeys（阶段二修复）
-- **功能**：书评回复（楼中楼）—— review_reply 表 + 后端 CRUD + 前端回复区域（阶段四）
-- **功能**：书评删除级联软删除回复（阶段四）
-- **功能**：数据导出增强 —— 借阅记录/逾期/积分排行/操作日志，支持 Excel（SXSSFWorkbook）和 CSV（阶段五）
-- **功能**：管理员端新增"数据导出"页面（阶段五）
-- **UX**：移动端响应式适配 —— useScreenSize composable + CSS Media Query（阶段六）
-- **UX**：侧边栏移动端改抽屉模式、座位网格缩略可滚动、搜索栏垂直堆叠（阶段六）
-- **文档**：Swagger API 文档 —— springdoc-openapi 2.3.0，22 个 Controller 全覆盖注解（阶段七）
-- **部署**：Docker 容器化 —— 多阶段 Dockerfile + docker-compose（MySQL + Redis + Backend + Frontend）（阶段八）
-- **修复**：zh-CN.js / en-US.js 多余闭括号导致 Vite 构建失败
-
-### v5.1 (2026-06-26)
-- **安全**：修复 NotificationController.markAsRead 和 SeatCheckinController.checkout 越权问题
-- **安全**：所有写操作增加 ownership 校验，读者只能操作自己的数据
-- **功能**：推荐算法新增同伴评分维度（基于 book_review 平均评分）
-- **功能**：wBorrowHistory 改为基于实际借阅次数（不再与 wPreferred 重复）
-- **功能**：读者首页新增当前预约状态卡片 + 一键签到 + 关注动态信息流
-- **功能**：图书搜索页卡片露出平均评分和书评数
-- **功能**：座位预约页新增扫码签到快捷入口（输入座位号快速签到）
-- **功能**：管理员端新增逾期率按月统计、借阅学院分布端点
-- **功能**：黑名单管理新增违约明细弹窗（超时未签到/取消预约记录）
-- **国际化**：补全 9 个缺失的 i18n key，修复 10 处硬编码中文
-- **国际化**：GlobalExceptionHandler 注入 MessageSource，异常返回走 i18n
-- **国际化**：Element Plus locale 改为 ElConfigProvider 响应式切换
-- **国际化**：社交通知/催还通知前端映射，切语言后自动翻译
-- **国际化**：router meta title 改为 i18n key，支持多语言页面标题
-
-### v5.0 (2026-06-26)
-- **安全**：15 个接口的 readerId 改为从 JWT Token 获取，消除水平越权风险
-- **安全**：新增 `/mine` 端点，读者端通过 JWT 身份访问个人数据
-- **功能**：学习伙伴完整实现（发布偏好、匹配伙伴、座位推荐集成）
-- **功能**：推荐算法权重从 system_config 动态读取（可在线调整）
-- **功能**：座位推荐支持时段过滤（排除已预约座位）
-- **功能**：催还通知 4 级梯度（明天到期/逾期1-3天/4-7天/7+天）+ 去重
-- **功能**：续借限制（到期前7天内才可续借）
-- **功能**：罚款宽限期（逾期3天内免罚）
-- **优化**：书评列表/我的书评 N+1 查询改为 JOIN 一次查询
-- **国际化**：前后端全量 i18n 落地（~750行语言包、Element Plus 语言包、MessageSource、LocaleResolver）
-- **国际化**：reader.language 持久化（登录返回、切语言同步后端）
-- **国际化**：8 处 formatTime 响应式切换、axios 拦截器 i18n 化
-- 新增 I18nConfig、StudyBuddyService/Controller、messages properties
-
-### v4.0.1 (2026-06-25)
-- 修复：书籍详情页书评不显示（响应字段 `records` → `items`）
-- 修复：个人资料页"我的书评"不显示
-- 修复：关注/粉丝列表始终为空
-- 修复：删除书评缺少 `readerId` 参数导致 400 错误
-- 修复：`getReaderReviews` 返回数据补充 `bookTitle`、`likeCount` 字段
-- 优化：`deleteReview` 对管理员/馆员角色可选 `readerId` 参数
-- 更新：README 文档，修正文件数量统计和功能状态说明
+> 这个项目是学习过程中的产物，很多东西是在做的过程中才慢慢理解的。如果有发现 bug 或者觉得哪里写得不好，欢迎提 issue。
