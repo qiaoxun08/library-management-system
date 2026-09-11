@@ -4,6 +4,35 @@
 
 ---
 
+---
+
+## v5.10 (2026-09-11) — 第四轮深度审查：部署链路真实验证（SQL 全量）
+
+### 🚀 部署阻断修复（Critical ×4）
+这一轮不再靠读代码，而是本机起 MySQL 26.7，按 docker-compose 的执行顺序把 8 个 SQL 脚本真实跑通（连跑三轮），直接暴露 4 个会让 `docker-compose up` 失败的问题：
+
+- **V4/V5/V6 缺 `USE library_system;`**：docker-entrypoint 下每个 .sql 文件独立执行，三个脚本直接报 `ERROR 1046: No database selected`，容器初始化中止。已补上
+- **V2 索引与 init.sql 重复**：init.sql 已内联建了 V2 全部表+索引，02-v2.sql 再跑一遍 `ALTER TABLE ADD INDEX` 因索引名重复报错（`CREATE TABLE IF NOT EXISTS` 幂等没事，`ADD INDEX` 不幂等）
+- **system_config 主键冲突**：`library.name` 在 init.sql 和 V2 脚本里各插一次，撞 UNIQUE 约束
+- **V3 的 ALTER TABLE ADD COLUMN 不幂等**：重复执行直接失败
+
+### 🔧 幂等化改造
+- 新增 `add_index_if_not_exists` / `add_column_if_not_exists` 两个存储过程（基于 information_schema 判断），init.sql / V2 / V3 / V5 的所有 `ADD INDEX`、`ADD COLUMN` 全部改用它们
+- `INSERT INTO` 统一改为 `INSERT IGNORE INTO`（system_config / sys_role / sys_permission / sys_role_permission / sys_user_role）
+
+### 🧹 配置项对齐
+- **7 个 config_key 是永远不会被读到的死配置**：init.sql 用下划线命名（`library.fine.daily_rate`），代码只读连字符版本（`library.fine.daily-rate`）。已全部对齐到代码实际读取的命名
+- 验证结果：代码需要的 8 个配置 key 在 DB 中零缺失，mock_data 全量灌入无外键错误（18 读者 / 25 书 / 15 借阅 / 15 预约）
+
+### ✅ 验证方式
+本机 mysqld 26.7 临时实例，按 docker-compose 顺序执行 8 个脚本，连跑三轮全绿；再灌 mock_data.sql + mock_data_v3.sql 验证数据自洽。
+
+### 📝 已知未修（记录在案）
+- mock_data 全部账号仍用 admin123 弱密码（文件头已有明确警告，属开发数据，生产需重置）
+- 集成测试（Testcontainers）需 Docker，本机不可用
+
+---
+
 ## v5.9 (2026-09-11) — 第三轮深度审查（SQL/数据层 + 基础设施 + i18n）
 
 ### 🐛 SQL/数据层（Critical）

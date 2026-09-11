@@ -13,6 +13,39 @@ DROP DATABASE IF EXISTS library_system;
 CREATE DATABASE IF NOT EXISTS library_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE library_system;
 
+-- ========================================
+-- 幂等性工具：允许脚本重复执行（docker-compose 会按序重跑）
+-- ========================================
+DROP PROCEDURE IF EXISTS add_index_if_not_exists;
+DROP PROCEDURE IF EXISTS add_column_if_not_exists;
+DELIMITER $$
+CREATE PROCEDURE add_index_if_not_exists(
+    IN p_table VARCHAR(64), IN p_index VARCHAR(64), IN p_columns VARCHAR(255)
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema = DATABASE() AND table_name = p_table AND index_name = p_index
+    ) THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD INDEX `', p_index, '` ', p_columns);
+        PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+CREATE PROCEDURE add_column_if_not_exists(
+    IN p_table VARCHAR(64), IN p_column VARCHAR(64), IN p_definition VARCHAR(500)
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = p_table AND column_name = p_column
+    ) THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD COLUMN `', p_column, '` ', p_definition);
+        PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+DELIMITER ;
+
+
 -- 删除旧表（按外键依赖逆序）
 DROP TABLE IF EXISTS scheduling;
 DROP TABLE IF EXISTS borrowing;
@@ -142,17 +175,17 @@ CREATE TABLE IF NOT EXISTS scheduling (
 -- ========================================
 -- 为关键查询字段添加索引
 -- ========================================
-ALTER TABLE book ADD INDEX idx_book_title (title);
-ALTER TABLE book ADD INDEX idx_book_author (author);
-ALTER TABLE book ADD INDEX idx_book_category (category);
-ALTER TABLE borrowing ADD INDEX idx_borrowing_reader_id (reader_id);
-ALTER TABLE borrowing ADD INDEX idx_borrowing_book_id (book_id);
-ALTER TABLE borrowing ADD INDEX idx_borrowing_status (status);
-ALTER TABLE reservation ADD INDEX idx_reservation_reader_id (reader_id);
-ALTER TABLE reservation ADD INDEX idx_reservation_book_id (book_id);
-ALTER TABLE reservation ADD INDEX idx_reservation_seat_id (seat_id);
-ALTER TABLE reservation ADD INDEX idx_reservation_status (status);
-ALTER TABLE seat ADD INDEX idx_seat_area (area);
+CALL add_index_if_not_exists('book', 'idx_book_title', '(title)');
+CALL add_index_if_not_exists('book', 'idx_book_author', '(author)');
+CALL add_index_if_not_exists('book', 'idx_book_category', '(category)');
+CALL add_index_if_not_exists('borrowing', 'idx_borrowing_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('borrowing', 'idx_borrowing_book_id', '(book_id)');
+CALL add_index_if_not_exists('borrowing', 'idx_borrowing_status', '(status)');
+CALL add_index_if_not_exists('reservation', 'idx_reservation_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('reservation', 'idx_reservation_book_id', '(book_id)');
+CALL add_index_if_not_exists('reservation', 'idx_reservation_seat_id', '(seat_id)');
+CALL add_index_if_not_exists('reservation', 'idx_reservation_status', '(status)');
+CALL add_index_if_not_exists('seat', 'idx_seat_area', '(area)');
 
 -- 插入初始数据
 -- 管理员账号（密码：admin123）
@@ -265,23 +298,23 @@ CREATE TABLE IF NOT EXISTS notification (
 );
 
 -- V2 索引
-ALTER TABLE operation_log ADD INDEX idx_oplog_user_id (user_id);
-ALTER TABLE operation_log ADD INDEX idx_oplog_module (module);
-ALTER TABLE operation_log ADD INDEX idx_oplog_create_time (create_time);
-ALTER TABLE blacklist ADD INDEX idx_blacklist_reader_id (reader_id);
-ALTER TABLE reader_level ADD INDEX idx_reader_level_reader_id (reader_id);
-ALTER TABLE seat_checkin ADD INDEX idx_seat_checkin_reader_id (reader_id);
-ALTER TABLE seat_checkin ADD INDEX idx_seat_checkin_seat_id (seat_id);
-ALTER TABLE notification ADD INDEX idx_notification_reader_id (reader_id);
-ALTER TABLE notification ADD INDEX idx_notification_is_read (is_read);
+CALL add_index_if_not_exists('operation_log', 'idx_oplog_user_id', '(user_id)');
+CALL add_index_if_not_exists('operation_log', 'idx_oplog_module', '(module)');
+CALL add_index_if_not_exists('operation_log', 'idx_oplog_create_time', '(create_time)');
+CALL add_index_if_not_exists('blacklist', 'idx_blacklist_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('reader_level', 'idx_reader_level_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('seat_checkin', 'idx_seat_checkin_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('seat_checkin', 'idx_seat_checkin_seat_id', '(seat_id)');
+CALL add_index_if_not_exists('notification', 'idx_notification_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('notification', 'idx_notification_is_read', '(is_read)');
 
 -- V2 插入系统参数默认数据
-INSERT INTO system_config (config_key, config_value, description) VALUES
+INSERT IGNORE INTO system_config (config_key, config_value, description) VALUES
 ('library.name', '智慧图书馆', '图书馆名称'),
-('library.borrow.default_days', '30', '默认借阅天数'),
-('library.borrow.max_count', '5', '读者最大借阅数量'),
-('library.borrow.max_renew_count', '2', '最大续借次数'),
-('library.fine.daily_rate', '0.10', '逾期罚款每日费率（元）'),
-('library.seat.auto_release_minutes', '30', '签到超时自动释放时间（分钟）'),
-('library.blacklist.violation_threshold', '3', '违规次数达到此值自动加入黑名单'),
-('library.notification.borrow_remind_days', '3', '借阅到期前提醒天数');
+('library.borrowing.default-days', '30', '默认借阅天数'),
+('library.reader.max-borrow-count', '5', '读者最大借阅数量'),
+('library.borrowing.max-renew-count', '2', '最大续借次数'),
+('library.fine.daily-rate', '0.10', '逾期罚款每日费率（元）'),
+('library.seat.auto-release-minutes', '30', '签到超时自动释放时间（分钟）'),
+('library.blacklist.violation-threshold', '3', '违规次数达到此值自动加入黑名单'),
+('library.notification.borrow-remind-days', '3', '借阅到期前提醒天数');

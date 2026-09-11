@@ -4,6 +4,39 @@
 
 USE library_system;
 
+-- ========================================
+-- 幂等性工具：允许脚本重复执行（docker-compose 会按序重跑）
+-- ========================================
+DROP PROCEDURE IF EXISTS add_index_if_not_exists;
+DROP PROCEDURE IF EXISTS add_column_if_not_exists;
+DELIMITER $$
+CREATE PROCEDURE add_index_if_not_exists(
+    IN p_table VARCHAR(64), IN p_index VARCHAR(64), IN p_columns VARCHAR(255)
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema = DATABASE() AND table_name = p_table AND index_name = p_index
+    ) THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD INDEX `', p_index, '` ', p_columns);
+        PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+CREATE PROCEDURE add_column_if_not_exists(
+    IN p_table VARCHAR(64), IN p_column VARCHAR(64), IN p_definition VARCHAR(500)
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = p_table AND column_name = p_column
+    ) THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD COLUMN `', p_column, '` ', p_definition);
+        PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+DELIMITER ;
+
+
 -- 1. 系统参数配置表
 CREATE TABLE IF NOT EXISTS system_config (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -80,20 +113,20 @@ CREATE TABLE IF NOT EXISTS notification (
 -- ========================================
 -- 索引
 -- ========================================
-ALTER TABLE operation_log ADD INDEX idx_oplog_user_id (user_id);
-ALTER TABLE operation_log ADD INDEX idx_oplog_module (module);
-ALTER TABLE operation_log ADD INDEX idx_oplog_create_time (create_time);
-ALTER TABLE blacklist ADD INDEX idx_blacklist_reader_id (reader_id);
-ALTER TABLE reader_level ADD INDEX idx_reader_level_reader_id (reader_id);
-ALTER TABLE seat_checkin ADD INDEX idx_seat_checkin_reader_id (reader_id);
-ALTER TABLE seat_checkin ADD INDEX idx_seat_checkin_seat_id (seat_id);
-ALTER TABLE notification ADD INDEX idx_notification_reader_id (reader_id);
-ALTER TABLE notification ADD INDEX idx_notification_is_read (is_read);
+CALL add_index_if_not_exists('operation_log', 'idx_oplog_user_id', '(user_id)');
+CALL add_index_if_not_exists('operation_log', 'idx_oplog_module', '(module)');
+CALL add_index_if_not_exists('operation_log', 'idx_oplog_create_time', '(create_time)');
+CALL add_index_if_not_exists('blacklist', 'idx_blacklist_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('reader_level', 'idx_reader_level_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('seat_checkin', 'idx_seat_checkin_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('seat_checkin', 'idx_seat_checkin_seat_id', '(seat_id)');
+CALL add_index_if_not_exists('notification', 'idx_notification_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('notification', 'idx_notification_is_read', '(is_read)');
 
 -- ========================================
 -- 插入系统参数默认数据
 -- ========================================
-INSERT INTO system_config (config_key, config_value, description) VALUES
+INSERT IGNORE INTO system_config (config_key, config_value, description) VALUES
 ('library.name', '智慧图书馆', '图书馆名称'),
 ('library.borrowing.default-days', '30', '默认借阅天数'),
 ('library.borrowing.renew-days', '30', '续借天数'),

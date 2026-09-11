@@ -7,12 +7,43 @@
 USE library_system;
 
 -- ========================================
+-- 幂等性工具：允许脚本重复执行（docker-compose 会按序重跑）
+-- ========================================
+DROP PROCEDURE IF EXISTS add_index_if_not_exists;
+DROP PROCEDURE IF EXISTS add_column_if_not_exists;
+DELIMITER $$
+CREATE PROCEDURE add_index_if_not_exists(
+    IN p_table VARCHAR(64), IN p_index VARCHAR(64), IN p_columns VARCHAR(255)
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.statistics
+        WHERE table_schema = DATABASE() AND table_name = p_table AND index_name = p_index
+    ) THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD INDEX `', p_index, '` ', p_columns);
+        PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+CREATE PROCEDURE add_column_if_not_exists(
+    IN p_table VARCHAR(64), IN p_column VARCHAR(64), IN p_definition VARCHAR(500)
+)
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_schema = DATABASE() AND table_name = p_table AND column_name = p_column
+    ) THEN
+        SET @ddl = CONCAT('ALTER TABLE `', p_table, '` ADD COLUMN `', p_column, '` ', p_definition);
+        PREPARE stmt FROM @ddl; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+    END IF;
+END$$
+DELIMITER ;
+
+
+-- ========================================
 -- 方向1：AI智能荐书
 -- 为读者添加偏好的图书分类，用于推荐算法
 -- ========================================
-ALTER TABLE reader
-    ADD COLUMN preferred_categories VARCHAR(500) DEFAULT NULL
-    COMMENT '偏好图书分类（JSON数组格式，如["计算机","文学"]）';
+CALL add_column_if_not_exists('reader', 'preferred_categories', 'VARCHAR(500) DEFAULT NULL COMMENT \'偏好图书分类（JSON数组格式，如["计算机","文学"]）\'');
 
 -- ========================================
 -- 方向2：社交书评
@@ -57,13 +88,13 @@ CREATE TABLE IF NOT EXISTS reader_follow (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='读者关注表';
 
 -- 社交书评相关索引
-ALTER TABLE book_review ADD INDEX idx_review_reader_id (reader_id);
-ALTER TABLE book_review ADD INDEX idx_review_book_id (book_id);
-ALTER TABLE book_review ADD INDEX idx_review_rating (rating);
-ALTER TABLE book_review ADD INDEX idx_review_create_time (create_time);
-ALTER TABLE review_like ADD INDEX idx_rlike_reader_id (reader_id);
-ALTER TABLE reader_follow ADD INDEX idx_rfollow_follower_id (follower_id);
-ALTER TABLE reader_follow ADD INDEX idx_rfollow_following_id (following_id);
+CALL add_index_if_not_exists('book_review', 'idx_review_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('book_review', 'idx_review_book_id', '(book_id)');
+CALL add_index_if_not_exists('book_review', 'idx_review_rating', '(rating)');
+CALL add_index_if_not_exists('book_review', 'idx_review_create_time', '(create_time)');
+CALL add_index_if_not_exists('review_like', 'idx_rlike_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('reader_follow', 'idx_rfollow_follower_id', '(follower_id)');
+CALL add_index_if_not_exists('reader_follow', 'idx_rfollow_following_id', '(following_id)');
 
 -- ========================================
 -- 方向3：大数据预测
@@ -75,25 +106,17 @@ ALTER TABLE reader_follow ADD INDEX idx_rfollow_following_id (following_id);
 -- 方向4：国际化
 -- 为读者添加语言偏好，为图书添加英文信息
 -- ========================================
-ALTER TABLE reader
-    ADD COLUMN language VARCHAR(20) DEFAULT 'zh_CN'
-    COMMENT '界面语言偏好（如 zh_CN、en_US）';
+CALL add_column_if_not_exists('reader', 'language', 'VARCHAR(20) DEFAULT \'zh_CN\' COMMENT \'界面语言偏好（如 zh_CN、en_US）\'');
 
-ALTER TABLE book
-    ADD COLUMN title_en VARCHAR(255) DEFAULT NULL
-    COMMENT '英文书名',
-    ADD COLUMN author_en VARCHAR(100) DEFAULT NULL
-    COMMENT '英文作者名',
-    ADD COLUMN description_en TEXT DEFAULT NULL
-    COMMENT '英文简介';
+CALL add_column_if_not_exists('book', 'title_en', 'VARCHAR(255) DEFAULT NULL COMMENT \'英文书名\'');
+CALL add_column_if_not_exists('book', 'author_en', 'VARCHAR(100) DEFAULT NULL COMMENT \'英文作者名\'');
+CALL add_column_if_not_exists('book', 'description_en', 'TEXT DEFAULT NULL COMMENT \'英文简介\'');
 
 -- ========================================
 -- 方向5：智能座位
 -- 座位预约增加时段偏好，支持学习搭子功能
 -- ========================================
-ALTER TABLE reservation
-    ADD COLUMN preferred_time_slot VARCHAR(50) DEFAULT NULL
-    COMMENT '偏好时段（如 08:00-12:00, 14:00-18:00）';
+CALL add_column_if_not_exists('reservation', 'preferred_time_slot', 'VARCHAR(50) DEFAULT NULL COMMENT \'偏好时段（如 08:00-12:00, 14:00-18:00）\'');
 
 -- 学习搭子表（寻找相同学习时段/兴趣的伙伴）
 CREATE TABLE IF NOT EXISTS study_buddy (
@@ -109,14 +132,14 @@ CREATE TABLE IF NOT EXISTS study_buddy (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='学习搭子表';
 
 -- 智能座位相关索引
-ALTER TABLE reservation ADD INDEX idx_reservation_time_slot (preferred_time_slot);
-ALTER TABLE study_buddy ADD INDEX idx_buddy_reader_id (reader_id);
-ALTER TABLE study_buddy ADD INDEX idx_buddy_area (preferred_area);
+CALL add_index_if_not_exists('reservation', 'idx_reservation_time_slot', '(preferred_time_slot)');
+CALL add_index_if_not_exists('study_buddy', 'idx_buddy_reader_id', '(reader_id)');
+CALL add_index_if_not_exists('study_buddy', 'idx_buddy_area', '(preferred_area)');
 
 -- ========================================
 -- system_config 新增参数
 -- ========================================
-INSERT INTO system_config (config_key, config_value, description) VALUES
+INSERT IGNORE INTO system_config (config_key, config_value, description) VALUES
 ('library.recommend.enabled', 'true', '是否启用AI智能荐书功能'),
 ('library.recommend.weight_borrow_history', '0.4', '借阅历史在推荐算法中的权重'),
 ('library.recommend.weight_preferred_categories', '0.3', '偏好分类在推荐算法中的权重'),

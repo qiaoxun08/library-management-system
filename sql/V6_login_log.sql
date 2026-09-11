@@ -1,3 +1,5 @@
+USE library_system;
+
 CREATE TABLE IF NOT EXISTS login_log (
     id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL COMMENT '用户名',

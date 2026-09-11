@@ -3,6 +3,8 @@
 -- ========================================
 
 -- 书评回复表
+USE library_system;
+
 CREATE TABLE IF NOT EXISTS review_reply (
     id INT PRIMARY KEY AUTO_INCREMENT,
     review_id INT NOT NULL COMMENT '关联书评ID',
