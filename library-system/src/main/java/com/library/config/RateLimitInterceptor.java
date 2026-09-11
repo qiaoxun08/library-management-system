@@ -58,6 +58,33 @@ public class RateLimitInterceptor implements HandlerInterceptor {
             }
         }
 
+        // 注册接口：每分钟最多 5 次，防止批量恶意注册
+        if (uri.contains("/auth/register")) {
+            if (isRateLimited(ip, "register", 5, 1)) {
+                log.warn("注册限流触发: ip={}, uri={}", ip, uri);
+                sendRateLimitResponse(response, "注册请求过于频繁，请1分钟后再试");
+                return false;
+            }
+        }
+
+        // 修改密码接口：每分钟最多 5 次，防止暴力改密
+        if (uri.contains("/auth/change-password")) {
+            if (isRateLimited(ip, "changePwd", 5, 1)) {
+                log.warn("修改密码限流触发: ip={}, uri={}", ip, uri);
+                sendRateLimitResponse(response, "操作过于频繁，请1分钟后再试");
+                return false;
+            }
+        }
+
+        // Token 刷新接口：每分钟最多 30 次，防止滥用
+        if (uri.contains("/auth/refresh")) {
+            if (isRateLimited(ip, "refresh", 30, 1)) {
+                log.warn("Token刷新限流触发: ip={}, uri={}", ip, uri);
+                sendRateLimitResponse(response, "操作过于频繁，请稍后再试");
+                return false;
+            }
+        }
+
         return true;
     }
 

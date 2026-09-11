@@ -173,6 +173,10 @@ export default {
       try {
         const response = await rawAxios.get('/api/auth/captcha', { responseType: 'blob' })
         this.loginForm.captchaKey = response.headers['captcha-key'] || response.headers['Captcha-Key']
+        // 释放旧的 Blob URL，防止内存泄漏
+        if (this.captchaImage) {
+          URL.revokeObjectURL(this.captchaImage)
+        }
         const blob = new Blob([response.data], { type: 'image/png' })
         this.captchaImage = URL.createObjectURL(blob)
       } catch (error) {

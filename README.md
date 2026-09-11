@@ -91,13 +91,19 @@ library-management-system/
 ### 方式一：Docker（推荐，省事）
 
 ```bash
+# 1. 准备环境变量（.env 不会被提交到 git）
+cp .env.example .env
+# 编辑 .env，设置 DB_PASSWORD / REDIS_PASSWORD / JWT_SECRET / AES_SECRET_KEY
+# JWT_SECRET 生成：openssl rand -base64 48
+
+# 2. 启动
 docker-compose up -d
 ```
 
 启动后：
 - 前端：`http://localhost`
 - 后端 API：`http://localhost:8080/api`
-- Swagger：`http://localhost:8080/swagger-ui.html`
+- Swagger：仅本地手动启动时可用（Docker 部署默认关闭）
 
 ### 方式二：手动启动
 
@@ -118,9 +124,10 @@ mysql -u root -p library_system < sql/mock_data_v3.sql
 # 2. 启动 Redis
 redis-server
 
-# 3. 启动后端
+# 3. 启动后端（必须先设置 JWT_SECRET，否则启动会失败——这是故意的，防止用弱密钥签发 Token）
 cd library-system
 export DB_PASSWORD=你的mysql密码
+export JWT_SECRET=$(openssl rand -base64 48)
 mvn spring-boot:run
 
 # 4. 启动前端

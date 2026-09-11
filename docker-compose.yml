@@ -5,21 +5,25 @@ services:
     image: mysql:8.0
     container_name: library-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
+      # 必须在 .env 中提供，无弱默认值
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?请在.env中设置DB_PASSWORD}
       MYSQL_DATABASE: library_system
       MYSQL_CHARSET: utf8mb4
       MYSQL_COLLATION: utf8mb4_unicode_ci
     ports:
-      - "3306:3306"
+      # 仅绑定本机回环地址，避免数据库直接暴露公网
+      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql
       - ./sql/V2_new_tables.sql:/docker-entrypoint-initdb.d/02-v2.sql
       - ./sql/V3_innovation.sql:/docker-entrypoint-initdb.d/03-v3.sql
       - ./sql/V4_reply.sql:/docker-entrypoint-initdb.d/04-v4.sql
+      - ./sql/V5_rbac.sql:/docker-entrypoint-initdb.d/05-v5.sql
+      - ./sql/V6_login_log.sql:/docker-entrypoint-initdb.d/06-v6.sql
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -29,12 +33,15 @@ services:
   redis:
     image: redis:7-alpine
     container_name: library-redis
+    # 启用密码认证，禁止无密码裸奔
+    command: redis-server --requirepass ${REDIS_PASSWORD:?请在.env中设置REDIS_PASSWORD}
     ports:
-      - "6379:6379"
+      # 仅绑定本机回环地址
+      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a $$REDIS_PASSWORD ping | grep PONG"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,13 +54,18 @@ services:
       dockerfile: Dockerfile
     container_name: library-backend
     environment:
-      DB_PASSWORD: ${DB_PASSWORD:-root}
+      DB_PASSWORD: ${DB_PASSWORD:?请在.env中设置DB_PASSWORD}
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: library_system
       REDIS_HOST: redis
       REDIS_PORT: 6379
-      JWT_SECRET: ${JWT_SECRET:-production-secret-key-change-me-32bytes!}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:?请在.env中设置REDIS_PASSWORD}
+      # 必须提供 ≥32 字节随机串：openssl rand -base64 48
+      JWT_SECRET: ${JWT_SECRET:?请在.env中设置JWT_SECRET}
+      # 生产环境关闭 Swagger
+      SPRINGDOC_API_DOCS_ENABLED: "false"
+      SPRINGDOC_SWAGGER_UI_ENABLED: "false"
     ports:
       - "8080:8080"
     depends_on:

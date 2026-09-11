@@ -72,15 +72,16 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    @Operation(summary = "刷新Token", description = "传入旧Token获取新Token，用于无感续期")
+    @Operation(summary = "刷新Token", description = "传入旧Token获取新Token，用于无感续期。已禁用账户无法续期")
     public Result<Map<String, String>> refreshToken(@RequestBody Map<String, String> body) {
         String oldToken = body.get("token");
         if (oldToken == null || oldToken.isEmpty()) {
             return Result.error(400, "Token不能为空");
         }
-        String newToken = jwtUtil.refreshToken(oldToken);
+        // 刷新前校验旧 Token 有效性及账户当前状态（禁用账户不可续期）
+        String newToken = authService.refreshUserToken(oldToken);
         if (newToken == null) {
-            return Result.error(401, "Token无效或已过期");
+            return Result.error(401, "Token无效、已过期或账户已被禁用");
         }
         return Result.success(Map.of("token", newToken));
     }

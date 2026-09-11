@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.dto.Result;
 import com.library.entity.StudyBuddy;
+import com.library.exception.BusinessException;
 import com.library.service.ReaderService;
 import com.library.service.StudyBuddyService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -99,7 +100,7 @@ public class StudyBuddyController {
         // 通过readerId字符串查询Reader对象，获取数据库中的id
         var reader = readerService.getReaderByReaderId(readerIdStr);
         if (reader == null) {
-            throw new RuntimeException("读者不存在");
+            throw new BusinessException("读者不存在");
         }
         return reader.getId();
     }

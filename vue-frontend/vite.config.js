@@ -22,7 +22,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        // bg.png（约6MB）不做 precache，避免超出 workbox 2MiB 限制导致构建失败
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globIgnores: ['**/bg.png'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

@@ -74,7 +74,7 @@ public class BookServiceImpl implements BookService {
         // 检查图书是否存在
         Book existingBook = bookMapper.findById(book.getId());
         if (existingBook == null) {
-            throw new RuntimeException("图书不存在");
+            throw new BusinessException("图书不存在");
         }
         bookMapper.update(book);
         return book;
@@ -85,7 +85,7 @@ public class BookServiceImpl implements BookService {
         // 检查是否有未归还的借阅记录
         int activeBorrowings = borrowingMapper.countActiveByBookId(id);
         if (activeBorrowings > 0) {
-            throw new RuntimeException("该图书仍有未归还的借阅记录，无法删除");
+            throw new BusinessException("该图书仍有未归还的借阅记录，无法删除");
         }
         bookMapper.delete(id);
     }

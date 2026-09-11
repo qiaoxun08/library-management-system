@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ElMessage, ElNotification } from 'element-plus'
 import router from '@/router'
+import store from '@/store'
 import i18n from '../i18n'
 
 const { t } = i18n.global
@@ -58,8 +59,9 @@ async function refreshToken() {
   if (!token) return null
 
   try {
-    const response = await axios.post('/api/auth/refresh', null, {
-      headers: { Authorization: `Bearer ${token}` }
+    const response = await axios.post('/api/auth/refresh', { token }, {
+      headers: { Authorization: `Bearer ${token}` },
+      timeout: 10000 // 防止刷新请求挂起导致 isRefreshing 永久卡死
     })
     if (response.data && response.data.code === 200 && response.data.data) {
       localStorage.setItem('token', response.data.data)
@@ -106,13 +108,14 @@ service.interceptors.request.use(
           if (newToken) {
             processQueue(null, newToken)
             config.headers.Authorization = `Bearer ${newToken}`
-          } else {
-            processQueue(new Error(t('messages.error.tokenRefreshFailed')), null)
-            localStorage.removeItem('token')
-            localStorage.removeItem('role')
-            localStorage.removeItem('username')
+            return config
           }
-          return config
+          // 刷新失败：拒绝队列中的请求并清理登录态，不携带过期 Token 发出请求
+          processQueue(new Error(t('messages.error.tokenRefreshFailed')), null)
+          localStorage.removeItem('token')
+          localStorage.removeItem('role')
+          localStorage.removeItem('username')
+          return Promise.reject(new Error(t('messages.error.tokenRefreshFailed')))
         }).catch(err => {
           isRefreshing = false
           processQueue(err, null)
@@ -151,6 +154,8 @@ service.interceptors.response.use(
               duration: 3000
             })
             setTimeout(() => {
+              // 同步清理 Vuex 状态，避免 store 与 localStorage 不一致
+              store.dispatch('logout')
               localStorage.removeItem('token')
               localStorage.removeItem('role')
               localStorage.removeItem('username')

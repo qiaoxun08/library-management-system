@@ -38,13 +38,15 @@ public class GlobalExceptionHandler {
     }
 
     /**
-     * 处理业务异常（RuntimeException，兼容旧代码）-> 400
+     * 处理未分类的 RuntimeException -> 500
+     * 不向客户端返回原始异常消息，避免泄露数据库错误、NPE 细节等内部信息
      */
     @ExceptionHandler(RuntimeException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Result<Void> handleRuntimeException(RuntimeException e) {
-        log.warn("业务异常: {}", e.getMessage());
-        return Result.error(400, e.getMessage());
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result<Void> handleRuntimeException(RuntimeException e, Locale locale) {
+        log.error("未捕获的运行时异常: ", e);
+        String message = messageSource.getMessage("error.server.internal", null, locale);
+        return Result.error(500, message);
     }
 
     /**

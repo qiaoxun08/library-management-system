@@ -4,6 +4,31 @@
 
 ---
 
+## v5.7 (2026-09-11) — 安全加固
+
+### 🔒 安全（Critical/High 全部修复）
+- **禁用账户不能登录**：登录时密码验证通过后仍校验 reader/librarian 的 status，被禁用账户直接拒绝并记录审计日志
+- **Token 刷新校验账户状态**：`/auth/refresh` 改为查库验证用户存在且未禁用后才签发新 Token，禁用用户无法靠旧 Token 无限续期
+- **JWT 密钥去弱默认值**：`jwt.secret` 改为必须通过 `JWT_SECRET` 环境变量提供，缺失时启动即失败（防止用可预测密钥伪造 Token）
+- **异常信息不泄露**：GlobalExceptionHandler 不再把 RuntimeException 原始消息返回客户端；业务异常统一改用 BusinessException
+- **AES 工具修复**：去掉硬编码密钥（改为 `AES_SECRET_KEY` 环境变量），CBC 固定 IV 改为随机 IV（IV 与密文拼接存储），升级 AES-256
+- **限流扩展**：注册（5次/分）、修改密码（5次/分）、Token 刷新（30次/分）新增 IP 限流
+- **Docker 加固**：MySQL/Redis 端口仅绑定 127.0.0.1；Redis 启用 requirepass；敏感环境变量改为 `:?` 强制必填（无弱默认值）；镜像内删除所有凭据 ENV；容器以非 root 用户运行；补挂 V5/V6 初始化脚本
+- **Nginx 加固**：安全响应头（X-Frame-Options/nosniff/XSS-Protection/Referrer-Policy）、server_tokens off、API 限流、生产环境 deny Swagger
+- **Swagger 生产关闭**：Docker 部署通过 SPRINGDOC 环境变量关闭 API 文档
+
+### 🐛 前端修复
+- **Token 刷新挂死修复**：refreshToken 请求加 10s 超时（原来挂起会永久卡住 isRefreshing，整个 API 层瘫痪）
+- **刷新失败不再带过期 Token 发请求**：刷新失败时直接 reject 并清理登录态
+- **401 同步清理 Vuex**：401 跳转登录时同步 dispatch logout，store 与 localStorage 不再不一致
+- **验证码内存泄漏**：登录页/学生登录页刷新验证码前 revokeObjectURL 旧 Blob URL
+
+### 📄 其他
+- 新增 `.env.example` 环境变量模板
+- init.sql 头部添加默认弱密码安全警告
+
+---
+
 ## v5.6 (2026-07-17)
 
 ### 🎯 体验优化

@@ -99,6 +99,11 @@ public class AuthServiceImpl implements AuthService {
         } else if ("librarian".equals(role)) {
             Librarian librarian = librarianMapper.findByUsername(username);
             if (librarian != null && passwordEncoder.matches(password, librarian.getPassword())) {
+                // 密码正确后仍需校验账户状态，禁用账户不允许登录
+                if (Integer.valueOf(0).equals(librarian.getStatus())) {
+                    asyncSaveLoginLog(username, role, 0, "账户已被禁用");
+                    throw new BusinessException("账户已被禁用，请联系管理员");
+                }
                 String token = jwtUtil.generateToken(username, role, librarian.getId());
                 asyncSaveLoginLog(username, role, 1, null);
                 return new LoginResponse(token, role, username, librarian.getRealName(), librarian.getId());
@@ -106,6 +111,11 @@ public class AuthServiceImpl implements AuthService {
         } else if ("reader".equals(role)) {
             Reader reader = readerMapper.findByReaderId(username);
             if (reader != null && passwordEncoder.matches(password, reader.getPassword())) {
+                // 密码正确后仍需校验账户状态，禁用/拉黑读者不允许登录
+                if (Integer.valueOf(0).equals(reader.getStatus())) {
+                    asyncSaveLoginLog(username, role, 0, "账户已被禁用");
+                    throw new BusinessException("账户已被禁用，请联系管理员");
+                }
                 String token = jwtUtil.generateToken(username, role, reader.getId());
                 asyncSaveLoginLog(username, role, 1, null);
                 return new LoginResponse(token, role, username, reader.getRealName(), reader.getId(), reader.getLanguage());
@@ -195,6 +205,47 @@ public class AuthServiceImpl implements AuthService {
         readerMapper.insert(reader);
 
         return reader;
+    }
+
+    @Override
+    public String refreshUserToken(String oldToken) {
+        io.jsonwebtoken.Claims claims;
+        try {
+            claims = jwtUtil.getAllClaimsFromToken(oldToken);
+        } catch (Exception e) {
+            return null; // Token 无效或已过期
+        }
+        String username = claims.getSubject();
+        String userType = claims.get("userType", String.class);
+        Integer userId = claims.get("userId", Integer.class);
+        if (username == null || userType == null || userId == null) {
+            return null;
+        }
+        // 刷新前校验账户当前状态：已禁用的用户不能再续期 Token
+        switch (userType.toUpperCase()) {
+            case "LIBRARIAN" -> {
+                Librarian librarian = librarianMapper.findByUsername(username);
+                if (librarian == null || Integer.valueOf(0).equals(librarian.getStatus())) {
+                    return null;
+                }
+            }
+            case "READER" -> {
+                Reader reader = readerMapper.findById(userId);
+                if (reader == null || Integer.valueOf(0).equals(reader.getStatus())) {
+                    return null;
+                }
+            }
+            case "ADMIN" -> {
+                Admin admin = adminMapper.findByUsername(username);
+                if (admin == null) {
+                    return null;
+                }
+            }
+            default -> {
+                return null;
+            }
+        }
+        return jwtUtil.generateToken(username, userType, userId);
     }
 
     @Override

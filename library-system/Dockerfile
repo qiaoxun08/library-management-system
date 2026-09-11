@@ -11,15 +11,18 @@ FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
 COPY --from=builder /build/target/*.jar app.jar
 
-# 环境变量（可在 docker-compose 中覆盖）
+# 非敏感默认值；敏感信息（DB_PASSWORD/JWT_SECRET/REDIS_PASSWORD）
+# 必须由 docker-compose 的 environment 注入，镜像内不保留任何凭据
 ENV DB_HOST=mysql
 ENV DB_PORT=3306
 ENV DB_NAME=library_system
 ENV DB_USERNAME=root
-ENV DB_PASSWORD=root
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
-ENV JWT_SECRET=production-secret-key-change-me-32bytes!
+
+# 以非 root 用户运行，降低容器被攻破后的影响面
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+USER appuser
 
 EXPOSE 8080
 
