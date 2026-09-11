@@ -241,7 +241,7 @@
 </template>
 
 <script>
-import { getSeats, checkinSeat, checkoutSeat, getSeatTimeline } from '@/api/seat'
+import { getSeats, checkinSeat, checkoutSeat, getSeatTimeline, getSeatRecommend } from '@/api/seat'
 import { addReservation } from '@/api/reservation'
 import { getMyBuddyProfile, saveBuddyProfile, getMatchedBuddies, deleteMyBuddyProfile } from '@/api/studyBuddy'
 import { Clock, MagicStick, User, Iphone } from '@element-plus/icons-vue'
@@ -439,11 +439,9 @@ export default {
       this.recommendedSeats = []
       try {
         const today = new Date().toISOString().split('T')[0]
-        const data = await fetch(`/api/seats/recommend?date=${today}&timeSlot=${this.recommendTimeSlot}&limit=3`)
-        if (data.ok) {
-          const result = await data.json()
-          this.recommendedSeats = Array.isArray(result.data) ? result.data : []
-        }
+        // 走 axios 实例：自动携带 Token、统一错误处理（原生 fetch 不带认证头，token 过期时静默失败）
+        const result = await getSeatRecommend(today, this.recommendTimeSlot, 3)
+        this.recommendedSeats = Array.isArray(result) ? result : []
       } catch (error) {
         console.error('智能推荐失败:', error)
         this.$message.error(this.$t('reader.seatReservation.noRecommend2'))
@@ -592,12 +590,13 @@ export default {
         }
       ).then(async () => {
         try {
-          const startTime = `${this.timelineDate}T${hourStr}:00:00`
-          const endTime = `${this.timelineDate}T${String(slot.hour + 1).padStart(2, '0')}:00:00`
+          const endHourStr = String(slot.hour + 1).padStart(2, '0')
           await addReservation({
             seatId: seat.seatId,
             bookId: null,
-            reservationDate: new Date(),
+            // 预约日期为时间轴选择的日期，时段传给后端持久化
+            reservationDate: new Date(`${this.timelineDate}T00:00:00`),
+            preferredTimeSlot: `${hourStr}:00-${endHourStr}:00`,
             status: 0,
             expiryDate: new Date(Date.now() + 3600000)
           })

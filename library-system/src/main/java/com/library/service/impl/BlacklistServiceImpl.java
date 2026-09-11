@@ -111,11 +111,24 @@ public class BlacklistServiceImpl implements BlacklistService {
     }
 
     @Override
+    @Transactional
     public void incrementViolation(Integer readerId) {
-        blacklistMapper.incrementViolationCount(readerId);
+        // 读者从未违规过时 blacklist 表中无记录，直接 UPDATE 会漏计
+        // 先确保记录存在，再原子累加
+        Blacklist existing = blacklistMapper.findByReaderId(readerId);
+        if (existing == null) {
+            Blacklist record = new Blacklist();
+            record.setReaderId(readerId);
+            record.setViolationCount(1);
+            record.setBlacklisted(0);
+            blacklistMapper.insert(record);
+            existing = record;
+        } else {
+            blacklistMapper.incrementViolationCount(readerId);
+            existing = blacklistMapper.findByReaderId(readerId);
+        }
 
         // 检查违规次数是否达到阈值，自动加入黑名单
-        Blacklist existing = blacklistMapper.findByReaderId(readerId);
         if (existing != null) {
             String thresholdStr = systemConfigService.getConfigValue("library.blacklist.violation-threshold");
             int threshold = thresholdStr != null ? Integer.parseInt(thresholdStr) : 3;

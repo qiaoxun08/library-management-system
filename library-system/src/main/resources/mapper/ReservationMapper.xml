@@ -73,8 +73,8 @@
     </select>
 
     <insert id="insert" parameterType="com.library.entity.Reservation" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO reservation (reader_id, book_id, seat_id, reservation_date, status, expiry_date)
-        VALUES (#{readerId}, #{bookId}, #{seatId}, #{reservationDate}, #{status}, #{expiryDate})
+        INSERT INTO reservation (reader_id, book_id, seat_id, reservation_date, status, expiry_date, preferred_time_slot)
+        VALUES (#{readerId}, #{bookId}, #{seatId}, #{reservationDate}, #{status}, #{expiryDate}, #{preferredTimeSlot})
     </insert>
 
     <update id="update" parameterType="com.library.entity.Reservation">

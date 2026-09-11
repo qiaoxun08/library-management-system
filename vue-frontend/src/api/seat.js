@@ -63,3 +63,7 @@ export function checkoutSeat(checkinId) {
 export function getSeatTimeline(date) {
   return axios.get('/seats/timeline', { params: { date } })
 }
+
+export function getSeatRecommend(date, timeSlot, limit = 3) {
+  return axios.get('/seats/recommend', { params: { date, timeSlot, limit } })
+}

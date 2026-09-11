@@ -56,7 +56,7 @@ public class NotificationController {
     }
 
     /**
-     * 获取通知详情
+     * 获取通知详情（READER 只能查看自己的通知，防止 ID 遍历越权）
      */
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
@@ -64,6 +64,19 @@ public class NotificationController {
     public Result<Notification> getNotificationById(
             @Parameter(description = "通知ID") @PathVariable Integer id) {
         Notification notification = notificationService.getNotificationById(id);
+        if (notification == null) {
+            return Result.error(404, "通知不存在");
+        }
+        // READER 只能看自己的通知
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        boolean isReader = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+        if (isReader) {
+            Integer currentReaderId = resolveReaderIdFromAuth(auth.getName());
+            if (currentReaderId == null || !currentReaderId.equals(notification.getReaderId())) {
+                return Result.error(403, "无权查看该通知");
+            }
+        }
         return Result.success(notification);
     }
 

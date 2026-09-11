@@ -181,7 +181,8 @@ public class BorrowingServiceImpl implements BorrowingService {
             int graceDays = Integer.parseInt(getConfigValue("library.fine.grace-days", "3"));
             if (overdueDays > graceDays) {
                 double dailyRate = Double.parseDouble(getConfigValue("library.fine.daily-rate", "0.10"));
-                fineAmount = new BigDecimal(overdueDays).multiply(BigDecimal.valueOf(dailyRate));
+                // 宽限期内免罚，只对超出宽限期的天数计费
+                fineAmount = new BigDecimal(overdueDays - graceDays).multiply(BigDecimal.valueOf(dailyRate));
             }
             borrowing.setFineAmount(fineAmount);
         }

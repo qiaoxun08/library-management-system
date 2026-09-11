@@ -252,7 +252,7 @@ export default {
     // 初始化座位占用率热力图
     const initSeatHeatmapChart = (data) => {
       if (!seatHeatmapChart.value) return
-      charts.seatHeatmap = echarts.init(seatHeatmapChart.value, warmTheme)
+      charts.seatHeatmap = charts.seatHeatmap || echarts.init(seatHeatmapChart.value, warmTheme)
 
       const areas = data.map(item => item.area)
       const values = data.map(item => ({
@@ -374,7 +374,7 @@ export default {
     // 初始化借阅分类分布饼图
     const initCategoryChart = (data) => {
       if (!categoryChart.value) return
-      charts.category = echarts.init(categoryChart.value, warmTheme)
+      charts.category = charts.category || echarts.init(categoryChart.value, warmTheme)
 
       const option = {
         tooltip: {
@@ -519,9 +519,8 @@ export default {
           initBorrowTrendChart(data.todayBorrowingsByHour || [])
         }
 
-        if (!charts.seatHeatmap) {
-          initSeatHeatmapChart(data.seatHeatmap || [])
-        }
+        // 热力图/饼图：复用实例并随刷新更新数据（原来只初始化一次，30秒刷新不生效）
+        initSeatHeatmapChart(data.seatHeatmap || [])
 
         if (charts.hotBooks) {
           const reversedData = [...(data.hotBooks || [])].reverse()
@@ -533,9 +532,7 @@ export default {
           initHotBooksChart(data.hotBooks || [])
         }
 
-        if (!charts.category) {
-          initCategoryChart(data.categoryDistribution || [])
-        }
+        initCategoryChart(data.categoryDistribution || [])
 
         if (charts.overdue) {
           const rates = (data.overdueTrend || []).map(item => {

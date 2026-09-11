@@ -170,6 +170,7 @@ export default {
         await borrowBook(this.borrowForm.readerId, this.borrowForm.bookId)
         this.$message.success(this.$t('librarian.borrowSuccess'))
         this.borrowForm = { readerId: '', bookId: '' }
+        this.loadData() // 刷新自动补全数据，更新可借数量
       } catch (error) {
         this.$message.error(this.$t('messages.error.borrowFailed') + ': ' + error.message)
       } finally {
@@ -187,6 +188,7 @@ export default {
         await returnBook(this.returnForm.borrowingId)
         this.$message.success(this.$t('librarian.returnSuccess'))
         this.returnForm = { borrowingId: '' }
+        this.loadData() // 刷新自动补全数据，更新可借数量
       } catch (error) {
         this.$message.error(this.$t('messages.error.returnFailed') + ': ' + error.message)
       } finally {

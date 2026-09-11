@@ -306,6 +306,8 @@ export default {
     },
     async loadBooks() {
       this.loading = true
+      // 重新加载（搜索/筛选变化）时重置页码，避免停留在已不存在的空页
+      this.currentPage = 1
       try {
         this.books = await getBooks()
         this.loadCategories()

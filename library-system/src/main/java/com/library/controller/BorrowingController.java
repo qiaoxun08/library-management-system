@@ -3,6 +3,7 @@ package com.library.controller;
 import com.library.dto.Result;
 import com.library.dto.BorrowingDTO;
 import com.library.entity.Borrowing;
+import com.library.mapper.ReaderMapper;
 import com.library.service.BorrowingService;
 import com.library.annotation.OperLog;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,9 @@ public class BorrowingController {
     @Autowired
     private BorrowingService borrowingService;
 
+    @Autowired
+    private ReaderMapper readerMapper;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     @Operation(summary = "获取所有借阅记录")
@@ -39,11 +43,24 @@ public class BorrowingController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
-    @Operation(summary = "根据ID获取借阅详情")
+    @Operation(summary = "根据ID获取借阅详情", description = "READER 只能查看自己的借阅记录")
     public Result<Borrowing> getBorrowingById(
             @Parameter(description = "借阅记录ID") @PathVariable Integer id) {
         try {
             Borrowing borrowing = borrowingService.getBorrowingById(id);
+            if (borrowing == null) {
+                return Result.error(404, "借阅记录不存在");
+            }
+            // READER 只能看自己的借阅记录，防止 ID 遍历越权
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isReader = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+            if (isReader) {
+                var reader = readerMapper.findByReaderId(auth.getName());
+                if (reader == null || !reader.getId().equals(borrowing.getReaderId())) {
+                    return Result.error(403, "无权查看该借阅记录");
+                }
+            }
             return Result.success(borrowing);
         } catch (Exception e) {
             return Result.error(e.getMessage());

@@ -10,6 +10,7 @@ import com.library.service.SeatService;
 import com.library.service.BorrowingService;
 import com.library.service.BlacklistService;
 import com.library.service.NotificationService;
+import com.library.service.ReaderLevelService;
 import com.library.service.RedisLockService;
 import com.library.mapper.BookMapper;
 import com.library.mapper.BorrowingMapper;
@@ -55,6 +56,9 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Autowired
     private RedisLockService redisLockService;
+
+    @Autowired
+    private ReaderLevelService readerLevelService;
 
     @Override
     public List<ReservationDTO> getAllReservations() {
@@ -131,15 +135,20 @@ public class ReservationServiceImpl implements ReservationService {
             });
         }
 
-        // 图书预约：检查重复预约
+        // 图书预约：分布式锁 + 重复预约检查（防止并发绕过重复检查）
         if (reservation.getBookId() != null) {
-            List<ReservationDTO> existing = reservationMapper.findByBookId(reservation.getBookId());
-            boolean duplicate = existing.stream().anyMatch(r ->
-                    r.getReaderId() != null && r.getReaderId().equals(reservation.getReaderId())
-                    && (r.getStatus() == 0 || r.getStatus() == 1));
-            if (duplicate) {
-                throw new BusinessException("您已预约过该图书，请等待审批或取消已有预约");
-            }
+            String lockKey = "book:reserve:" + reservation.getBookId();
+            return redisLockService.executeWithLock(lockKey, 5, () -> {
+                List<ReservationDTO> existing = reservationMapper.findByBookId(reservation.getBookId());
+                boolean duplicate = existing.stream().anyMatch(r ->
+                        r.getReaderId() != null && r.getReaderId().equals(reservation.getReaderId())
+                        && (r.getStatus() == 0 || r.getStatus() == 1));
+                if (duplicate) {
+                    throw new BusinessException("您已预约过该图书，请等待审批或取消已有预约");
+                }
+                reservationMapper.insert(reservation);
+                return reservation;
+            });
         }
 
         reservationMapper.insert(reservation);
@@ -158,6 +167,21 @@ public class ReservationServiceImpl implements ReservationService {
         ReservationDTO reservation = reservationMapper.findById(id);
         if (reservation == null) {
             throw new BusinessException("预约记录不存在");
+        }
+        // 删除已审批通过的预约必须释放占用的资源，否则座位/库存被幽灵占用
+        if (reservation.getStatus() != null && reservation.getStatus() == 1) {
+            if (reservation.getSeatId() != null) {
+                seatService.updateSeatStatus(reservation.getSeatId(), 0);
+            }
+            if (reservation.getBookId() != null && reservation.getReaderId() != null) {
+                com.library.entity.Borrowing activeBorrowing = borrowingMapper.findActiveByReaderAndBook(
+                        reservation.getReaderId(), reservation.getBookId());
+                if (activeBorrowing != null) {
+                    borrowingMapper.updateStatus(activeBorrowing.getId(), 3); // 3: 已取消
+                    readerMapper.decrementBorrowCount(activeBorrowing.getReaderId());
+                }
+                bookMapper.incrementAvailableCount(reservation.getBookId());
+            }
         }
         reservationMapper.delete(id);
     }
@@ -213,6 +237,12 @@ public class ReservationServiceImpl implements ReservationService {
             // 违约累计
             if (reservation.getReaderId() != null) {
                 blacklistService.incrementViolation(reservation.getReaderId());
+                // 审批通过时 borrowBook 曾加 10 积分，取消时对称回退
+                try {
+                    readerLevelService.subtractPoints(reservation.getReaderId(), 10);
+                } catch (Exception e) {
+                    log.warn("回退预约积分失败: readerId={}", reservation.getReaderId(), e);
+                }
             }
             if (reservation.getSeatId() != null) {
                 seatService.updateSeatStatus(reservation.getSeatId(), 0);
@@ -238,16 +268,11 @@ public class ReservationServiceImpl implements ReservationService {
         List<ReservationDTO> expired = reservationMapper.findExpired(LocalDateTime.now());
         for (ReservationDTO reservation : expired) {
             try {
+                // findExpired 只查 status=0（待审批）的过期预约：
+                // 待审批预约从未占用座位或图书库存，只需标记过期，不能释放资源
+                // （否则会虚增库存，甚至把正在使用的座位错误置为空闲）
                 reservationMapper.updateStatus(reservation.getId(), 4); // 4: 已过期
-                // 释放座位
-                if (reservation.getSeatId() != null) {
-                    seatService.updateSeatStatus(reservation.getSeatId(), 0);
-                }
-                // 释放图书库存
-                if (reservation.getBookId() != null) {
-                    bookMapper.incrementAvailableCount(reservation.getBookId());
-                }
-                log.info("释放过期预约: id={}, readerId={}", reservation.getId(), reservation.getReaderId());
+                log.info("过期预约标记完成: id={}, readerId={}", reservation.getId(), reservation.getReaderId());
             } catch (Exception e) {
                 log.error("释放过期预约失败: id={}", reservation.getId(), e);
             }

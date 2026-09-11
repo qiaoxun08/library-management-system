@@ -47,11 +47,24 @@ public class ReservationController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
-    @Operation(summary = "根据ID获取预约详情")
+    @Operation(summary = "根据ID获取预约详情", description = "READER 只能查看自己的预约")
     public Result<ReservationDTO> getReservationById(
             @Parameter(description = "预约记录ID") @PathVariable Integer id) {
         try {
             ReservationDTO reservation = reservationService.getReservationById(id);
+            if (reservation == null) {
+                return Result.error(404, "预约记录不存在");
+            }
+            // READER 只能看自己的预约，防止 ID 遍历越权
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            boolean isReader = auth.getAuthorities().stream()
+                    .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
+            if (isReader) {
+                var reader = readerMapper.findByReaderId(auth.getName());
+                if (reader == null || !reader.getId().equals(reservation.getReaderId())) {
+                    return Result.error(403, "无权查看该预约");
+                }
+            }
             return Result.success(reservation);
         } catch (Exception e) {
             return Result.error(e.getMessage());
@@ -112,6 +125,8 @@ public class ReservationController {
                 if (currentUser != null) {
                     reservation.setReaderId(currentUser.getId());
                 }
+                // READER 创建的预约必须走审批流，强制 status=0，防止前端传 status=1 绕过审批
+                reservation.setStatus(0);
             }
             Reservation newReservation = reservationService.addReservation(reservation);
             return Result.success(newReservation);
