@@ -38,7 +38,7 @@ public class CaptchaController {
         String key = UUID.randomUUID().toString();
 
         // 存入Redis，5分钟过期
-        redisTemplate.opsForValue().set("captcha:" + key, code, 5, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("captcha:" + key, code, 3, TimeUnit.MINUTES);
 
         // 设置响应头（必须在写入body之前设置，否则header不会生效）
         response.setContentType("image/png");

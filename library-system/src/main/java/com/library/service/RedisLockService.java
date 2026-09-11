@@ -84,7 +84,7 @@ public class RedisLockService {
         if (lockValue == null) return false;
 
         if (!isRedisAvailable()) {
-            return unlockLocalLock(lockKey);
+            return unlockLocalLock(lockKey, lockValue);
         }
 
         try {
@@ -164,9 +164,12 @@ public class RedisLockService {
         return null;
     }
 
-    private boolean unlockLocalLock(String lockKey) {
-        localLocks.remove(lockKey);
-        localLockExpiry.remove(lockKey);
+    private boolean unlockLocalLock(String lockKey, String lockValue) {
+        // 校验持有者：锁可能已过期被其他线程获取，不能删别人的锁
+        if (localLocks.get(lockKey) != null && localLocks.get(lockKey).equals(lockValue)) {
+            localLocks.remove(lockKey);
+            localLockExpiry.remove(lockKey);
+        }
         return true;
     }
 

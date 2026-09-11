@@ -573,6 +573,7 @@ export default {
       reservationId: '预约ID',
       reservationRejected: '预约已拒绝',
       startTime: '开始时间',
+      timeSlot: '预约时段',
       status: '状态',
       statusFilter: '按状态筛选',
       target: '预约对象',
@@ -788,6 +789,7 @@ export default {
       noReservations: '暂无预约记录',
       reservationId: '预约ID',
       reserveTime: '预约时间',
+      timeSlot: '预约时段',
       target: '预约对象',
       title: '我的预约',
       type: '类型'

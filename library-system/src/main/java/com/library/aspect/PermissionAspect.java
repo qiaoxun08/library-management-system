@@ -49,15 +49,15 @@ public class PermissionAspect {
         // 校验权限
         boolean hasPermission;
         if (requirePermission.allRequired()) {
-            // 需要所有权限都满足
+            // 需要所有权限都满足（忽略大小写，避免 DB 与注解大小写不一致时静默失败）
             hasPermission = requiredPermissions.stream()
                     .allMatch(perm -> authorities.stream()
-                            .anyMatch(auth2 -> perm.equals(auth2.getAuthority())));
+                            .anyMatch(auth2 -> perm.equalsIgnoreCase(auth2.getAuthority())));
         } else {
             // 只需要其中一个权限
             hasPermission = requiredPermissions.stream()
                     .anyMatch(perm -> authorities.stream()
-                            .anyMatch(auth2 -> perm.equals(auth2.getAuthority())));
+                            .anyMatch(auth2 -> perm.equalsIgnoreCase(auth2.getAuthority())));
         }
 
         if (!hasPermission) {

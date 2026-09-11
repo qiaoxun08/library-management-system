@@ -33,6 +33,11 @@
           {{ formatDate(scope.row.endTime) }}
         </template>
       </el-table-column>
+      <el-table-column v-if="hasSeatReservations" :label="$t('reader.reservations.timeSlot')" width="120" align="center">
+        <template #default="scope">
+          {{ scope.row.preferredTimeSlot || '—' }}
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('common.status.status')" width="100" align="center">
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)" size="small">
@@ -75,6 +80,12 @@ export default {
   mounted() {
     this.loadReservations()
   },
+  computed: {
+    hasSeatReservations() {
+      return (this.reservations || []).some(r => r.preferredTimeSlot);
+    }
+  },
+
   methods: {
     async loadReservations() {
       this.loading = true

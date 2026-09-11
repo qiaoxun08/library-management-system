@@ -113,6 +113,13 @@ public class OperationLogAspect {
                 }
                 if (i > 0) sb.append(", ");
                 sb.append(paramNames[i]).append("=");
+                // 敏感字段脱敏：不依赖类名约定，按参数名判断（password/secret/token/key）
+                String pname = paramNames[i].toLowerCase();
+                if (pname.contains("password") || pname.contains("secret")
+                        || pname.contains("token") || pname.contains("captcha")) {
+                    sb.append("******");
+                    continue;
+                }
                 try {
                     String json = objectMapper.writeValueAsString(args[i]);
                     // 截断过长的内容

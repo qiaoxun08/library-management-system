@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -18,7 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Configuration
 @EnableAsync
-public class AsyncConfig {
+public class AsyncConfig implements AsyncConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(AsyncConfig.class);
 
@@ -38,6 +39,17 @@ public class AsyncConfig {
         executor.setAwaitTerminationSeconds(30);
         executor.initialize();
         return executor;
+    }
+
+    /**
+     * 异步任务未捕获异常统一处理
+     * （需实现 AsyncConfigurer 接口才会生效，@Bean 单独定义是死代码）
+     */
+    @Override
+    public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+        return (Throwable ex, Method method, Object... params) -> {
+            log.error("异步任务执行失败: method={}", method.getName(), ex);
+        };
     }
 
     /**

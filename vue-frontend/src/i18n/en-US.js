@@ -552,6 +552,7 @@ export default {
       reservationId: 'Reservation ID',
       reservationRejected: 'Reservation rejected',
       startTime: 'Start Time',
+      timeSlot: 'Time Slot',
       status: 'Status',
       statusFilter: 'Filter by status',
       target: 'Target',
@@ -789,6 +790,7 @@ export default {
       noReservations: 'No reservations',
       reservationId: 'Reservation ID',
       reserveTime: 'Reservation Time',
+      timeSlot: 'Time Slot',
       target: 'Target',
       title: 'My Reservations',
       type: 'Type'

@@ -47,6 +47,11 @@
           {{ formatDate(scope.row.endTime) }}
         </template>
       </el-table-column>
+      <el-table-column v-if="hasSeatReservations" :label="$t('librarian.reservations.timeSlot')" width="120" align="center">
+        <template #default="scope">
+          {{ scope.row.preferredTimeSlot || '—' }}
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('librarian.reservations.status')" width="90" align="center">
         <template #default="scope">
           <el-tag :type="getStatusType(scope.row.status)" size="small">
@@ -107,6 +112,9 @@ export default {
     }
   },
   computed: {
+    hasSeatReservations() {
+      return (this.reservations || []).some(r => r.preferredTimeSlot);
+    },
     filteredReservations() {
       if (this.filterStatus === '') return this.reservations
       return this.reservations.filter(r => r.status === this.filterStatus)
