@@ -46,6 +46,10 @@ export default createStore({
       localStorage.removeItem('username')
       localStorage.removeItem('realName')
       localStorage.removeItem('id')
+      localStorage.removeItem('language')
+      // 清理用户私有数据，避免下一个用户看到上一个人的搜索历史
+      localStorage.removeItem('searchHistory')
+      localStorage.removeItem('seatReservationTime')
     }
   },
   actions: {

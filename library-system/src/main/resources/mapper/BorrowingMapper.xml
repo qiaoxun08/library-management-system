@@ -146,6 +146,15 @@
         ORDER BY count DESC
     </select>
 
+    <!-- 按天统计借阅量（时间序列，用于趋势计算） -->
+    <select id="countByDay" resultType="java.util.Map">
+        SELECT DATE(br.borrow_date) AS day, COUNT(*) AS count
+        FROM borrowing br
+        WHERE br.borrow_date &gt;= DATE_SUB(CURDATE(), INTERVAL #{days} DAY)
+        GROUP BY DATE(br.borrow_date)
+        ORDER BY day ASC
+    </select>
+
     <!-- 热门图书：按借阅次数降序排列 -->
     <select id="findPopularBooks" resultType="com.library.entity.Book">
         SELECT b.*

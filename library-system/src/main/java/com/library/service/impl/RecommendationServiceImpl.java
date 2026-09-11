@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 @Service
 public class RecommendationServiceImpl implements RecommendationService {
 
+    /** ObjectMapper 线程安全，全类复用，避免每次调用重复创建 */
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private static final Logger log = LoggerFactory.getLogger(RecommendationServiceImpl.class);
 
     private static final String POPULAR_BOOKS_KEY = "popular_books";
@@ -73,7 +76,14 @@ public class RecommendationServiceImpl implements RecommendationService {
         List<Book> categoryBooks = preferredCategories.isEmpty()
                 ? Collections.emptyList()
                 : bookMapper.findAvailableByCategories(preferredCategories, borrowedBookIds);
-        List<Book> popularBooks = borrowingMapper.findPopularBooks(limit * 3);
+        List<Book> popularBooks = borrowingMapper.findPopularBooks(Math.min(limit * 3, 100));
+
+        // 热门排名映射：Book 未重写 equals，indexOf 是引用比较恒为 -1，
+        // 会导致热门维度永远拿不到分，这里改用 bookId -> 排名 的 Map 做 O(1) 查找
+        Map<Integer, Integer> popularRankMap = new HashMap<>();
+        for (int i = 0; i < popularBooks.size(); i++) {
+            popularRankMap.put(popularBooks.get(i).getId(), i);
+        }
 
         // 合并候选集（去重）
         Map<Integer, Book> candidateMap = new LinkedHashMap<>();
@@ -113,7 +123,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             }
 
             // 维度2: 热门程度（wHot）—— 按候选池中的位置近似
-            int hotIndex = popularBooks.indexOf(book);
+            int hotIndex = popularRankMap.getOrDefault(book.getId(), -1);
             if (hotIndex >= 0) {
                 double hotScore = Math.max(0, 1.0 - hotIndex / (double) Math.max(popularBooks.size(), 1));
                 score += wHot * hotScore * 100;
@@ -132,11 +142,11 @@ public class RecommendationServiceImpl implements RecommendationService {
 
             // 维度4: 同伴评分（wPeer_rating）—— 基于书评平均评分
             Map<String, Object> ratingInfo = bookRatings.get(book.getId());
-            if (ratingInfo != null) {
+            if (ratingInfo != null && ratingInfo.get("avgRating") != null && ratingInfo.get("reviewCount") != null) {
                 double avgRating = ((Number) ratingInfo.get("avgRating")).doubleValue();
                 int reviewCount = ((Number) ratingInfo.get("reviewCount")).intValue();
-                // 评分归一化到 0-100（1-5星 → 0-100）
-                double peerScore = ((avgRating - 1.0) / 4.0) * 100;
+                // 评分归一化到 0-100（1-5星 → 0-100），钳制范围防止脏数据（<1 或 >5）污染总分排序
+                double peerScore = Math.max(0, Math.min(100, ((avgRating - 1.0) / 4.0) * 100));
                 // 评论数越多，权重越高（最多1.5倍加成）
                 double countBoost = Math.min(1.5, 1.0 + reviewCount * 0.1);
                 score += wPeer * peerScore * countBoost;
@@ -246,7 +256,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
         // 序列化为JSON数组
         try {
-            String categoriesJson = new ObjectMapper().writeValueAsString(topCategories);
+            String categoriesJson = OBJECT_MAPPER.writeValueAsString(topCategories);
             readerMapper.updatePreferredCategories(reader.getId(), categoriesJson);
             log.info("更新读者偏好分类: readerId={}, categories={}", readerId, categoriesJson);
         } catch (Exception e) {
@@ -319,7 +329,7 @@ public class RecommendationServiceImpl implements RecommendationService {
             return Collections.emptyList();
         }
         try {
-            return new ObjectMapper().readValue(categoriesJson, new TypeReference<List<String>>() {});
+            return OBJECT_MAPPER.readValue(categoriesJson, new TypeReference<List<String>>() {});
         } catch (Exception e) {
             log.warn("解析偏好分类失败: {}", categoriesJson, e);
             return Collections.emptyList();

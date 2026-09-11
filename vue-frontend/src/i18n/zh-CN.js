@@ -355,6 +355,7 @@ export default {
       checkout: '签退',
       close: '关闭',
       confirm: '确认',
+      confirmChange: '确认修改',
       confirmRenew: '确认续借',
       delete: '删除',
       goToBorrow: '去借书',

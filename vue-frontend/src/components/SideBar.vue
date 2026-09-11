@@ -117,8 +117,8 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="showPasswordDialog = false">取消</el-button>
-      <el-button type="primary" @click="handleChangePassword" :loading="passwordLoading">确认修改</el-button>
+      <el-button @click="showPasswordDialog = false">{{ $t('common.button.cancel') }}</el-button>
+      <el-button type="primary" @click="handleChangePassword" :loading="passwordLoading">{{ $t('common.button.confirmChange') }}</el-button>
     </template>
   </el-dialog>
 </template>
@@ -150,12 +150,12 @@ export default {
         oldPassword: [{ required: true, message: this.$t('passwordDialog.oldPasswordPlaceholder'), trigger: 'blur' }],
         newPassword: [
           { required: true, message: this.$t('passwordDialog.newPasswordPlaceholder'), trigger: 'blur' },
-          { min: 6, message: '密码至少6位', trigger: 'blur' }
+          { min: 6, message: this.$t('passwordDialog.minLen'), trigger: 'blur' }
         ],
         confirmPassword: [
           { required: true, message: this.$t('passwordDialog.confirmPassword'), trigger: 'blur' },
           { validator: (rule, value, callback) => {
-            if (value !== this.passwordForm.newPassword) callback(new Error('两次密码不一致'))
+            if (value !== this.passwordForm.newPassword) callback(new Error(this.$t('passwordDialog.mismatch')))
             else callback()
           }, trigger: 'blur' }
         ]

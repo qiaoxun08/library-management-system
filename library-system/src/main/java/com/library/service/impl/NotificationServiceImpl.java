@@ -59,8 +59,9 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    public void markAsRead(Integer id) {
-        notificationMapper.markAsRead(id);
+    public void markAsRead(Integer id, Integer readerId) {
+        // readerId 非空时由 SQL 强制归属校验（AND reader_id = ?），管理员传 null 则不限制
+        notificationMapper.markAsRead(id, readerId);
     }
 
     @Override
@@ -87,13 +88,23 @@ public class NotificationServiceImpl implements NotificationService {
     public void checkOverdueNotifications() {
         log.info("开始检查即将到期和已逾期的借阅...");
         String remindDaysStr = systemConfigService.getConfigValue("library.notification.borrow-remind-days");
-        int remindDays = remindDaysStr != null ? Integer.parseInt(remindDaysStr) : 3;
+        // 配置值可能是空串/非数字，解析失败会让整个定时任务中断、当天催还通知全丢
+        int remindDays = 3;
+        if (remindDaysStr != null && !remindDaysStr.trim().isEmpty()) {
+            try {
+                remindDays = Integer.parseInt(remindDaysStr.trim());
+            } catch (NumberFormatException e) {
+                log.warn("borrow-remind-days 配置格式错误，使用默认值3: {}", remindDaysStr);
+            }
+        }
 
         List<Borrowing> borrowings = borrowingMapper.findDueSoonOrOverdue(remindDays);
         int sentCount = 0;
 
         for (Borrowing borrowing : borrowings) {
-            long daysUntilDue = ChronoUnit.DAYS.between(LocalDateTime.now(), borrowing.getDueDate());
+            // 按自然日差计算（原来按 24 小时整块算，"明天到期"在晚上会被算成 0 天，进不了提醒窗口）
+            long daysUntilDue = ChronoUnit.DAYS.between(
+                    LocalDateTime.now().toLocalDate(), borrowing.getDueDate().toLocalDate());
 
             // 梯度通知策略：根据逾期天数决定通知频率，避免重复打扰
             String notifyLevel = determineNotifyLevel(daysUntilDue);
@@ -101,7 +112,7 @@ public class NotificationServiceImpl implements NotificationService {
                 continue; // 当前天数不在通知窗口
             }
 
-            // 去重：检查今天是否已发过同级别通知
+            // 去重：走 COUNT 查询，原来 findByReaderId 全量加载后在内存过滤（N+1）
             if (hasNotificationToday(borrowing.getReaderId(), notifyLevel)) {
                 continue;
             }
@@ -162,10 +173,7 @@ public class NotificationServiceImpl implements NotificationService {
             case "overdue_7_plus": titleKeyword = "严重逾期"; break;
             default: return false;
         }
-        List<Notification> todayNotifs = notificationMapper.findByReaderId(readerId);
-        return todayNotifs.stream().anyMatch(n ->
-                n.getTitle() != null && n.getTitle().contains(titleKeyword)
-                && n.getCreateTime() != null
-                && n.getCreateTime().toLocalDate().equals(LocalDateTime.now().toLocalDate()));
+        // 用 COUNT 查询替代全量加载（该方法在循环内被调用，全量加载会造成 N+1）
+        return notificationMapper.countTodayByReaderIdAndKeyword(readerId, titleKeyword) > 0;
     }
 }

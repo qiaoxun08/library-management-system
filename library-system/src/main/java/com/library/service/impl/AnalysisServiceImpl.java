@@ -94,24 +94,39 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Override
     public Map<String, Object> getBookTrend(int days) {
         Map<String, Object> result = new LinkedHashMap<>();
+        if (days <= 0 || days > 365) {
+            days = 30;
+        }
         result.put("days", days);
 
-        // 按分类统计指定天数内的借阅量
+        // 按分类统计指定天数内的借阅量（用于分类趋势展示）
         List<Map<String, Object>> categoryTrends = borrowingMapper.countByCategoryAndDays(days);
         result.put("categoryTrends", categoryTrends);
 
-        // 计算趋势方向
-        if (categoryTrends.size() >= 2) {
-            long firstHalf = categoryTrends.subList(0, categoryTrends.size() / 2).stream()
-                    .mapToLong(m -> ((Number) m.get("count")).longValue()).sum();
-            long secondHalf = categoryTrends.subList(categoryTrends.size() / 2, categoryTrends.size()).stream()
-                    .mapToLong(m -> ((Number) m.get("count")).longValue()).sum();
-            result.put("trend", secondHalf > firstHalf ? "上升" : secondHalf < firstHalf ? "下降" : "稳定");
-        } else {
-            result.put("trend", "稳定");
+        // 按天统计借阅量，用时间序列的真实前后半段对比计算趋势方向。
+        // 原实现按 count DESC 排序后对半拆分，前半必然 >= 后半，导致"上升"永远不可能出现。
+        List<Map<String, Object>> daily = borrowingMapper.countByDay(days);
+        String trend = "稳定";
+        if (daily.size() >= 2) {
+            long firstHalf = 0, secondHalf = 0;
+            int mid = daily.size() / 2;
+            for (int i = 0; i < daily.size(); i++) {
+                long c = ((Number) daily.get(i).get("count")).longValue();
+                if (i < mid) {
+                    firstHalf += c;
+                } else {
+                    secondHalf += c;
+                }
+            }
+            if (secondHalf > firstHalf) {
+                trend = "上升";
+            } else if (secondHalf < firstHalf) {
+                trend = "下降";
+            }
         }
+        result.put("trend", trend);
 
-        log.info("获取借阅趋势: days={}, 分类数量={}", days, categoryTrends.size());
+        log.info("获取借阅趋势: days={}, 分类数量={}, 日数据点={}", days, categoryTrends.size(), daily.size());
         return result;
     }
 

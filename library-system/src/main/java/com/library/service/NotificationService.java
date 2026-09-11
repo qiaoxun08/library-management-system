@@ -12,7 +12,7 @@ public interface NotificationService {
     Notification getNotificationById(Integer id);
     int countUnread(Integer readerId);
     void sendNotification(Notification notification);
-    void markAsRead(Integer id);
+    void markAsRead(Integer id, Integer readerId);
     void markAllAsRead(Integer readerId);
 
     /**

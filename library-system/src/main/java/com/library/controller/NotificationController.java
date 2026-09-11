@@ -117,14 +117,13 @@ public class NotificationController {
         boolean isReader = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_READER"));
         if (isReader) {
-            // reader 只能标记自己的通知
+            // reader 只能标记自己的通知（readerId 直接进 SQL，避免查不到时 NPE）
             Integer readerId = resolveReaderIdFromAuth(auth.getName());
-            Notification notification = notificationService.getNotificationById(id);
-            if (!notification.getReaderId().equals(readerId)) {
-                return Result.error("无权操作此通知");
-            }
+            notificationService.markAsRead(id, readerId);
+        } else {
+            // 管理员/馆员不受归属限制
+            notificationService.markAsRead(id, null);
         }
-        notificationService.markAsRead(id);
         return Result.success();
     }
 

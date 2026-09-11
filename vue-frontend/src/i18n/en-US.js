@@ -355,6 +355,7 @@ export default {
       checkout: 'Check Out',
       close: 'Close',
       confirm: 'Confirm',
+      confirmChange: 'Confirm Change',
       confirmRenew: 'Confirm Renew',
       delete: 'Delete',
       goToBorrow: 'Go Borrow',

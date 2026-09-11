@@ -4,6 +4,26 @@
 
 ---
 
+## v5.11 (2026-09-11) — 第四轮深度审查：算法/越权/状态一致性
+
+### 🧠 算法逻辑（Critical ×2）
+- **借阅趋势永远不可能"上升"修复**：原实现把按 `count DESC` 排序的分类列表对半拆分比较，前半必然 ≥ 后半，趋势维度完全失效。改为新增 `countByDay` 按天时间序列查询，前后半段真实对比
+- **推荐算法热门维度完全失效修复**：`popularBooks.indexOf(book)` 依赖 `equals()`，但 Book 是普通类未重写，引用比较恒为 -1，热门程度这一维度永远拿不到分。改为 `Map<Integer, Integer>` 按 bookId 查排名（顺带把 O(n) 线性搜索变成 O(1)）
+
+### 🔒 越权（High）
+- 通知标记已读：readerId 现在直接进 SQL 条件（`AND reader_id = ?`），管理员传 null 才不限制。原实现先查通知再比对归属，通知不存在时直接 NPE
+
+### ⚙️ 健壮性
+- 推荐算法：`avgRating`/`reviewCount` 可能为 null 导致 NPE，加判空；`peerScore` 加 0-100 钳制防脏数据污染排序；候选池上限 `limit*3` 封顶 100 防大参数内存溢出；`ObjectMapper` 改为静态常量复用（原来每次调用都 new）
+- 催还定时任务：`Integer.parseInt` 配置值加 try-catch（配置写错会让整个定时任务中断，当天催还通知全丢）；去重逻辑从全量加载读者通知改为 `COUNT` 查询（N+1）
+- 到期天数改按自然日计算（原来按 24 小时整块算，晚上看"明天到期"会算成 0 天进不了提醒窗口）
+
+### 🖥️ 前端
+- **登录后语言不生效修复**：LoginView 登录成功后未同步 `i18n.global.locale`，偏好英文的用户登录后仍显示中文（StudentLoginView 早就有这行，LoginView 漏了）
+- Token 刷新失败时改走 `store.dispatch('logout')`（原来只清 3 个 localStorage key，遗漏 realName/id，且 Vuex 里的用户信息还在）
+- 登出清理对称性：CLEAR_USER 现在也清 `language`、`searchHistory`、`seatReservationTime`（搜索历史会跨账号泄露）
+- SideBar 修改密码弹窗剩余 4 处硬编码中文 i18n 化
+
 ---
 
 ## v5.10 (2026-09-11) — 第四轮深度审查：部署链路真实验证（SQL 全量）

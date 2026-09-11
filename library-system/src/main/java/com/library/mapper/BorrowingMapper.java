@@ -38,6 +38,9 @@ public interface BorrowingMapper {
     List<Borrowing> findActiveByReaderId(@Param("readerId") Integer readerId);
     int countByReaderIdAndStatus(@Param("readerId") Integer readerId, @Param("status") Integer status);
     List<java.util.Map<String, Object>> countByCategoryAndDays(@Param("days") int days);
+
+    /** 按天统计借阅量（时间序列，用于趋势计算） */
+    List<java.util.Map<String, Object>> countByDay(@Param("days") int days);
     List<Book> findPopularBooks(@Param("limit") int limit);
     List<Borrowing> findRecentByReaderId(@Param("readerId") String readerId, @Param("days") int days);
 

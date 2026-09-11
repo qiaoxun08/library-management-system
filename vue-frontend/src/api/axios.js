@@ -110,11 +110,12 @@ service.interceptors.request.use(
             config.headers.Authorization = `Bearer ${newToken}`
             return config
           }
-          // 刷新失败：拒绝队列中的请求并清理登录态，不携带过期 Token 发出请求
+          // 刷新失败：统一走 logout（Vuex + localStorage 一起清，避免两边不一致）
           processQueue(new Error(t('messages.error.tokenRefreshFailed')), null)
-          localStorage.removeItem('token')
-          localStorage.removeItem('role')
-          localStorage.removeItem('username')
+          store.dispatch('logout')
+          localStorage.removeItem('language')
+          // 用户私有数据一并清理，避免下一个登录的用户看到上一个人的记录
+          localStorage.removeItem('searchHistory')
           return Promise.reject(new Error(t('messages.error.tokenRefreshFailed')))
         }).catch(err => {
           isRefreshing = false

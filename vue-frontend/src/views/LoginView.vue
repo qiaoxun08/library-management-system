@@ -126,6 +126,12 @@ export default {
               id: response.id,
               language: response.language
             })
+            // 同步 i18n locale（与 StudentLoginView 保持一致，否则偏好英文的用户登录后仍显示中文）
+            if (response.language) {
+              const lang = response.language === 'en_US' ? 'en-US' : 'zh-CN'
+              this.$i18n.global.locale.value = lang
+              localStorage.setItem('language', lang)
+            }
 
             switch (response.role) {
               case 'admin':
