@@ -233,6 +233,7 @@ export default {
       last90Days: '近90天',
       loadFailed: '加载统计数据失败',
       low: '低',
+      monthFormat: '{month}月',
       months: '月',
       predictedOccupancy: '预计占用率(%)',
       seatPrediction: '座位预测',
@@ -314,6 +315,26 @@ export default {
     username: '用户名',
     usernamePlaceholder: '请输入用户名',
     usernameRequired: '请输入用户名'
+  },
+  notification: {
+  title: {
+    like: '收到点赞',
+    follow: '新关注者',
+    dueTomorrow: '明天到期提醒',
+    overdueMild: '逾期提醒',
+    overdueUrgent: '紧急催还',
+    overdueSevere: '严重逾期警告'
+  },
+
+  passwordDialog: {
+    oldPassword: '旧密码',
+    oldPasswordPlaceholder: '请输入旧密码',
+    newPassword: '新密码',
+    newPasswordPlaceholder: '请输入新密码（至少6位）',
+    confirmPassword: '确认密码',
+    confirmPasswordPlaceholder: '请再次输入新密码',
+    mismatch: '两次输入的密码不一致',
+    minLen: '密码长度至少6位',
   },
   common: {
     action: {
@@ -718,15 +739,6 @@ export default {
       title: '消息通知'
     },
     // 通知 i18n 映射（后端存中文，前端按规则映射）
-    notification: {
-    title: {
-      like: '收到点赞',
-      follow: '新关注者',
-      dueTomorrow: '明天到期提醒',
-      overdueMild: '逾期提醒',
-      overdueUrgent: '紧急催还',
-      overdueSevere: '严重逾期警告'
-    },
     content: {
       like: '{name} 赞了您的评论',
       follow: '{name} 关注了你',

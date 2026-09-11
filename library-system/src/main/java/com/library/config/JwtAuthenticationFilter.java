@@ -17,7 +17,10 @@ import java.io.IOException;
 import java.util.Collections;
 
 /**
- * JWT 认证过滤器
+ * JWT 认证过滤器（已废弃：实际生效的是 RbacJwtAuthenticationFilter，
+ * 本类未注册为 Bean，保留仅为参考，请勿再注册，否则会出现双过滤器）
+ *
+ * @deprecated 使用 RbacJwtAuthenticationFilter
  * 
  * 工作流程：
  * 1. 从请求头 Authorization: Bearer <token> 中提取 JWT
@@ -31,6 +34,7 @@ import java.util.Collections;
  * 即使 Token 无效也不会阻断请求，只是不设置认证信息
  * 具体的权限检查由 Spring Security 的授权过滤器完成
  */
+@Deprecated
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);

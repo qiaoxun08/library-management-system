@@ -4,6 +4,35 @@
 
 ---
 
+## v5.9 (2026-09-11) — 第三轮深度审查（SQL/数据层 + 基础设施 + i18n）
+
+### 🐛 SQL/数据层（Critical）
+- **关注功能完全不可用修复**：ReaderFollowMapper.xml 用了不存在的列 `followee_id`（DDL 实际是 `following_id`），所有关注/取关/查询 SQL 运行即报错。已全量改名
+- **座位热力图修复**：getSeatHeatmapData 返回类型声明为单个 Map 但 SQL 返回多行（多区域时 MyBatis 直接抛异常），改为 List<Map> 并同步调用方
+- **签到超时误释放修复**：reservation_date 是预约创建日期，提前预约的座位会被"30分钟未签到"任务立即释放。现在按 preferredTimeSlot 的实际开始时间判断，无时段时才回退到创建时间
+
+### 🔒 安全（Critical/High）
+- **XSS 过滤覆盖 JSON body**：原来只过滤 URL 参数，所有 POST JSON（登录、评论等）完全绕过 XSS 过滤。现在解析 JSON 后递归清洗所有字符串值，不破坏结构
+- **CSV 公式注入防护**：导出的读者名/书名/日志详情等用户字段以 =+-@ 开头时会当 Excel 公式执行，现已转义
+- **401 返回 JSON**：原来未认证请求返回 Spring Security 默认 HTML，前端与其他端格式不一致，现统一返回 Result JSON
+- 死代码 JwtAuthenticationFilter 标注 @Deprecated（实际生效的是 RbacJwtAuthenticationFilter）
+
+### 🖥️ 前端修复
+- **通知页面 i18n 完全失效修复**：`notification.*` key 嵌套在 `reader` 下导致 12 处通知标题/内容中英文都显示原始 key，已提升为顶层 key
+- SideBar 修改密码弹窗全部文案 i18n 化（原来英文模式下全中文）
+- 补 admin.statistics.monthFormat key（统计图表 X 轴原来显示 key 字符串）
+
+### 📝 已知未修（记录在案）
+- Redis 分布式锁无 watchdog 续期（锁 TTL 内未完成的操作会失去保护）
+- 缓存固定 TTL 无随机抖动（大批量同刻写入有雪崩理论风险）
+- isRedisAvailable 每次调用都 PING（高并发下可优化为带缓存的健康检查）
+- 操作日志敏感参数依赖类名含 "Request" 的约定（建议改为字段名级脱敏）
+- 4 位纯数字验证码偏弱（配合登录限流风险可接受）
+- 限流可伪造 X-Forwarded-For 绕过（部署层需在网关覆盖该头）
+- findPopularBooks 的 `SELECT b.* GROUP BY b.id` 依赖 MySQL 功能依赖检测（MySQL 8 默认支持，已核实无需改）
+
+---
+
 ## v5.8 (2026-09-11) — 深度逻辑审查修复
 
 ### 🐛 业务逻辑（Critical）

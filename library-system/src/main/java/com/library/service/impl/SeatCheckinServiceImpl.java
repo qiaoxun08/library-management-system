@@ -148,22 +148,36 @@ public class SeatCheckinServiceImpl implements SeatCheckinService {
         LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(minutes);
 
         for (ReservationDTO reservation : approvedReservations) {
-            if (reservation.getSeatId() != null && reservation.getStartTime() != null
-                    && reservation.getStartTime().isBefore(cutoffTime)) {
-                // 检查是否已有签到记录
-                SeatCheckin activeCheckin = seatCheckinMapper.findActiveBySeatId(reservation.getSeatId());
-                if (activeCheckin == null) {
-                    // 超时未签到，释放座位
-                    reservationMapper.updateStatus(reservation.getId(), 4); // 4: 已过期
-                    Seat seat = seatMapper.findById(reservation.getSeatId());
-                    if (seat != null) {
-                        seat.setStatus(0);
-                        seatMapper.update(seat);
+            if (reservation.getSeatId() != null && reservation.getStartTime() != null) {
+                // 计算预约的实际开始时间：
+                // reservation_date 是预约创建日期，提前一天预约的不能一过午夜就被释放；
+                // 有 preferredTimeSlot（如 "09:00-10:00"）时，开始时间 = 预约日期 + 时段起点
+                LocalDateTime intendedStart = reservation.getStartTime();
+                String slot = reservation.getPreferredTimeSlot();
+                if (slot != null && slot.matches("\\d{1,2}:\\d{2}-\\d{1,2}:\\d{2}")) {
+                    try {
+                        java.time.LocalTime slotStart = java.time.LocalTime.parse(slot.split("-")[0]);
+                        intendedStart = reservation.getStartTime().toLocalDate().atTime(slotStart);
+                    } catch (Exception e) {
+                        log.warn("解析预约时段失败: reservationId={}, slot={}", reservation.getId(), slot);
                     }
-                    // 违约累计
-                    blacklistService.incrementViolation(reservation.getReaderId());
-                    log.info("释放超时未签到座位: reservationId={}, seatId={}, readerId={}",
-                            reservation.getId(), reservation.getSeatId(), reservation.getReaderId());
+                }
+                if (intendedStart.isBefore(cutoffTime)) {
+                    // 检查是否已有签到记录
+                    SeatCheckin activeCheckin = seatCheckinMapper.findActiveBySeatId(reservation.getSeatId());
+                    if (activeCheckin == null) {
+                        // 超时未签到，释放座位
+                        reservationMapper.updateStatus(reservation.getId(), 4); // 4: 已过期
+                        Seat seat = seatMapper.findById(reservation.getSeatId());
+                        if (seat != null) {
+                            seat.setStatus(0);
+                            seatMapper.update(seat);
+                        }
+                        // 违约累计
+                        blacklistService.incrementViolation(reservation.getReaderId());
+                        log.info("释放超时未签到座位: reservationId={}, seatId={}, readerId={}",
+                                reservation.getId(), reservation.getSeatId(), reservation.getReaderId());
+                    }
                 }
             }
         }

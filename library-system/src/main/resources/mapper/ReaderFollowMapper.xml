@@ -3,18 +3,18 @@
 <mapper namespace="com.library.mapper.ReaderFollowMapper">
 
     <insert id="insert" parameterType="com.library.entity.ReaderFollow" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO reader_follow (follower_id, followee_id)
+        INSERT INTO reader_follow (follower_id, following_id)
         VALUES (#{followerId}, #{followeeId})
     </insert>
 
     <delete id="deleteByPair">
         DELETE FROM reader_follow
-        WHERE follower_id = #{followerId} AND followee_id = #{followeeId}
+        WHERE follower_id = #{followerId} AND following_id = #{followeeId}
     </delete>
 
     <select id="existsByPair" resultType="int">
         SELECT COUNT(*) FROM reader_follow
-        WHERE follower_id = #{followerId} AND followee_id = #{followeeId}
+        WHERE follower_id = #{followerId} AND following_id = #{followeeId}
     </select>
 
     <!-- 获取关注者列表（谁关注了我），包含读者信息 -->
@@ -23,7 +23,7 @@
                r.id AS reader_id, r.reader_id AS reader_no, r.real_name, r.department
         FROM reader_follow rf
         LEFT JOIN reader r ON rf.follower_id = r.id
-        WHERE rf.followee_id = #{followeeId}
+        WHERE rf.following_id = #{followeeId}
         ORDER BY rf.create_time DESC
     </select>
 
@@ -32,13 +32,13 @@
         SELECT rf.id AS follow_id, rf.create_time AS follow_time,
                r.id AS reader_id, r.reader_id AS reader_no, r.real_name, r.department
         FROM reader_follow rf
-        LEFT JOIN reader r ON rf.followee_id = r.id
+        LEFT JOIN reader r ON rf.following_id = r.id
         WHERE rf.follower_id = #{followerId}
         ORDER BY rf.create_time DESC
     </select>
 
     <select id="countFollowers" resultType="int">
-        SELECT COUNT(*) FROM reader_follow WHERE followee_id = #{followeeId}
+        SELECT COUNT(*) FROM reader_follow WHERE following_id = #{followeeId}
     </select>
 
     <select id="countFollowees" resultType="int">

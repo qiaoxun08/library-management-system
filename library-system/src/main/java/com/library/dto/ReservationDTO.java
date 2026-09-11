@@ -15,6 +15,7 @@ public class ReservationDTO {
     private LocalDateTime endTime;
     private Integer status;
     private LocalDateTime expiryDate;
+    private String preferredTimeSlot; // 预约时段，如 "09:00-10:00"
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -40,4 +41,6 @@ public class ReservationDTO {
     public void setStatus(Integer status) { this.status = status; }
     public LocalDateTime getExpiryDate() { return expiryDate; }
     public void setExpiryDate(LocalDateTime expiryDate) { this.expiryDate = expiryDate; }
+    public String getPreferredTimeSlot() { return preferredTimeSlot; }
+    public void setPreferredTimeSlot(String preferredTimeSlot) { this.preferredTimeSlot = preferredTimeSlot; }
 }

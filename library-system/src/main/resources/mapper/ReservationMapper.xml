@@ -64,6 +64,7 @@
         SELECT
             r.id, r.reader_id as readerId, r.book_id as bookId, r.seat_id as seatId,
             r.reservation_date as startTime, r.status, r.expiry_date as endTime,
+            r.preferred_time_slot as preferredTimeSlot,
             b.title as bookTitle,
             s.seat_number as seatNumber, s.area as area
         FROM reservation r

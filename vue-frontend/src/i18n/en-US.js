@@ -241,6 +241,7 @@ export default {
       last90Days: 'Last 90 Days',
       high: 'High',
       low: 'Low',
+      monthFormat: 'M{month}',
       months: '',
       loadFailed: 'Failed to load statistics',
       yAxisBorrowCount: 'Borrow Count',
@@ -314,6 +315,26 @@ export default {
     username: 'Username',
     usernamePlaceholder: 'Enter username',
     usernameRequired: 'Please enter username'
+  },
+  notification: {
+  title: {
+    like: 'Like Received',
+    follow: 'New Follower',
+    dueTomorrow: 'Due Tomorrow',
+    overdueMild: 'Overdue Reminder',
+    overdueUrgent: 'Urgent Recall',
+    overdueSevere: 'Severe Overdue Warning'
+  },
+
+  passwordDialog: {
+    oldPassword: 'Old Password',
+    oldPasswordPlaceholder: 'Enter old password',
+    newPassword: 'New Password',
+    newPasswordPlaceholder: 'Enter new password (min 6 characters)',
+    confirmPassword: 'Confirm Password',
+    confirmPasswordPlaceholder: 'Re-enter new password',
+    mismatch: 'Passwords do not match',
+    minLen: 'Password must be at least 6 characters',
   },
   common: {
     action: {
@@ -719,15 +740,6 @@ export default {
       title: 'Notifications'
     },
     // Notification i18n mapping (backend stores Chinese, frontend maps by pattern)
-    notification: {
-    title: {
-      like: 'Like Received',
-      follow: 'New Follower',
-      dueTomorrow: 'Due Tomorrow',
-      overdueMild: 'Overdue Reminder',
-      overdueUrgent: 'Urgent Recall',
-      overdueSevere: 'Severe Overdue Warning'
-    },
     content: {
       like: '{name} liked your review',
       follow: '{name} started following you',

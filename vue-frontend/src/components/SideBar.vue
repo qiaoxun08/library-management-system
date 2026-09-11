@@ -104,16 +104,16 @@
   </template>
 
   <!-- 修改密码弹窗 -->
-  <el-dialog v-model="showPasswordDialog" title="修改密码" width="420px" :close-on-click-modal="false">
+  <el-dialog v-model="showPasswordDialog" :title="$t('common.text.changePassword')" width="420px" :close-on-click-modal="false">
     <el-form :model="passwordForm" :rules="passwordRules" ref="passwordFormRef" label-width="80px">
-      <el-form-item label="旧密码" prop="oldPassword">
-        <el-input v-model="passwordForm.oldPassword" type="password" show-password placeholder="请输入旧密码" />
+      <el-form-item :label="$t('passwordDialog.oldPassword')" prop="oldPassword">
+        <el-input v-model="passwordForm.oldPassword" type="password" show-password :placeholder="$t('passwordDialog.oldPasswordPlaceholder')" />
       </el-form-item>
-      <el-form-item label="新密码" prop="newPassword">
-        <el-input v-model="passwordForm.newPassword" type="password" show-password placeholder="请输入新密码（至少6位）" />
+      <el-form-item :label="$t('passwordDialog.newPassword')" prop="newPassword">
+        <el-input v-model="passwordForm.newPassword" type="password" show-password :placeholder="$t('passwordDialog.newPasswordPlaceholder')" />
       </el-form-item>
-      <el-form-item label="确认密码" prop="confirmPassword">
-        <el-input v-model="passwordForm.confirmPassword" type="password" show-password placeholder="请再次输入新密码" />
+      <el-form-item :label="$t('passwordDialog.confirmPassword')" prop="confirmPassword">
+        <el-input v-model="passwordForm.confirmPassword" type="password" show-password :placeholder="$t('passwordDialog.confirmPasswordPlaceholder')" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -147,13 +147,13 @@ export default {
       passwordLoading: false,
       passwordForm: { oldPassword: '', newPassword: '', confirmPassword: '' },
       passwordRules: {
-        oldPassword: [{ required: true, message: '请输入旧密码', trigger: 'blur' }],
+        oldPassword: [{ required: true, message: this.$t('passwordDialog.oldPasswordPlaceholder'), trigger: 'blur' }],
         newPassword: [
-          { required: true, message: '请输入新密码', trigger: 'blur' },
+          { required: true, message: this.$t('passwordDialog.newPasswordPlaceholder'), trigger: 'blur' },
           { min: 6, message: '密码至少6位', trigger: 'blur' }
         ],
         confirmPassword: [
-          { required: true, message: '请确认新密码', trigger: 'blur' },
+          { required: true, message: this.$t('passwordDialog.confirmPassword'), trigger: 'blur' },
           { validator: (rule, value, callback) => {
             if (value !== this.passwordForm.newPassword) callback(new Error('两次密码不一致'))
             else callback()

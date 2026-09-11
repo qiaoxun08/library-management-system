@@ -21,6 +21,6 @@ public interface SeatMapper {
     int countAvailableSeats();
     int countByAreaAndStatus(@Param("area") String area, @Param("status") Integer status);
 
-    /** 获取座位热力图数据（按区域统计占用率） */
-    java.util.Map<String, Object> getSeatHeatmapData();
+    /** 获取座位热力图数据（按区域统计占用率，每个区域一行） */
+    java.util.List<java.util.Map<String, Object>> getSeatHeatmapData();
 }

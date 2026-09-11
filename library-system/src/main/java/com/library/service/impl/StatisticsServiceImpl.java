@@ -123,8 +123,8 @@ public class StatisticsServiceImpl implements StatisticsService {
         List<Map<String, Object>> hotBooks = bookMapper.findHotBooksTop10();
         result.put("hotBooks", hotBooks);
 
-        // 座位占用率热力图数据
-        Map<String, Object> seatHeatmap = seatMapper.getSeatHeatmapData();
+        // 座位占用率热力图数据（每个区域一行）
+        List<Map<String, Object>> seatHeatmap = seatMapper.getSeatHeatmapData();
         result.put("seatHeatmap", seatHeatmap);
 
         // 借阅分类分布

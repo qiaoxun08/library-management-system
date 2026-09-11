@@ -211,6 +211,21 @@ public class ExportServiceImpl implements ExportService {
 
     // ==================== CSV 写入 ====================
 
+    /**
+     * CSV 公式注入防护：以 = + - @ 制表符开头的单元格在 Excel 中会被当公式执行，
+     * 加前缀单引号强制按文本处理
+     */
+    private String csvSafe(String value) {
+        if (value == null || value.isEmpty()) {
+            return "";
+        }
+        char c = value.charAt(0);
+        if (c == '=' || c == '+' || c == '-' || c == '@' || c == '\t' || c == '\r') {
+            return "'" + value;
+        }
+        return value;
+    }
+
     private void writeBorrowingsCsv(List<BorrowingDTO> data, String filename, HttpServletResponse response) throws Exception {
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(filename + ".csv", StandardCharsets.UTF_8));
@@ -221,8 +236,8 @@ public class ExportServiceImpl implements ExportService {
             for (BorrowingDTO b : data) {
                 writer.writeNext(new String[]{
                         String.valueOf(b.getId()),
-                        b.getReaderName() != null ? b.getReaderName() : "",
-                        b.getBookTitle() != null ? b.getBookTitle() : "",
+                        csvSafe(b.getReaderName() != null ? b.getReaderName() : ""),
+                        csvSafe(b.getBookTitle() != null ? b.getBookTitle() : ""),
                         formatDateTime(b.getBorrowDate()),
                         formatDateTime(b.getDueDate()),
                         formatDateTime(b.getReturnDate()),
@@ -266,11 +281,11 @@ public class ExportServiceImpl implements ExportService {
             for (OperationLog log : data) {
                 writer.writeNext(new String[]{
                         String.valueOf(log.getId()),
-                        log.getUsername() != null ? log.getUsername() : "",
-                        log.getRole() != null ? log.getRole() : "",
-                        log.getModule() != null ? log.getModule() : "",
-                        log.getAction() != null ? log.getAction() : "",
-                        log.getDetail() != null ? log.getDetail() : "",
+                        csvSafe(log.getUsername() != null ? log.getUsername() : ""),
+                        csvSafe(log.getRole() != null ? log.getRole() : ""),
+                        csvSafe(log.getModule() != null ? log.getModule() : ""),
+                        csvSafe(log.getAction() != null ? log.getAction() : ""),
+                        csvSafe(log.getDetail() != null ? log.getDetail() : ""),
                         log.getIp() != null ? log.getIp() : "",
                         formatDateTime(log.getCreateTime())
                 });
@@ -294,8 +309,8 @@ public class ExportServiceImpl implements ExportService {
                 for (BorrowingDTO b : borrowings) {
                     writer.writeNext(new String[]{
                             String.valueOf(b.getId()),
-                            b.getBookTitle() != null ? b.getBookTitle() : "",
-                            b.getBookAuthor() != null ? b.getBookAuthor() : "",
+                            csvSafe(b.getBookTitle() != null ? b.getBookTitle() : ""),
+                            csvSafe(b.getBookAuthor() != null ? b.getBookAuthor() : ""),
                             formatDateTime(b.getBorrowDate()),
                             formatDateTime(b.getDueDate()),
                             formatDateTime(b.getReturnDate()),
