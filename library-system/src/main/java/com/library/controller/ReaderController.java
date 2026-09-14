@@ -2,6 +2,7 @@ package com.library.controller;
 
 import com.library.dto.PasswordChangeRequest;
 import com.library.dto.PasswordResetRequest;
+import com.library.dto.PublicReaderProfile;
 import com.library.dto.Result;
 import com.library.entity.Reader;
 import com.library.service.ReaderService;
@@ -57,6 +58,29 @@ public class ReaderController {
         try {
             Reader reader = readerService.getReaderByReaderId(readerId);
             return Result.success(reader);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+
+    @GetMapping("/public/{readerId}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
+    @Operation(summary = "获取读者公开主页信息", description = "任何登录用户可查看他人公开主页（仅返回昵称/性别/院系/读者编号等公开字段，不含手机/邮箱/罚款/借阅数等隐私）")
+    public Result<PublicReaderProfile> getPublicProfile(
+            @Parameter(description = "读者编号") @PathVariable String readerId) {
+        try {
+            Reader reader = readerService.getReaderByReaderId(readerId);
+            if (reader == null) {
+                return Result.error("读者不存在");
+            }
+            PublicReaderProfile profile = new PublicReaderProfile();
+            profile.setId(reader.getId());
+            profile.setReaderId(reader.getReaderId());
+            profile.setRealName(reader.getRealName());
+            profile.setGender(reader.getGender());
+            profile.setDepartment(reader.getDepartment());
+            profile.setCreateTime(reader.getCreateTime());
+            return Result.success(profile);
         } catch (Exception e) {
             return Result.error(e.getMessage());
         }

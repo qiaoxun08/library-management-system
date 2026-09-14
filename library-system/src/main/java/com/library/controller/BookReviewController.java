@@ -116,8 +116,8 @@ public class BookReviewController {
      * 获取读者的评论列表（管理员/馆员用）
      */
     @GetMapping("/reader/{readerId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
-    @Operation(summary = "获取读者的评论列表", description = "管理员/馆员查看指定读者的所有评论")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
+    @Operation(summary = "获取读者的评论列表", description = "管理员/馆员/读者查看指定读者的所有评论（书评为公开内容）")
     public Result<Map<String, Object>> getReaderReviews(
             @Parameter(description = "读者ID") @PathVariable Integer readerId) {
         try {

@@ -22,8 +22,14 @@
 ### 🖥️ 资源修复
 - 新增 `default-cover.png`（书香暖底封面占位）修复图书封面 404；新增 `vite.svg`（PWA 图标）修复启动 404
 
+### 🔓 v6.6 读者查看他人主页 403 已解决（放宽为公开信息）
+- **问题**：`UserProfileView`（`/reader/user/:id`）查看他人时，档案、书评、关注列表三个接口都撞上越权保护（仅管理员/馆员/本人），读者点他人主页就 403。
+- **决策**：放宽为「公开信息」，不隐藏社交功能。后端新增**白名单公开端点**，只回公开字段（`id`/`readerId`/`realName`/`gender`/`department`/`createTime`），**不含** phone / email / 罚款 / 借阅数 / 借阅偏好等隐私字段。
+- **改动**：后端 `ReaderController` 加 `GET /readers/public/{readerId}`；`BookReviewController` / `ReaderFollowController` 放开 READER 角色读取（关注列表 SQL 已验证只查安全字段）；前端 `UserProfileView` 改用公开端点，即使后端放开也拿不到隐私字段（纵深防御）。
+- **验证**：reader(2024001) 查 self 与他人(2024002) 主页 → 档案/书评/粉丝/关注均 200，隐私字段零泄露，旧受限端点对他人仍 403。
+
 ### 📋 待决定
-- 读者查看他人主页 403：后端越权保护（仅管理员 / 馆员 / 本人）与前端社交功能冲突，留待选择放宽或隐藏（详见 `docs/audit/01-functional-issues.md`）
+- ~~读者查看他人主页 403~~ → 见上方 v6.6，已放宽为公开信息解决。
 
 ---
 

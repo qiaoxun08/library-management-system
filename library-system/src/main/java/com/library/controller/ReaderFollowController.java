@@ -132,8 +132,8 @@ public class ReaderFollowController {
      * 获取粉丝列表（管理员/馆员用）
      */
     @GetMapping("/followers/{readerId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
-    @Operation(summary = "获取读者的粉丝列表", description = "管理员/馆员查看指定读者的粉丝")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
+    @Operation(summary = "获取读者的粉丝列表", description = "管理员/馆员/读者查看指定读者的粉丝（公开主页信息）")
     public Result<Map<String, Object>> getFollowers(
             @Parameter(description = "读者ID") @PathVariable Integer readerId) {
         try {
@@ -148,8 +148,8 @@ public class ReaderFollowController {
      * 获取关注列表（管理员/馆员用）
      */
     @GetMapping("/followees/{readerId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
-    @Operation(summary = "获取读者的关注列表", description = "管理员/馆员查看指定读者的关注列表")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or hasRole('READER')")
+    @Operation(summary = "获取读者的关注列表", description = "管理员/馆员/读者查看指定读者的关注列表（公开主页信息）")
     public Result<Map<String, Object>> getFollowees(
             @Parameter(description = "读者ID") @PathVariable Integer readerId) {
         try {

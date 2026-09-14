@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { getReaderByReaderId } from '@/api/reader'
+import { getPublicProfile } from '@/api/reader'
 
 export default {
   name: 'UserProfileView',
@@ -102,7 +102,7 @@ export default {
     async loadProfile() {
       this.loading = true
       try {
-        const data = await getReaderByReaderId(this.userId)
+        const data = await getPublicProfile(this.userId)
         this.user = data || {}
         this.isSelf = this.userId === this.$store.getters.username
         this.loadSocialData()

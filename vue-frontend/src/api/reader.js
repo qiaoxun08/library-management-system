@@ -12,6 +12,15 @@ export function getReaderByReaderId(readerId) {
   return axios.get(`/readers/readerId/${readerId}`)
 }
 
+/**
+ * 获取读者公开主页信息（任何登录用户可查看他人，仅含公开字段）
+ * @param {string} readerId - 读者编号
+ * @returns {Promise}
+ */
+export function getPublicProfile(readerId) {
+  return axios.get(`/readers/public/${readerId}`)
+}
+
 export function addReader(data) {
   return axios.post('/readers', data)
 }
