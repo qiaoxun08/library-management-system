@@ -66,7 +66,7 @@ html, body, #app {
 /* 全局过渡动画 */
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.25s ease;
+  transition: opacity 0.28s var(--ease-out);
 }
 
 .fade-enter-from,
@@ -108,11 +108,16 @@ html, body, #app {
 .el-dialog {
   border-radius: 14px !important;
   overflow: hidden;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  box-shadow: var(--glass-shadow), var(--glass-highlight), var(--glass-border);
+  border: none;
 }
 
 .el-dialog__header {
-  border-bottom: 1px solid var(--el-border-color-light);
-  padding-bottom: 16px !important;
+  padding: 20px 24px 8px !important;
+  margin-right: 0;
 }
 
 .el-dialog__title {
@@ -147,7 +152,11 @@ html, body, #app {
 .el-button {
   border-radius: 8px;
   font-weight: 500;
-  transition: all 0.25s ease;
+  transition: transform 0.18s var(--ease-spring), box-shadow 0.28s var(--ease-out), background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), color 0.28s var(--ease-out);
+}
+
+.el-button:active {
+  transform: scale(0.97);
 }
 
 .el-button--primary {
@@ -165,16 +174,17 @@ html, body, #app {
   border-radius: 12px;
   border: 1px solid var(--el-border-color-lighter);
   box-shadow: 0 2px 12px rgba(44, 62, 80, 0.04);
-  transition: all 0.25s ease;
+  transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 
 .el-card:hover {
-  box-shadow: 0 4px 20px rgba(44, 62, 80, 0.08);
+  box-shadow: 0 6px 24px rgba(44, 62, 80, 0.08);
+  border-color: var(--el-border-color-light);
 }
 
 /* 输入框 */
 .el-input__wrapper {
-  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
   border-radius: 8px;
 }
 
@@ -201,8 +211,12 @@ html, body, #app {
 
 /* 选择器下拉 */
 .el-select-dropdown {
-  border-radius: 10px;
-  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border: none;
+  box-shadow: var(--glass-shadow), var(--glass-highlight), var(--glass-border);
 }
 
 /* 表单标签 */
@@ -251,5 +265,51 @@ html, body, #app {
 /* 菜单 hover 态 */
 .el-menu-item:hover {
   background-color: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ========================================
+   液态玻璃 — 其余浮层（popover/tooltip/确认框）
+   与 select-dropdown/dialog 统一深度秩序
+   ======================================== */
+.el-popover.el-popper,
+.el-tooltip__popper,
+.el-message-box {
+  border-radius: 12px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  border: none !important;
+  box-shadow: var(--glass-shadow), var(--glass-highlight), var(--glass-border);
+}
+
+/* ========================================
+   骨架屏 — 呼吸感 0.3↔0.6 / 1.5s
+   安静但可见（谷底在暖背景接近消失则上调）
+   ======================================== */
+.skeleton {
+  background-color: rgba(44, 62, 80, 0.5);
+  border-radius: 6px;
+  animation: skeleton-breath 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-breath {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* ========================================
+   动效降级 — prefers-reduced-motion
+   全部动效转静态，功能不瘫痪
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .el-button:active { transform: none; }
 }
 </style>
