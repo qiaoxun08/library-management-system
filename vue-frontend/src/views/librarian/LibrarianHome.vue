@@ -10,7 +10,7 @@
 
     <div class="stats-row">
       <div class="stat-card" @click="$router.push('/librarian/borrow')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #6B8F71, #8FB396)">
+        <div class="stat-icon" style="background: #6B8F71">
           <el-icon :size="28"><Reading /></el-icon>
         </div>
         <div class="stat-info">
@@ -19,7 +19,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/librarian/records')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #2C3E50, #3D5A80)">
+        <div class="stat-icon" style="background: #2C3E50">
           <el-icon :size="28"><Document /></el-icon>
         </div>
         <div class="stat-info">
@@ -28,7 +28,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/librarian/reservations')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #C0785C, #D4956B)">
+        <div class="stat-icon" style="background: #C0785C">
           <el-icon :size="28"><Calendar /></el-icon>
         </div>
         <div class="stat-info">
@@ -37,7 +37,7 @@
         </div>
       </div>
       <div class="stat-card" @click="$router.push('/librarian/fines')">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #A85454, #C06B6B)">
+        <div class="stat-icon" style="background: #A85454">
           <el-icon :size="28"><Money /></el-icon>
         </div>
         <div class="stat-info">
@@ -144,7 +144,7 @@ export default {
 .librarian-home { padding: 24px;   }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #6B8F71 0%, #8FB396 100%);
+  background: #6B8F71;
   border-radius: 12px; padding: 24px 32px;  color: white;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
@@ -197,7 +197,7 @@ export default {
 }
 
 .action-item.primary {
-  background: linear-gradient(135deg, #F5F0E8, #EBE5DB);
+  background: #F5F0E8;
   color: #C0785C; font-weight: 600;
 }
 

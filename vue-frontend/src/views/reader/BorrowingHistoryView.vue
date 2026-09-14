@@ -5,7 +5,7 @@
     <!-- 借阅统计卡片 -->
     <div class="stats-row">
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #2C3E50, #3D5A80)">
+        <div class="stat-icon" style="background: #2C3E50">
           <el-icon :size="28"><Document /></el-icon>
         </div>
         <div class="stat-info">
@@ -14,7 +14,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #6B8F71, #8FB396)">
+        <div class="stat-icon" style="background: #6B8F71">
           <el-icon :size="28"><Check /></el-icon>
         </div>
         <div class="stat-info">
@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #C0785C, #A85454)">
+        <div class="stat-icon" style="background: #C0785C">
           <el-icon :size="28"><Clock /></el-icon>
         </div>
         <div class="stat-info">
@@ -32,7 +32,7 @@
         </div>
       </div>
       <div class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, #5A7D9A, #8BABC4)">
+        <div class="stat-icon" style="background: #5A7D9A">
           <el-icon :size="28"><Calendar /></el-icon>
         </div>
         <div class="stat-info">

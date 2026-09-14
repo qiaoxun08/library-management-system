@@ -77,7 +77,7 @@ html, body, #app {
 /* ---- 书脊装饰线（通用） ---- */
 .book-spine-accent {
   height: 3px;
-  background: linear-gradient(90deg, #C0785C, #D4956B, #C0785C);
+  background: #C0785C;
   border-radius: 2px;
 }
 
@@ -95,7 +95,7 @@ html, body, #app {
   display: block;
   width: 40px;
   height: 3px;
-  background: linear-gradient(90deg, #C0785C, #D4956B);
+  background: #C0785C;
   border-radius: 2px;
   margin-top: 8px;
 }

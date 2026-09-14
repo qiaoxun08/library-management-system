@@ -163,7 +163,7 @@ export default {
   align-items: center;
   height: 100vh;
   width: 100vw;
-  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 40%, #C0785C 100%);
+  background: #2C3E50;
   position: relative;
   overflow: hidden;
 }
@@ -213,7 +213,7 @@ export default {
   transform: translateX(-50%);
   width: 60%;
   height: 3px;
-  background: linear-gradient(90deg, transparent, #C0785C, #D4956B, #C0785C, transparent);
+  background: #C0785C;
   border-radius: 0 0 16px 16px;
 }
 
@@ -257,7 +257,7 @@ export default {
   width: 64px;
   height: 64px;
   border-radius: 16px;
-  background: linear-gradient(135deg, #2C3E50, #3D5A80);
+  background: #2C3E50;
   color: white;
   margin-bottom: 16px;
 }

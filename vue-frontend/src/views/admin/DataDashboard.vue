@@ -616,7 +616,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: linear-gradient(180deg, rgba(20, 30, 40, 0.95) 0%, rgba(15, 25, 35, 0.8) 100%);
+  background: rgba(20, 30, 40, 0.95);
   border-bottom: 2px solid #C0785C;
 }
 
@@ -655,7 +655,7 @@ export default {
   display: inline-block;
   width: 40px;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #C0785C, transparent);
+  background: #C0785C;
 }
 
 .fullscreen-btn {
@@ -684,7 +684,7 @@ export default {
 
 /* 面板通用样式 */
 .panel {
-  background: linear-gradient(135deg, rgba(20, 30, 40, 0.9) 0%, rgba(25, 35, 45, 0.8) 100%);
+  background: rgba(20, 30, 40, 0.9);
   border-radius: 8px;
   border: 1px solid rgba(192, 120, 92, 0.2);
   overflow: hidden;
@@ -711,7 +711,7 @@ export default {
   display: inline-block;
   width: 30px;
   height: 3px;
-  background: linear-gradient(90deg, #C0785C, transparent);
+  background: #C0785C;
   border-radius: 2px;
 }
 

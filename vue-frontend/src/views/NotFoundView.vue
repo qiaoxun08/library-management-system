@@ -50,7 +50,7 @@ export default {
   font-size: 120px;
   font-weight: 900;
   font-family: var(--font-serif);
-  background: linear-gradient(135deg, #2C3E50 0%, #C0785C 100%);
+  background: #2C3E50;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -61,7 +61,7 @@ export default {
 .error-divider {
   width: 60px;
   height: 3px;
-  background: linear-gradient(90deg, #C0785C, #D4956B);
+  background: #C0785C;
   margin: 0 auto 20px;
   border-radius: 2px;
 }

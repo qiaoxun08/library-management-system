@@ -277,7 +277,7 @@ export default {
 .reader-home { padding: 24px;   }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
+  background: #2C3E50;
   border-radius: 14px; padding: 24px 32px;  color: white;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;

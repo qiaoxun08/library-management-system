@@ -713,26 +713,26 @@ export default {
 }
 
 .seat-item.available {
-  background: linear-gradient(135deg, #6B8F71 0%, #8FB396 100%);
+  background: #6B8F71;
   color: white;
 }
 
 .seat-item.occupied {
-  background: linear-gradient(135deg, #A85454 0%, #C06B6B 100%);
+  background: #A85454;
   color: white;
   cursor: not-allowed;
   opacity: 0.8;
 }
 
 .seat-item.reserved {
-  background: linear-gradient(135deg, #D4A84B 0%, #E8C878 100%);
+  background: #D4A84B;
   color: white;
   cursor: pointer;
   opacity: 0.9;
 }
 
 .seat-item.checked-in {
-  background: linear-gradient(135deg, #C0785C 0%, #D4956B 100%);
+  background: #C0785C;
   color: white;
   cursor: pointer;
 }
@@ -769,7 +769,7 @@ export default {
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
+  background: #2C3E50;
   color: white;
   padding: 12px 24px;
   border-radius: 12px;
@@ -796,7 +796,7 @@ export default {
 .recommend-seat-item:hover { border-color: #C0785C; background: #F5F0E8; }
 .recommend-rank {
   width: 28px; height: 28px; border-radius: 50%;
-  background: linear-gradient(135deg, #2C3E50, #3D5A80);
+  background: #2C3E50;
   color: white; display: flex; align-items: center; justify-content: center;
   font-size: 14px; font-weight: bold; flex-shrink: 0;
 }
@@ -906,7 +906,7 @@ export default {
 
 .timeline-table th {
   padding: 8px 8px;
-  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%);
+  background: #2C3E50;
   color: white;
   font-weight: 600;
   text-align: center;
@@ -918,7 +918,7 @@ export default {
   position: sticky;
   left: 0;
   z-index: 3;
-  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%) !important;
+  background: #2C3E50 !important;
 }
 
 .timeline-header-area {
@@ -926,7 +926,7 @@ export default {
   position: sticky;
   left: 80px;
   z-index: 3;
-  background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%) !important;
+  background: #2C3E50 !important;
 }
 
 .timeline-header-hour {

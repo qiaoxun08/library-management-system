@@ -315,19 +315,19 @@ export default {
 }
 
 .seat-item.available {
-  background: linear-gradient(135deg, #6B8F71 0%, #85ce61 100%);
+  background: #6B8F71;
   color: white;
   border: 2px solid #529b2e;
 }
 
 .seat-item.occupied {
-  background: linear-gradient(135deg, #A85454 0%, #f78989 100%);
+  background: #A85454;
   color: white;
   border: 2px solid #dd6161;
 }
 
 .seat-item.reserved {
-  background: linear-gradient(135deg, #D4A84B 0%, #ebb563 100%);
+  background: #D4A84B;
   color: white;
   border: 2px solid #cf9236;
 }

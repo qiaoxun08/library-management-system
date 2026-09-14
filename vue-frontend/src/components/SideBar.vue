@@ -252,7 +252,7 @@ export default {
   left: 20%;
   width: 60%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #C0785C, transparent);
+  background: #C0785C;
 }
 
 .title-icon {
@@ -274,7 +274,7 @@ export default {
 
 .menu-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: rgba(255, 255, 255, 0.1);
   margin: 8px 16px;
 }
 
