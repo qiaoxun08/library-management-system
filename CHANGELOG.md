@@ -4,6 +4,29 @@
 
 ---
 
+## v6.0–v6.5 (2026-09-14) — 全站完美化审查：i18n 修复 + 苹果级设计升级
+
+### 🔤 i18n 全站失效修复（P0）
+- **根因**：`zh-CN.js`/`en-US.js` 的 `notification` 块（319 行）缺一个闭合大括号，把 `common`/`reader`/`librarian`/`messages`/`passwordDialog` 等 9 个顶层 section 全吞成它的子节点 → 运行时 `common`"消失"，全站侧边栏/按钮/表头显示裸代码。用逐字符扫描器（跳过字符串内花括号）+ 真实 JS 解析器定位，程序化重组为正确结构
+- 补齐 7 个漏写的 i18n key（`common.button.export`、`reader.bookSearch.available`、`librarian.fines.unpaidCount`、`librarian.records.totalCount`、`admin.books.totalCount`、`admin.readers.totalReaders`、`admin.dashboardScreen.title`，zh + en）
+- `router` 的 `dashboard-screen` 路由 `meta.title` 从中文硬编码改为规范 key
+- 修复后四角色走查：缺失 key = 0、可见裸 key = 0
+
+### 🎨 设计升级（对照苹果级标准，书香暖墨底保留）
+- **动效**：新增 `--ease-spring`（轻回弹）/ `--ease-out`（苹果曲线）token；全局过渡 `ease` → 苹果曲线，`transition: all` → 具体属性（不触发布局）；按钮按压缩放 0.97（spring 惯性）
+- **液态玻璃**：浮层（dialog / select-dropdown / popover / tooltip / message-box）半透明暖白 + `backdrop-filter` blur + 1px inset 活光边，背景偏实保文字对比度；侧边栏保持实色底（固定列非叠层，不为玻璃而玻璃）
+- **骨架屏**：`.skeleton` 呼吸 0.3↔0.6 / 1.5s
+- **`prefers-reduced-motion`**：全局动效降级为静态，功能不瘫痪
+- 间距补 12px（对齐 4/8/12/16/24/32）；dialog header 去分割线改留白；图书管理表格列宽优化（表头不再换行、核心列保证基础宽度 + tooltip）
+
+### 🖥️ 资源修复
+- 新增 `default-cover.png`（书香暖底封面占位）修复图书封面 404；新增 `vite.svg`（PWA 图标）修复启动 404
+
+### 📋 待决定
+- 读者查看他人主页 403：后端越权保护（仅管理员 / 馆员 / 本人）与前端社交功能冲突，留待选择放宽或隐藏（详见 `docs/audit/01-functional-issues.md`）
+
+---
+
 ## v5.11 (2026-09-11) — 第四轮深度审查：算法/越权/状态一致性
 
 ### 🧠 算法逻辑（Critical ×2）
