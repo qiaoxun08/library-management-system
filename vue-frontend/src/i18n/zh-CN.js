@@ -101,7 +101,8 @@ export default {
       searchFailed: '搜索图书失败',
       searchPlaceholder: '搜索书名、作者或ISBN',
       title: '图书管理',
-      totalBooks: '图书总数'
+      totalBooks: '图书总数',
+      totalCount: '共 {count} 本'
     },
     dataExport: {
       title: '数据导出',
@@ -159,6 +160,9 @@ export default {
       totalBooks: '图书总数',
       welcome: '欢迎回来'
     },
+    dashboardScreen: {
+      title: '数据大屏'
+    },
     logs: {
       detail: '详情',
       endDate: '结束日期',
@@ -196,7 +200,8 @@ export default {
       },
       saveFailed: '保存读者失败',
       searchPlaceholder: '搜索学号或姓名',
-      title: '读者管理'
+      title: '读者管理',
+      totalReaders: '共 {count} 位'
     },
     seats: {
       addSeat: '新增座位',

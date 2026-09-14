@@ -101,7 +101,8 @@ export default {
         author: 'Please enter author',
         isbn: 'Please enter ISBN',
         totalCount: 'Please enter total count'
-      }
+      },
+      totalCount: 'Total: {count}'
     },
     dataExport: {
       title: 'Data Export',
@@ -159,6 +160,9 @@ export default {
         night: 'Good Night'
       }
     },
+    dashboardScreen: {
+      title: 'Data Dashboard'
+    },
     logs: {
       title: 'Operation Logs',
       startDate: 'Start Date',
@@ -196,7 +200,8 @@ export default {
         phone: 'Please enter phone number',
         email: 'Please enter email',
         emailFormat: 'Please enter a valid email address'
-      }
+      },
+      totalReaders: 'Total: {count}'
     },
     seats: {
       title: 'Seat Management',
