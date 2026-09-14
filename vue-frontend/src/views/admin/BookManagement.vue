@@ -51,15 +51,15 @@
       <el-table-column type="selection" width="50" align="center"></el-table-column>
       <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
       <el-table-column prop="isbn" label="ISBN" width="140"></el-table-column>
-      <el-table-column prop="title" :label="$t('common.field.title')" min-width="150" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="author" :label="$t('common.field.author')" width="110" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="title" :label="$t('common.field.title')" min-width="220" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="author" :label="$t('common.field.author')" min-width="140" show-overflow-tooltip></el-table-column>
       <el-table-column prop="category" :label="$t('common.field.category')" width="100" align="center">
         <template #default="scope">
           <el-tag size="small" v-if="scope.row.category">{{ scope.row.category }}</el-tag>
           <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column prop="totalCount" :label="$t('admin.books.totalBooks')" width="70" align="center"></el-table-column>
+      <el-table-column prop="totalCount" :label="$t('admin.books.totalBooks')" width="95" align="center"></el-table-column>
       <el-table-column :label="$t('admin.books.borrowed')" width="80" align="center">
         <template #default="scope">
           <span :class="{ 'text-danger': (scope.row.totalCount || 0) - (scope.row.availableCount || 0) > 0 }">
