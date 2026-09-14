@@ -27,7 +27,7 @@
       stripe
       border
     >
-      <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
+      <el-table-column prop="id" label="ID" width="60" align="center"></el-table-column>
       <el-table-column prop="readerId" :label="$t('common.field.readerId')" width="120" align="center"></el-table-column>
       <el-table-column prop="realName" :label="$t('common.field.realName')" width="100" align="center"></el-table-column>
       <el-table-column prop="gender" :label="$t('common.field.gender')" width="80" align="center">
@@ -47,7 +47,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.field.action')" width="230" align="center" fixed="right">
+      <el-table-column :label="$t('common.field.action')" width="200" align="center" fixed="right">
         <template #default="scope">
           <el-button size="small" @click="editReader(scope.row)">{{ $t('common.action.edit') }}</el-button>
           <el-button size="small" type="warning" link @click="resetPassword(scope.row)">{{ $t('common.action.resetPassword') }}</el-button>

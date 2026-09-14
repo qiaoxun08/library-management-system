@@ -297,10 +297,12 @@ export default {
 .welcome-text p { margin: 0; opacity: 0.8; font-size: 14px; }
 
 .borrowing-summary {
-  display: flex; align-items: center; gap: 20px;
-  background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 24px; 
-  backdrop-filter: blur(10px);
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 20px;
+  backdrop-filter: blur(10px); flex-shrink: 0;
 }
+.welcome-text { min-width: 0; }
+.welcome-text p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .summary-item { text-align: center; }
 .summary-value { display: block; font-size: 22px; font-weight: 700; font-family: var(--font-mono); }
@@ -363,11 +365,12 @@ export default {
   cursor: pointer; transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 .recommend-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(44,62,80,0.08); }
-.recommend-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: var(--el-fill-color-lighter); margin-bottom: 8px;   }
-.recommend-cover img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; }
+.recommend-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: var(--el-fill-color-lighter); margin-bottom: 8px; line-height: 0; }
+.recommend-cover img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; display: block; }
 .recommend-title { font-size: 14px; font-weight: 600; color: var(--el-text-color-primary); margin-bottom: 4px;  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .recommend-author { font-size: 12px; color: var(--el-text-color-secondary); margin-bottom: 8px;   }
 .recommend-reason { font-size: 11px; }
+.recommend-reason :deep(.el-tag) { white-space: normal; word-break: break-word; height: auto; line-height: 1.4; padding: 2px 8px; }
 
 /* 当前预约状态卡片 */
 .active-section, .activity-section {

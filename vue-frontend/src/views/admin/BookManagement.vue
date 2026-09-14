@@ -48,40 +48,40 @@
       border
       @selection-change="handleSelectionChange"
     >
-      <el-table-column type="selection" width="50" align="center"></el-table-column>
-      <el-table-column prop="id" label="ID" width="70" align="center"></el-table-column>
-      <el-table-column prop="isbn" label="ISBN" width="140"></el-table-column>
-      <el-table-column prop="title" :label="$t('common.field.title')" min-width="220" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="author" :label="$t('common.field.author')" min-width="140" show-overflow-tooltip></el-table-column>
-      <el-table-column prop="category" :label="$t('common.field.category')" width="100" align="center">
+      <el-table-column type="selection" width="40" align="center"></el-table-column>
+      <el-table-column prop="id" label="ID" width="60" align="center"></el-table-column>
+      <el-table-column prop="isbn" label="ISBN" width="120"></el-table-column>
+      <el-table-column prop="title" :label="$t('common.field.title')" min-width="200" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="author" :label="$t('common.field.author')" min-width="120" show-overflow-tooltip></el-table-column>
+      <el-table-column prop="category" :label="$t('common.field.category')" width="90" align="center">
         <template #default="scope">
           <el-tag size="small" v-if="scope.row.category">{{ scope.row.category }}</el-tag>
           <span v-else>-</span>
         </template>
       </el-table-column>
-      <el-table-column prop="totalCount" :label="$t('admin.books.totalBooks')" width="95" align="center"></el-table-column>
-      <el-table-column :label="$t('admin.books.borrowed')" width="80" align="center">
+      <el-table-column prop="totalCount" :label="$t('admin.books.totalBooks')" width="80" align="center"></el-table-column>
+      <el-table-column :label="$t('admin.books.borrowed')" width="70" align="center">
         <template #default="scope">
           <span :class="{ 'text-danger': (scope.row.totalCount || 0) - (scope.row.availableCount || 0) > 0 }">
             {{ (scope.row.totalCount || 0) - (scope.row.availableCount || 0) }}
           </span>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('admin.books.available')" width="70" align="center">
+      <el-table-column :label="$t('admin.books.available')" width="60" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.availableCount > 0 ? 'success' : 'danger'" size="small">
             {{ scope.row.availableCount || 0 }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.field.status')" width="90" align="center">
+      <el-table-column :label="$t('common.field.status')" width="80" align="center">
         <template #default="scope">
           <el-tag :type="scope.row.status === 1 ? 'success' : 'info'" size="small">
             {{ scope.row.status === 1 ? $t('common.status.normal') : $t('admin.books.offShelf') }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column :label="$t('common.field.action')" width="200" align="center" fixed="right">
+      <el-table-column :label="$t('common.field.action')" width="170" align="center" fixed="right">
         <template #default="scope">
           <el-button size="small" type="primary" link @click="editBook(scope.row)">{{ $t('common.action.edit') }}</el-button>
           <el-button size="small" :type="scope.row.status === 1 ? 'warning' : 'success'" link @click="toggleStatus(scope.row)">

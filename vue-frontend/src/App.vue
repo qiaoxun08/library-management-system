@@ -122,6 +122,23 @@ html, body, #app {
   border: none;
 }
 
+/* 弹窗关闭按钮：EP 默认 absolute right:0 贴死弹窗边框（零内边距）
+   改为距边缘 12px、36px 见方（苹果规范：不贴边、点击区适中） */
+.el-dialog__headerbtn {
+  width: 36px;
+  height: 36px;
+  right: 12px;
+  top: 12px;
+  font-size: 18px;
+}
+.el-message-box__headerbtn {
+  width: 36px;
+  height: 36px;
+  right: 12px;
+  top: 10px;
+  font-size: 18px;
+}
+
 .el-dialog__header {
   padding: 24px 24px 8px !important;
   margin-right: 0;
