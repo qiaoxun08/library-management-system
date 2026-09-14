@@ -317,15 +317,23 @@ export default {
     usernameRequired: '请输入用户名'
   },
   notification: {
-  title: {
-    like: '收到点赞',
-    follow: '新关注者',
-    dueTomorrow: '明天到期提醒',
-    overdueMild: '逾期提醒',
-    overdueUrgent: '紧急催还',
-    overdueSevere: '严重逾期警告'
+    title: {
+      like: '收到点赞',
+      follow: '新关注者',
+      dueTomorrow: '明天到期提醒',
+      overdueMild: '逾期提醒',
+      overdueUrgent: '紧急催还',
+      overdueSevere: '严重逾期警告'
+    },
+    content: {
+      like: '{name} 赞了您的评论',
+      follow: '{name} 关注了你',
+      dueTomorrow: '您借阅的图书将于明天到期，请及时归还或续借。',
+      overdueMild: '您借阅的图书已逾期 {days} 天，请尽快归还。',
+      overdueUrgent: '您借阅的图书已逾期 {days} 天，继续逾期将影响借阅权限，请立即归还。',
+      overdueSevere: '您借阅的图书已逾期 {days} 天，已产生较高罚款，请立即归还并缴纳罚款。'
+    }
   },
-
   passwordDialog: {
     oldPassword: '旧密码',
     oldPasswordPlaceholder: '请输入旧密码',
@@ -741,15 +749,6 @@ export default {
       title: '消息通知'
     },
     // 通知 i18n 映射（后端存中文，前端按规则映射）
-    content: {
-      like: '{name} 赞了您的评论',
-      follow: '{name} 关注了你',
-      dueTomorrow: '您借阅的图书将于明天到期，请及时归还或续借。',
-      overdueMild: '您借阅的图书已逾期 {days} 天，请尽快归还。',
-      overdueUrgent: '您借阅的图书已逾期 {days} 天，继续逾期将影响借阅权限，请立即归还。',
-      overdueSevere: '您借阅的图书已逾期 {days} 天，已产生较高罚款，请立即归还并缴纳罚款。'
-    }
-  },
     profile: {
       changePassword: '修改密码',
       confirmDeleteReview: '确定要删除这条书评吗？',
@@ -876,6 +875,6 @@ export default {
       title: '用户主页',
       unfollow: '取消关注'
     }
-  }
+  },
 }
 

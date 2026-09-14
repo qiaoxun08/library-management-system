@@ -317,15 +317,23 @@ export default {
     usernameRequired: 'Please enter username'
   },
   notification: {
-  title: {
-    like: 'Like Received',
-    follow: 'New Follower',
-    dueTomorrow: 'Due Tomorrow',
-    overdueMild: 'Overdue Reminder',
-    overdueUrgent: 'Urgent Recall',
-    overdueSevere: 'Severe Overdue Warning'
+    title: {
+      like: 'Like Received',
+      follow: 'New Follower',
+      dueTomorrow: 'Due Tomorrow',
+      overdueMild: 'Overdue Reminder',
+      overdueUrgent: 'Urgent Recall',
+      overdueSevere: 'Severe Overdue Warning'
+    },
+    content: {
+      like: '{name} liked your review',
+      follow: '{name} started following you',
+      dueTomorrow: 'Your borrowed book is due tomorrow, please return or renew it.',
+      overdueMild: 'Your borrowed book is {days} day(s) overdue, please return it soon.',
+      overdueUrgent: 'Your borrowed book is {days} day(s) overdue. Continued delay will affect your borrowing privileges. Please return immediately.',
+      overdueSevere: 'Your borrowed book is {days} day(s) overdue with significant fines. Please return immediately and pay the fine.'
+    }
   },
-
   passwordDialog: {
     oldPassword: 'Old Password',
     oldPasswordPlaceholder: 'Enter old password',
@@ -742,15 +750,6 @@ export default {
       title: 'Notifications'
     },
     // Notification i18n mapping (backend stores Chinese, frontend maps by pattern)
-    content: {
-      like: '{name} liked your review',
-      follow: '{name} started following you',
-      dueTomorrow: 'Your borrowed book is due tomorrow, please return or renew it.',
-      overdueMild: 'Your borrowed book is {days} day(s) overdue, please return it soon.',
-      overdueUrgent: 'Your borrowed book is {days} day(s) overdue. Continued delay will affect your borrowing privileges. Please return immediately.',
-      overdueSevere: 'Your borrowed book is {days} day(s) overdue with significant fines. Please return immediately and pay the fine.'
-    }
-  },
     profile: {
       changePassword: 'Change Password',
       confirmDeleteReview: 'Delete this review?',
@@ -877,6 +876,6 @@ export default {
       title: 'User Profile',
       unfollow: 'Unfollow'
     }
-  }
+  },
 }
 
