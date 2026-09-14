@@ -83,6 +83,6 @@ export default {
 /* ---- 移动端响应式 ---- */
 @media (max-width: 767px) {
   .dashboard-container :deep(.el-aside) { display: none; }
-  .dashboard-container :deep(.el-main) { margin-left: 0 !important; padding-top: 50px; }
+  .dashboard-container :deep(.el-main) { margin-left: 0 !important; padding-top: 48px;   }
 }
 </style>

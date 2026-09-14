@@ -230,7 +230,7 @@ export default {
 
 <style scoped>
 .menu-title {
-  padding: 20px;
+  padding: 24px;
   text-align: center;
   font-size: 16px;
   font-weight: bold;
@@ -262,7 +262,7 @@ export default {
 }
 
 .user-info {
-  padding: 12px 20px;
+  padding: 12px 24px;
   display: flex;
   align-items: center;
   gap: 8px;

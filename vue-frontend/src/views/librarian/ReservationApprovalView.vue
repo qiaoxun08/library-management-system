@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <el-table :data="pagedReservations" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+    <el-table :data="pagedReservations" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
       <el-table-column prop="id" :label="$t('librarian.reservations.reservationId')" width="80" align="center"></el-table-column>
       <el-table-column prop="readerId" :label="$t('librarian.reservations.readerId')" width="80" align="center"></el-table-column>
       <el-table-column :label="$t('librarian.reservations.type')" width="100" align="center">
@@ -187,12 +187,12 @@ export default {
 
 <style scoped>
 .reservation-approval-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 

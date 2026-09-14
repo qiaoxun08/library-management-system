@@ -338,7 +338,7 @@ export default {
 
 .lang-switch span {
   cursor: pointer;
-  padding: 2px 6px;
+  padding: 4px 8px;
   border-radius: 4px;
   transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out);
 }
@@ -385,7 +385,7 @@ export default {
 
 .login-footer {
   text-align: center;
-  margin-top: 20px;
+  margin-top: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--el-border-color-lighter);
 }

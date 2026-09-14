@@ -15,7 +15,7 @@
       </el-dropdown>
     </div>
 
-    <el-table :data="borrowings" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+    <el-table :data="borrowings" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
       <el-table-column prop="id" :label="$t('reader.borrowing.borrowingId')" width="90" align="center"></el-table-column>
       <el-table-column prop="bookTitle" :label="$t('reader.borrowing.bookName')" min-width="150" show-overflow-tooltip></el-table-column>
       <el-table-column :label="$t('reader.borrowing.borrowDate')" width="170">
@@ -161,15 +161,15 @@ export default {
 
 <style scoped>
 .my-borrowings-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -188,7 +188,7 @@ export default {
 /* ---- 移动端响应式 ---- */
 @media (max-width: 767px) {
   .el-table { font-size: 13px; }
-  .borrowing-card { padding: 12px; }
+  .borrowing-card { padding: 12px;   }
   .overdue-alert { font-size: 12px; }
 }
 </style>

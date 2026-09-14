@@ -55,7 +55,7 @@ export default {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .error-divider {
@@ -70,12 +70,12 @@ export default {
   font-size: 24px;
   font-family: var(--font-serif);
   color: var(--el-text-color-primary);
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .not-found p {
   font-size: 14px;
   color: var(--el-text-color-secondary);
-  margin-bottom: 30px;
+  margin-bottom: 32px;
 }
 </style>

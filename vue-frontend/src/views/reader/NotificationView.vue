@@ -145,7 +145,7 @@ export default {
 
 <style scoped>
 .notification-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
@@ -153,7 +153,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
-  padding-bottom: 15px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 

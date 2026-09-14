@@ -434,7 +434,7 @@ export default {
 
       const dates = data.map(item => {
         const date = item.date || ''
-        return date.substring(5) // 只显示 MM-DD
+        return date.substring(5) + '月' // 'YYYY-MM' -> 'MM月'
       })
       const rates = data.map(item => {
         const total = item.total || 0

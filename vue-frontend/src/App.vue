@@ -105,6 +105,13 @@ html, body, #app {
    ======================================== */
 
 /* 弹窗 */
+/* 弹窗遮罩层（真实浮层：液态玻璃模糊 + 深度秩序） */
+.el-overlay {
+  backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
 .el-dialog {
   border-radius: 14px !important;
   overflow: hidden;
@@ -116,7 +123,7 @@ html, body, #app {
 }
 
 .el-dialog__header {
-  padding: 20px 24px 8px !important;
+  padding: 24px 24px 8px !important;
   margin-right: 0;
 }
 

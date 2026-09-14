@@ -169,24 +169,24 @@ export default {
 </script>
 
 <style scoped>
-.user-profile-view { padding: 20px; }
-.page-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #C0785C; }
+.user-profile-view { padding: 24px;   }
+.page-header { margin-bottom: 24px;  padding-bottom: 16px;  border-bottom: 2px solid #C0785C; }
 .page-header h2 { margin: 0; color: #2C3440; font-size: 22px; font-family: var(--font-serif); }
 
 .profile-info {
-  background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 20px;
+  background: white; border-radius: 10px; padding: 24px; 
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 24px; 
   display: flex; justify-content: space-between; align-items: center;
 }
 .info-card { display: flex; flex-direction: column; gap: 8px; }
 .info-row { display: flex; gap: 12px; font-size: 14px; }
 .info-row .label { color: #7A8599; min-width: 50px; }
 
-.content-tabs { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 12px rgba(44,62,80,0.04); }
+.content-tabs { background: white; padding: 24px;  border-radius: 10px; box-shadow: 0 2px 12px rgba(44,62,80,0.04); }
 
 .review-item { padding: 12px 0; border-bottom: 1px solid #F8F5F0; }
 .review-item:last-child { border-bottom: none; }
-.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px;   }
 .review-time { color: #7A8599; font-size: 12px; margin-left: auto; }
 .review-content { font-size: 14px; color: #4A5568; line-height: 1.6; }
 

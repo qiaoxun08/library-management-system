@@ -23,7 +23,7 @@
     <el-table
       :data="pagedReaders"
       v-loading="loading"
-      style="width: 100%; margin-top: 20px;"
+      style="width: 100%; margin-top: 24px;"
       stripe
       border
     >
@@ -258,7 +258,7 @@ export default {
 
 <style scoped>
 .reader-management {
-  padding: 20px;
+  padding: 24px;
   background-color: #F8F5F0;
   min-height: calc(100vh - 60px);
 }
@@ -267,8 +267,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -283,10 +283,10 @@ export default {
   justify-content: space-between;
   align-items: center;
   background: white;
-  padding: 15px 20px;
+  padding: 16px 24px;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .search-box {

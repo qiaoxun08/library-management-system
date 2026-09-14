@@ -4,7 +4,7 @@
       <h2>{{ $t('reader.reservations.title') }}</h2>
     </div>
 
-    <el-table :data="reservations" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+    <el-table :data="reservations" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
       <el-table-column prop="id" :label="$t('reader.reservations.reservationId')" width="90" align="center"></el-table-column>
       <el-table-column :label="$t('reader.reservations.type')" width="110" align="center">
         <template #default="scope">
@@ -129,12 +129,12 @@ export default {
 
 <style scoped>
 .my-reservations-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 

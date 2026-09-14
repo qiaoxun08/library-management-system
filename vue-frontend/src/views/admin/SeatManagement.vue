@@ -14,7 +14,7 @@
           <el-option label="阅览室B" value="阅览室B"></el-option>
           <el-option label="自习室C" value="自习室C"></el-option>
         </el-select>
-        <el-select v-model="filterStatus" :placeholder="$t('admin.seats.filterStatus')" style="margin-left: 10px;" clearable>
+        <el-select v-model="filterStatus" :placeholder="$t('admin.seats.filterStatus')" style="margin-left: 8px;" clearable>
           <el-option :label="$t('common.seatStatus.available')" :value="0"></el-option>
           <el-option :label="$t('common.seatStatus.occupied')" :value="1"></el-option>
           <el-option :label="$t('common.seatStatus.reserved')" :value="2"></el-option>
@@ -218,7 +218,7 @@ export default {
 
 <style scoped>
 .seat-management {
-  padding: 20px;
+  padding: 24px;
   background-color: #F8F5F0;
   min-height: calc(100vh - 60px);
 }
@@ -227,8 +227,8 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -243,10 +243,10 @@ export default {
   justify-content: space-between;
   align-items: center;
   background: white;
-  padding: 15px 20px;
+  padding: 16px 24px;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .filters {
@@ -262,15 +262,15 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 15px;
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: 24px;
+  padding: 24px;
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(44,62,80,0.08);
 }
 
 .seat-item {
-  padding: 15px;
+  padding: 16px;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
@@ -291,7 +291,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .seat-actions {
@@ -301,7 +301,7 @@ export default {
   right: 5px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 4px;
-  padding: 2px;
+  padding: 4px;
 }
 
 .seat-item:hover .seat-actions {

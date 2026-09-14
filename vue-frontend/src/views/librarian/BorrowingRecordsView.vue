@@ -10,7 +10,7 @@
           <el-icon><Search /></el-icon>
         </template>
       </el-input>
-      <el-select v-model="filterStatus" :placeholder="$t('librarian.records.statusFilter')" style="margin-left: 15px; width: 130px;">
+      <el-select v-model="filterStatus" :placeholder="$t('librarian.records.statusFilter')" style="margin-left: 16px;  width: 130px;">
         <el-option :label="$t('librarian.records.all')" value=""></el-option>
         <el-option :label="$t('librarian.records.borrowing')" value="1"></el-option>
         <el-option :label="$t('librarian.records.returned')" value="2"></el-option>
@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <el-table :data="pagedBorrowings" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+    <el-table :data="pagedBorrowings" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
       <el-table-column prop="id" :label="$t('librarian.records.borrowingId')" width="80" align="center"></el-table-column>
       <el-table-column prop="readerId" :label="$t('librarian.records.readerId')" width="80" align="center"></el-table-column>
       <el-table-column prop="readerName" :label="$t('librarian.records.readerName')" width="100"></el-table-column>
@@ -183,12 +183,12 @@ export default {
 
 <style scoped>
 .borrowing-records-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 

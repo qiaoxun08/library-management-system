@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <el-table :data="pagedFines" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+    <el-table :data="pagedFines" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
       <el-table-column prop="id" :label="$t('librarian.fines.borrowingId')" width="80" align="center"></el-table-column>
       <el-table-column prop="readerId" :label="$t('librarian.fines.readerId')" width="80" align="center"></el-table-column>
       <el-table-column prop="bookTitle" :label="$t('librarian.fines.bookName')" min-width="150" show-overflow-tooltip></el-table-column>
@@ -154,12 +154,12 @@ export default {
 
 <style scoped>
 .fine-management-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 

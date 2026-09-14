@@ -640,22 +640,22 @@ export default {
 
 <style scoped>
 .seat-reservation-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .toolbar {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -743,7 +743,7 @@ export default {
 
 .seat-actions .el-button {
   font-size: 12px;
-  padding: 4px 10px;
+  padding: 4px 8px;
 }
 
 .seat-number {
@@ -790,8 +790,8 @@ export default {
 .recommend-list { max-height: 400px; overflow-y: auto; }
 .recommend-seat-item {
   display: flex; align-items: center; gap: 12px;
-  padding: 12px; border: 1px solid #EAE6E0; border-radius: 10px;
-  margin-bottom: 8px; transition: border-color 0.28s var(--ease-out), background-color 0.28s var(--ease-out);
+  padding: 12px;  border: 1px solid #EAE6E0; border-radius: 10px;
+  margin-bottom: 8px;  transition: border-color 0.28s var(--ease-out), background-color 0.28s var(--ease-out);
 }
 .recommend-seat-item:hover { border-color: #C0785C; background: #F5F0E8; }
 .recommend-rank {
@@ -803,7 +803,7 @@ export default {
 .recommend-seat-info { flex: 1; }
 .recommend-seat-number { font-weight: 600; color: #2C3440; }
 .recommend-seat-area { font-size: 12px; color: #7A8599; }
-.recommend-seat-reason { margin-top: 4px; }
+.recommend-seat-reason { margin-top: 4px;   }
 
 /* 学习伙伴面板 */
 .buddy-panel {
@@ -811,7 +811,7 @@ export default {
   border: 1px solid #e1f3d8;
   border-radius: 8px;
   padding: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 .buddy-panel-header {
   display: flex;
@@ -860,7 +860,7 @@ export default {
   background: white;
   border: 1px solid #e1f3d8;
   border-radius: 6px;
-  padding: 10px 14px;
+  padding: 8px 16px;
   min-width: 140px;
 }
 .buddy-match-name {
@@ -871,17 +871,17 @@ export default {
 .buddy-match-area {
   font-size: 12px;
   color: #6B8F71;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 .buddy-match-slot {
   font-size: 12px;
   color: #7A8599;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 /* ---- 时间轴视图样式 ---- */
 .timeline-container {
-  margin-top: 10px;
+  margin-top: 8px;
   overflow-x: auto;
 }
 
@@ -905,7 +905,7 @@ export default {
 }
 
 .timeline-table th {
-  padding: 10px 6px;
+  padding: 8px 8px;
   background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 100%);
   color: white;
   font-weight: 600;
@@ -943,7 +943,7 @@ export default {
 
 .timeline-cell-seat,
 .timeline-cell-area {
-  padding: 8px 10px;
+  padding: 8px 8px;
   font-weight: 600;
   color: #2C3440;
   text-align: center;

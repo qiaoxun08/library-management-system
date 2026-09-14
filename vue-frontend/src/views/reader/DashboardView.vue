@@ -108,7 +108,7 @@ export default {
 @media (max-width: 767px) {
   .dashboard-container :deep(.el-main) {
     margin-left: 0 !important;
-    padding-top: 50px;
+    padding-top: 48px;
   }
 }
 </style>

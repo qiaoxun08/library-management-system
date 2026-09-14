@@ -106,7 +106,7 @@ export default {
 
 <style scoped>
 .login-log-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
@@ -122,7 +122,7 @@ export default {
 }
 
 .table-card {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .pagination-wrapper {

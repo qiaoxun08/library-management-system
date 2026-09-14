@@ -261,7 +261,7 @@ export default {
 
 <style scoped>
 .borrowing-history-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .borrowing-history-view h2 {
@@ -280,7 +280,7 @@ export default {
 .stat-card {
   background: white;
   border-radius: 10px;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -307,7 +307,7 @@ export default {
 .stat-label {
   font-size: 13px;
   color: #7A8599;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .charts-row {

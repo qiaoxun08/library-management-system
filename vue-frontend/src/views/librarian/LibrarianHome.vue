@@ -141,11 +141,11 @@ export default {
 </script>
 
 <style scoped>
-.librarian-home { padding: 20px; }
+.librarian-home { padding: 24px;   }
 
 .welcome-banner {
   background: linear-gradient(135deg, #6B8F71 0%, #8FB396 100%);
-  border-radius: 12px; padding: 24px 30px; color: white;
+  border-radius: 12px; padding: 24px 32px;  color: white;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
 }
@@ -156,11 +156,11 @@ export default {
 
 .stats-row {
   display: grid; grid-template-columns: repeat(4, 1fr);
-  gap: 16px; margin-bottom: 24px;
+  gap: 16px; margin-bottom: 24px;  
 }
 
 .stat-card {
-  background: white; border-radius: 10px; padding: 20px;
+  background: white; border-radius: 10px; padding: 24px; 
   display: flex; align-items: center; gap: 16px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04); cursor: pointer;
   transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out);
@@ -175,11 +175,11 @@ export default {
 }
 
 .stat-value { font-size: 28px; font-weight: 700; color: var(--el-text-color-primary); }
-.stat-label { font-size: 13px; color: #7A8599; margin-top: 2px; }
+.stat-label { font-size: 13px; color: #7A8599; margin-top: 4px;   }
 
 .quick-actions, .tips-section {
-  background: white; border-radius: 10px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  background: white; border-radius: 10px; padding: 24px; 
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;  
 }
 
 .quick-actions h3, .tips-section h3 {
@@ -192,7 +192,7 @@ export default {
 
 .action-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 16px; border-radius: 8px; cursor: pointer;
+  padding: 16px;  border-radius: 8px; cursor: pointer;
   transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), color 0.28s var(--ease-out); font-size: 13px; color: var(--el-text-color-regular);
 }
 

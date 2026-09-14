@@ -30,7 +30,7 @@
         :key="item"
         closable
         size="small"
-        style="margin-right: 8px; margin-bottom: 8px; cursor: pointer;"
+        style="margin-right: 8px;  margin-bottom: 8px;  cursor: pointer;"
         @click="applyHistory(item)"
         @close="removeHistory(item)"
       >{{ item }}</el-tag>
@@ -56,7 +56,7 @@
 
     <div class="book-list" v-loading="loading">
       <!-- 始终显示搜索结果统计 -->
-      <div v-if="!loading" style="margin-bottom: 10px; color: #7A8599; font-size: 14px;">
+      <div v-if="!loading" style="margin-bottom: 8px;  color: #7A8599; font-size: 14px;">
         {{ $t('reader.bookSearch.foundCount', { count: totalCount }) }}
       </div>
       <div v-for="book in paginatedBooks" :key="book.id" class="book-item">
@@ -129,7 +129,7 @@
             <div class="detail-row"><span class="detail-label">{{ $t('reader.bookSearch.price') }}</span><span>¥{{ (detailBook.price || 0).toFixed(2) }}</span></div>
             <div class="detail-row" v-if="detailBook.description" style="flex-direction: column; align-items: flex-start;">
               <span class="detail-label">{{ $t('reader.bookSearch.description') }}</span>
-              <span style="margin-top: 6px; line-height: 1.6; color: #4A5568;">{{ detailBook.description }}</span>
+              <span style="margin-top: 8px;  line-height: 1.6; color: #4A5568;">{{ detailBook.description }}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">{{ $t('reader.bookSearch.stockStatus') }}</span>
@@ -583,12 +583,12 @@ export default {
 
 <style scoped>
 .book-search-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -623,7 +623,7 @@ export default {
 /* 高级搜索样式 */
 .advanced-search {
   margin-bottom: 16px;
-  padding: 16px 20px;
+  padding: 16px 24px;
   background: #F8F5F0;
   border-radius: 10px;
 }
@@ -645,7 +645,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 20px;
+  padding: 16px 24px;
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04);
@@ -750,39 +750,39 @@ export default {
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 24px;
   padding: 10px 0;
 }
 
 /* 书评样式 */
-.review-form { margin-bottom: 12px; }
-.review-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 14px; }
+.review-form { margin-bottom: 12px;   }
+.review-rating { display: flex; align-items: center; gap: 8px; margin-bottom: 8px;  font-size: 14px; }
 .review-item { padding: 12px 0; border-bottom: 1px solid #F8F5F0; }
 .review-item:last-child { border-bottom: none; }
-.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.review-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px;   }
 .reviewer-name { font-weight: 600; color: #2C3440; font-size: 14px; }
 .review-time { color: #7A8599; font-size: 12px; margin-left: auto; }
-.review-content { font-size: 14px; color: #4A5568; line-height: 1.6; margin-bottom: 6px; }
+.review-content { font-size: 14px; color: #4A5568; line-height: 1.6; margin-bottom: 8px;   }
 .review-actions { display: flex; gap: 12px; }
 
 /* 回复区域样式 */
-.reply-section { margin-top: 10px; padding: 10px 12px; background: #F8F5F0; border-radius: 6px; }
+.reply-section { margin-top: 8px;  padding: 8px 12px;  background: #F8F5F0; border-radius: 6px; }
 .reply-item { padding: 6px 0; font-size: 13px; border-bottom: 1px solid #DDD8D0; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .reply-item:last-child { border-bottom: none; }
 .reply-author { font-weight: 600; color: #2C3440; }
 .reply-to { color: #C0785C; }
 .reply-content { color: #4A5568; flex: 1; }
 .reply-time { color: #A0A8B8; font-size: 12px; }
-.reply-input { display: flex; gap: 8px; margin-top: 8px; }
+.reply-input { display: flex; gap: 8px; margin-top: 8px;   }
 
 /* 相似图书样式 */
 .similar-books { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-.similar-item { display: flex; gap: 10px; padding: 10px; border: 1px solid #EAE6E0; border-radius: 10px; cursor: pointer; transition: border-color 0.28s var(--ease-out), background-color 0.28s var(--ease-out); }
+.similar-item { display: flex; gap: 10px; padding: 8px;  border: 1px solid #EAE6E0; border-radius: 10px; cursor: pointer; transition: border-color 0.28s var(--ease-out), background-color 0.28s var(--ease-out); }
 .similar-item:hover { border-color: #C0785C; box-shadow: 0 2px 8px rgba(192,120,92,0.15); }
 .similar-cover { width: 50px; height: 70px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #F8F5F0; }
 .similar-cover img { width: 100%; height: 100%; object-fit: cover; }
-.similar-title { font-size: 13px; font-weight: 600; color: #2C3440; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.similar-author { font-size: 12px; color: #7A8599; margin-bottom: 4px; }
+.similar-title { font-size: 13px; font-weight: 600; color: #2C3440; margin-bottom: 4px;  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.similar-author { font-size: 12px; color: #7A8599; margin-bottom: 4px;   }
 
 /* ---- 移动端响应式 ---- */
 @media (max-width: 767px) {

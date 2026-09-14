@@ -21,7 +21,7 @@
                 >
                   <template #default="{ item }">
                     <span style="font-weight: 600;">{{ item.readerId }}</span>
-                    <span style="margin-left: 8px; color: #7A8599;">{{ item.realName }}</span>
+                    <span style="margin-left: 8px;  color: #7A8599;">{{ item.realName }}</span>
                     <span style="float: right; color: #7A8599; font-size: 12px;">{{ item.department }}</span>
                   </template>
                 </el-autocomplete>
@@ -39,7 +39,7 @@
                 >
                   <template #default="{ item }">
                     <span style="font-weight: 600;">{{ item.title }}</span>
-                    <span style="margin-left: 8px; color: #7A8599;">ISBN: {{ item.isbn }}</span>
+                    <span style="margin-left: 8px;  color: #7A8599;">ISBN: {{ item.isbn }}</span>
                     <span style="float: right; color: #6B8F71; font-size: 12px;">{{ $t('librarian.availableCount', { count: item.availableCount }) }}</span>
                   </template>
                 </el-autocomplete>
@@ -218,12 +218,12 @@ export default {
 
 <style scoped>
 .borrow-return-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -235,8 +235,8 @@ export default {
 
 .form-container {
   width: 450px;
-  margin-top: 20px;
-  padding: 20px;
+  margin-top: 24px;
+  padding: 24px;
   background: #fafafa;
   border-radius: 8px;
 }

@@ -42,7 +42,7 @@
     <el-table
       ref="bookTable"
       :data="pagedBooks"
-      style="width: 100%; margin-top: 15px;"
+      style="width: 100%; margin-top: 16px;"
       v-loading="loading"
       stripe
       border
@@ -405,15 +405,15 @@ export default {
 
 <style scoped>
 .book-management {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -434,7 +434,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   background: white;
-  padding: 15px 20px;
+  padding: 16px 24px;
   border-radius: 8px;
   box-shadow: 0 2px 12px 0 rgba(44,62,80,0.04);
 }
@@ -448,8 +448,8 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-top: 15px;
-  padding: 12px 20px;
+  margin-top: 16px;
+  padding: 12px 24px;
   background: #FFF8F0;
   border: 1px solid #E8C4AC;
   border-radius: 8px;

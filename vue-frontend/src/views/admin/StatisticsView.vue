@@ -378,19 +378,19 @@ export default {
 
 <style scoped>
 .statistics-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .stat-card {
   background: white;
-  padding: 20px;
+  padding: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.08);
   text-align: center;
@@ -399,7 +399,7 @@ export default {
 .stat-title {
   color: #666;
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .stat-value {
@@ -409,16 +409,16 @@ export default {
 }
 
 .charts-section {
-  margin-top: 30px;
+  margin-top: 32px;
   background: white;
-  padding: 20px;
+  padding: 24px;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.08);
 }
 
 .chart-container {
   height: 350px;
-  margin-top: 15px;
+  margin-top: 16px;
 }
 
 .section-header {

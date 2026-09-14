@@ -150,7 +150,7 @@ export default {
 
 <style scoped>
 .operation-log-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
@@ -172,7 +172,7 @@ export default {
 }
 
 .table-card {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .pagination-wrapper {

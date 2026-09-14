@@ -161,13 +161,13 @@ export default {
 
 <style scoped>
 .admin-home {
-  padding: 20px;
+  padding: 24px;
 }
 
 .welcome-banner {
   background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
   border-radius: 12px;
-  padding: 24px 30px;
+  padding: 24px 32px;
   color: white;
   display: flex;
   justify-content: space-between;
@@ -201,7 +201,7 @@ export default {
 .stat-card {
   background: white;
   border-radius: 10px;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   align-items: center;
   gap: 16px;
@@ -235,13 +235,13 @@ export default {
 .stat-label {
   font-size: 13px;
   color: #7A8599;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .quick-actions {
   background: white;
   border-radius: 10px;
-  padding: 20px;
+  padding: 24px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04);
 }
 

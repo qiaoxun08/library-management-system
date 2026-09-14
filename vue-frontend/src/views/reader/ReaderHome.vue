@@ -274,11 +274,11 @@ export default {
 </script>
 
 <style scoped>
-.reader-home { padding: 20px; }
+.reader-home { padding: 24px;   }
 
 .welcome-banner {
   background: linear-gradient(135deg, #2C3E50 0%, #3D5A80 60%, #C0785C 100%);
-  border-radius: 14px; padding: 24px 30px; color: white;
+  border-radius: 14px; padding: 24px 32px;  color: white;
   display: flex; justify-content: space-between; align-items: center;
   margin-bottom: 24px;
   position: relative; overflow: hidden;
@@ -298,7 +298,7 @@ export default {
 
 .borrowing-summary {
   display: flex; align-items: center; gap: 20px;
-  background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 24px;
+  background: rgba(255,255,255,0.12); border-radius: 10px; padding: 12px 24px; 
   backdrop-filter: blur(10px);
 }
 
@@ -309,8 +309,8 @@ export default {
 .summary-item.has-fine .summary-value { color: #D4A84B; }
 
 .quick-actions, .tips-section {
-  background: white; border-radius: 12px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  background: white; border-radius: 12px; padding: 24px; 
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px; 
   border: 1px solid var(--el-border-color-lighter);
 }
 
@@ -325,7 +325,7 @@ export default {
 
 .action-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 20px 12px; border-radius: 10px; cursor: pointer;
+  padding: 24px 12px;  border-radius: 10px; cursor: pointer;
   transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), color 0.28s var(--ease-out); font-size: 13px; color: var(--el-text-color-regular);
   border: 1px solid transparent;
 }
@@ -350,8 +350,8 @@ export default {
 .tip-item strong { color: var(--el-text-color-primary); }
 
 .recommend-section {
-  background: white; border-radius: 12px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  background: white; border-radius: 12px; padding: 24px; 
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px; 
   border: 1px solid var(--el-border-color-lighter);
 }
 .recommend-section h3 { margin: 0 0 16px 0; color: var(--el-text-color-primary); font-size: 16px; font-family: var(--font-serif); }
@@ -359,20 +359,20 @@ export default {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px;
 }
 .recommend-card {
-  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 12px;
+  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 12px; 
   cursor: pointer; transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 .recommend-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(44,62,80,0.08); }
-.recommend-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: var(--el-fill-color-lighter); margin-bottom: 8px; }
+.recommend-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: var(--el-fill-color-lighter); margin-bottom: 8px;   }
 .recommend-cover img { width: 100%; height: 120px; object-fit: cover; border-radius: 6px; }
-.recommend-title { font-size: 14px; font-weight: 600; color: var(--el-text-color-primary); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.recommend-author { font-size: 12px; color: var(--el-text-color-secondary); margin-bottom: 6px; }
+.recommend-title { font-size: 14px; font-weight: 600; color: var(--el-text-color-primary); margin-bottom: 4px;  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.recommend-author { font-size: 12px; color: var(--el-text-color-secondary); margin-bottom: 8px;   }
 .recommend-reason { font-size: 11px; }
 
 /* 当前预约状态卡片 */
 .active-section, .activity-section {
-  background: white; border-radius: 12px; padding: 20px;
-  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px;
+  background: white; border-radius: 12px; padding: 24px; 
+  box-shadow: 0 2px 12px rgba(44,62,80,0.04); margin-bottom: 16px; 
   border: 1px solid var(--el-border-color-lighter);
 }
 .active-section h3, .activity-section h3 {
@@ -383,17 +383,17 @@ export default {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
 }
 .active-card {
-  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 14px; transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
+  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 16px;  transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 .active-card:hover { box-shadow: 0 4px 12px rgba(44,62,80,0.06); }
 .active-card.seat-reservation { border-left: 3px solid #6B8F71; }
 .active-card.book-reservation { border-left: 3px solid #C0785C; }
 .active-card-header {
-  display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;  
 }
 .active-type { font-weight: 600; font-size: 14px; color: var(--el-text-color-primary); flex: 1; }
-.active-card-body { margin-bottom: 10px; }
-.active-target { font-size: 15px; font-weight: 500; color: var(--el-text-color-primary); margin-bottom: 4px; }
+.active-card-body { margin-bottom: 8px;   }
+.active-target { font-size: 15px; font-weight: 500; color: var(--el-text-color-primary); margin-bottom: 4px;   }
 .active-time { font-size: 12px; color: var(--el-text-color-secondary); }
 .active-card-actions { display: flex; justify-content: flex-end; }
 

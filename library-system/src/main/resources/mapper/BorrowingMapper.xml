@@ -234,28 +234,28 @@
         ORDER BY hour
     </select>
 
-    <!-- 借阅分类分布（最近30天） -->
+    <!-- 借阅分类分布（最近12个月） -->
     <select id="countByCategoryDistribution" resultType="java.util.Map">
         SELECT
             b.category AS name,
             COUNT(*) AS value
         FROM borrowing br
         JOIN book b ON br.book_id = b.id
-        WHERE br.borrow_date &gt;= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+        WHERE br.borrow_date &gt;= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
         AND b.category IS NOT NULL AND b.category != ''
         GROUP BY b.category
         ORDER BY value DESC
     </select>
 
-    <!-- 本月逾期率趋势（按天） -->
+    <!-- 逾期率趋势（最近12个月，按月聚合，避免按天过密） -->
     <select id="countOverdueTrendByDay" resultType="java.util.Map">
         SELECT
-            DATE(borrow_date) AS date,
+            DATE_FORMAT(borrow_date, '%Y-%m') AS date,
             COUNT(*) AS total,
             SUM(CASE WHEN status = 1 AND due_date &lt; NOW() THEN 1 ELSE 0 END) AS overdue
         FROM borrowing
-        WHERE borrow_date &gt;= DATE_FORMAT(CURDATE(), '%Y-%m-01')
-        GROUP BY DATE(borrow_date)
+        WHERE borrow_date &gt;= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+        GROUP BY DATE_FORMAT(borrow_date, '%Y-%m')
         ORDER BY date
     </select>
 </mapper>

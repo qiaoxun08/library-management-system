@@ -37,8 +37,8 @@
           <span :style="{ color: fineAmount > 0 ? '#A85454' : '#6B8F71', fontWeight: '600', fontSize: '16px' }">
             ¥{{ fineAmount.toFixed(2) }}
           </span>
-          <el-tag v-if="fineAmount > 0" type="danger" size="small" style="margin-left: 10px">{{ $t('reader.profile.hasFine') }}</el-tag>
-          <el-tag v-else type="success" size="small" style="margin-left: 10px">{{ $t('reader.profile.noFine') }}</el-tag>
+          <el-tag v-if="fineAmount > 0" type="danger" size="small" style="margin-left: 10px;">{{ $t('reader.profile.hasFine') }}</el-tag>
+          <el-tag v-else type="success" size="small" style="margin-left: 10px;">{{ $t('reader.profile.noFine') }}</el-tag>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="saveProfile" :loading="saving">{{ $t('reader.profile.saveChanges') }}</el-button>
@@ -308,12 +308,12 @@ export default {
 
 <style scoped>
 .my-profile-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {
-  margin-bottom: 20px;
-  padding-bottom: 15px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 2px solid #C0785C;
 }
 
@@ -327,15 +327,15 @@ export default {
 .profile-card {
   width: 550px;
   background: white;
-  padding: 30px;
+  padding: 32px;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .social-tabs {
   background: white;
-  padding: 20px;
+  padding: 24px;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04);
 }
@@ -353,7 +353,7 @@ export default {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .review-book {
@@ -374,7 +374,7 @@ export default {
 }
 
 .review-actions {
-  margin-top: 6px;
+  margin-top: 8px;
 }
 
 .follow-item {

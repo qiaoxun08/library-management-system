@@ -177,7 +177,7 @@ export default {
 
 <style scoped>
 .system-config-view {
-  padding: 20px;
+  padding: 24px;
 }
 
 .page-header {

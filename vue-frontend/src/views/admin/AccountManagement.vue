@@ -8,7 +8,7 @@
         <div class="toolbar">
           <el-button type="primary" @click="showAddDialog('admin')">{{ $t('admin.accounts.addAdmin') }}</el-button>
         </div>
-        <el-table :data="admins" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+        <el-table :data="admins" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
           <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
           <el-table-column prop="username" :label="$t('common.field.username')" width="150"></el-table-column>
           <el-table-column prop="realName" :label="$t('common.field.realName')" width="120"></el-table-column>
@@ -29,7 +29,7 @@
         <div class="toolbar">
           <el-button type="primary" @click="showAddDialog('librarian')">{{ $t('admin.accounts.addLibrarian') }}</el-button>
         </div>
-        <el-table :data="librarians" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+        <el-table :data="librarians" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
           <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
           <el-table-column prop="username" :label="$t('common.field.username')" width="150"></el-table-column>
           <el-table-column prop="realName" :label="$t('common.field.realName')" width="120"></el-table-column>
@@ -56,10 +56,10 @@
       <el-tab-pane :label="$t('admin.accounts.tabReader')" name="reader">
         <div class="toolbar">
           <el-button type="primary" @click="showAddDialog('reader')">{{ $t('admin.accounts.addReader') }}</el-button>
-          <el-input v-model="readerSearchKeyword" :placeholder="$t('admin.accounts.searchPlaceholder')" clearable style="width: 200px; margin-left: 15px;">
+          <el-input v-model="readerSearchKeyword" :placeholder="$t('admin.accounts.searchPlaceholder')" clearable style="width: 200px; margin-left: 16px;">
           </el-input>
         </div>
-        <el-table :data="filteredReaders" style="width: 100%; margin-top: 15px;" v-loading="loading" stripe border>
+        <el-table :data="filteredReaders" style="width: 100%; margin-top: 16px;" v-loading="loading" stripe border>
           <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
           <el-table-column prop="readerId" :label="$t('common.field.readerId')" width="120" align="center"></el-table-column>
           <el-table-column prop="realName" :label="$t('common.field.realName')" width="100" align="center"></el-table-column>
@@ -395,11 +395,11 @@ export default {
 
 <style scoped>
 .account-management {
-  padding: 20px;
+  padding: 24px;
 }
 
 .toolbar {
-  margin-top: 15px;
+  margin-top: 16px;
   display: flex;
   align-items: center;
 }
