@@ -366,6 +366,7 @@ export default {
       confirmChange: '确认修改',
       confirmRenew: '确认续借',
       delete: '删除',
+      export: '导出',
       goToBorrow: '去借书',
       goToReserve: '去预约',
       publishReview: '发表书评',
@@ -531,7 +532,8 @@ export default {
       status: '状态',
       statusFilter: '按状态筛选',
       title: '罚款管理',
-      unpaid: '未缴纳'
+      unpaid: '未缴纳',
+      unpaidCount: '未缴 {count} 笔'
     },
     homeTitle: '图书管理员工作台',
     onLoan: '在借图书',
@@ -560,7 +562,8 @@ export default {
       searchPlaceholder: '搜索读者/图书...',
       status: '状态',
       statusFilter: '按状态筛选',
-      title: '借阅记录'
+      title: '借阅记录',
+      totalCount: '共 {count} 条'
     },
     renewSuccess: '续借成功',
     reservations: {
@@ -641,6 +644,7 @@ export default {
   },
   reader: {
     bookSearch: {
+      available: '可借 {count} 本',
       anonymous: '匿名',
       author: '作者',
       bookDetail: '图书详情',

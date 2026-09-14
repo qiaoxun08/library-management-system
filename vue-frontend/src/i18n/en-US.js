@@ -366,6 +366,7 @@ export default {
       confirmChange: 'Confirm Change',
       confirmRenew: 'Confirm Renew',
       delete: 'Delete',
+      export: 'Export',
       goToBorrow: 'Go Borrow',
       goToReserve: 'Go Reserve',
       publishReview: 'Submit Review',
@@ -539,7 +540,8 @@ export default {
       searchPlaceholder: 'Search reader/book...',
       status: 'Status',
       statusFilter: 'Filter by status',
-      title: 'Borrowing Records'
+      title: 'Borrowing Records',
+      totalCount: 'Total: {count}'
     },
     renewSuccess: 'Renewed',
     reservations: {
@@ -595,7 +597,8 @@ export default {
       status: 'Status',
       statusFilter: 'Filter by status',
       title: 'Fine Management',
-      unpaid: 'Unpaid'
+      unpaid: 'Unpaid',
+      unpaidCount: 'Unpaid: {count}'
     }
   },
   messages: {
@@ -642,6 +645,7 @@ export default {
   },
   reader: {
     bookSearch: {
+      available: 'Available: {count}',
       anonymous: 'Anonymous',
       author: 'Author',
       bookDetail: 'Book Detail',
