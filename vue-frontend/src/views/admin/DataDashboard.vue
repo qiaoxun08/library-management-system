@@ -170,12 +170,12 @@ export default {
         xAxis: {
           type: 'category',
           data: ['8:00', '9:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'],
-          axisLabel: { color: '#8E99A4', fontSize: 10 },
+          axisLabel: { color: '#A8B4C0', fontSize: 10 },
           axisLine: { lineStyle: { color: '#2A3A4A' } }
         },
         yAxis: {
           type: 'value',
-          axisLabel: { color: '#8E99A4', fontSize: 10 },
+          axisLabel: { color: '#A8B4C0', fontSize: 10 },
           splitLine: { lineStyle: { color: '#1A2A3A' } }
         },
         series: [{
@@ -215,12 +215,12 @@ export default {
         xAxis: {
           type: 'category',
           data: hours,
-          axisLabel: { color: '#8E99A4', fontSize: 10, rotate: 30 },
+          axisLabel: { color: '#A8B4C0', fontSize: 10, rotate: 30 },
           axisLine: { lineStyle: { color: '#2A3A4A' } }
         },
         yAxis: {
           type: 'value',
-          axisLabel: { color: '#8E99A4', fontSize: 10 },
+          axisLabel: { color: '#A8B4C0', fontSize: 10 },
           splitLine: { lineStyle: { color: '#1A2A3A' } }
         },
         tooltip: {
@@ -266,13 +266,13 @@ export default {
         xAxis: {
           type: 'value',
           max: 100,
-          axisLabel: { color: '#8E99A4', fontSize: 10, formatter: '{value}%' },
+          axisLabel: { color: '#A8B4C0', fontSize: 10, formatter: '{value}%' },
           splitLine: { lineStyle: { color: '#1A2A3A' } }
         },
         yAxis: {
           type: 'category',
           data: areas,
-          axisLabel: { color: '#8E99A4', fontSize: 11 },
+          axisLabel: { color: '#A8B4C0', fontSize: 11 },
           axisLine: { lineStyle: { color: '#2A3A4A' } }
         },
         tooltip: {
@@ -294,7 +294,7 @@ export default {
           inRange: {
             color: ['#1A3A2A', '#3D6B4A', '#6B8F71', '#D4A84B', '#C0785C', '#A85454']
           },
-          textStyle: { color: '#8E99A4' }
+          textStyle: { color: '#A8B4C0' }
         },
         series: [{
           type: 'bar',
@@ -332,7 +332,7 @@ export default {
         grid: { top: 10, right: 50, bottom: 10, left: 100 },
         xAxis: {
           type: 'value',
-          axisLabel: { color: '#8E99A4', fontSize: 10 },
+          axisLabel: { color: '#A8B4C0', fontSize: 10 },
           splitLine: { lineStyle: { color: '#1A2A3A' } }
         },
         yAxis: {
@@ -388,7 +388,7 @@ export default {
           orient: 'vertical',
           right: 10,
           top: 'center',
-          textStyle: { color: '#8E99A4', fontSize: 11 }
+          textStyle: { color: '#A8B4C0', fontSize: 11 }
         },
         series: [{
           type: 'pie',
@@ -447,12 +447,12 @@ export default {
         xAxis: {
           type: 'category',
           data: dates,
-          axisLabel: { color: '#8E99A4', fontSize: 10, rotate: 30 },
+          axisLabel: { color: '#A8B4C0', fontSize: 10, rotate: 30 },
           axisLine: { lineStyle: { color: '#2A3A4A' } }
         },
         yAxis: {
           type: 'value',
-          axisLabel: { color: '#8E99A4', fontSize: 10, formatter: '{value}%' },
+          axisLabel: { color: '#A8B4C0', fontSize: 10, formatter: '{value}%' },
           splitLine: { lineStyle: { color: '#1A2A3A' } }
         },
         tooltip: {
@@ -669,7 +669,7 @@ export default {
 
 .refresh-time {
   font-size: 12px;
-  color: #8E99A4;
+  color: #A8B4C0;
 }
 
 /* 数据面板网格 */
@@ -752,7 +752,7 @@ export default {
 
 .count-unit {
   font-size: 18px;
-  color: #8E99A4;
+  color: #A8B4C0;
 }
 
 .online-trend {

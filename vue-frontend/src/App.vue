@@ -333,4 +333,36 @@ html, body, #app {
   }
   .el-button:active { transform: none; }
 }
+
+/* ========================================
+   Element Plus 内置间距 → 4/8/12/16/24/32 网格
+   覆盖 EP 组件默认 padding/margin（源码改不到，只能全局覆盖）
+   ======================================== */
+/* 菜单项：EP 默认 padding 0 20px → 0 24px（横向对齐 24 网格） */
+.el-menu-item {
+  padding: 0 24px !important;
+}
+/* 主内容区：EP 默认 20px → 24px（margin-left:200px 是侧栏宽度豁免，非间距） */
+.el-main {
+  padding: 24px !important;
+}
+/* 图标：EP 默认 margin-right 5px → 8px（图标与文字间距） */
+.el-icon {
+  margin-right: 8px;
+}
+.el-icon.el-icon--right {
+  margin-left: 8px;
+  margin-right: 0;
+}
+/* 菜单项内图标：EP 内置 .el-menu-item .el-icon{margin-right:5px} 优先级更高，需专门覆盖 */
+.el-menu-item .el-icon {
+  margin-right: 8px;
+}
+/* 下拉菜单：EP 默认 5px → 8px */
+.el-dropdown-menu {
+  padding: 8px 0 !important;
+}
+.el-dropdown-menu__item {
+  padding: 8px 16px !important;
+}
 </style>

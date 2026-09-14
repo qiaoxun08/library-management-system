@@ -293,7 +293,7 @@ export default {
   background: rgba(255, 255, 255, 0.05);
 }
 
-.welcome-text h2 { margin: 0 0 6px 0; font-size: 22px; font-family: var(--font-serif); letter-spacing: 0.5px; }
+.welcome-text h2 { margin: 0 0 8px 0; font-size: 22px; font-family: var(--font-serif); letter-spacing: 0.5px; }
 .welcome-text p { margin: 0; opacity: 0.8; font-size: 14px; }
 
 .borrowing-summary {

@@ -150,7 +150,7 @@ export default {
   margin-bottom: 24px;
 }
 
-.welcome-text h2 { margin: 0 0 6px 0; font-size: 22px; }
+.welcome-text h2 { margin: 0 0 8px 0; font-size: 22px; }
 .welcome-text p { margin: 0; opacity: 0.85; font-size: 14px; }
 .current-time { font-size: 13px; opacity: 0.8; }
 

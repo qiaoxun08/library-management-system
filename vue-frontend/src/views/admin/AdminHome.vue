@@ -176,7 +176,7 @@ export default {
 }
 
 .welcome-text h2 {
-  margin: 0 0 6px 0;
+  margin: 0 0 8px 0;
   font-size: 22px;
 }
 
