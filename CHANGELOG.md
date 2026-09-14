@@ -4,6 +4,27 @@
 
 ---
 
+## v7.1 (2026-09-14) — EP 运行时间距网格化 + 大屏对比度提亮
+
+### 🧩 Element Plus 内置间距 → 网格覆盖
+- **根因**：审计发现 admin 页 18 处违规元素全来自 EP 组件内置默认值（`el-menu-item padding=20`、`el-main padding=20`、`el-icon margin=5`、`el-dropdown-menu padding=5`），源码改不到
+- **修复**：App.vue 全局覆盖这 5 类 EP 选择器，统一到 4/8/12/16/24/32 网格（`el-main marginLeft=200` 是侧栏固定宽度豁免，非间距）
+- **验证**：审计脚本 admin 页违规元素 18→1（仅剩合理豁免）
+
+### 🎨 大屏辅助文字对比度提亮
+- **根因**：深色背景（#0A0E1A 近黑）上辅助文字 `#8E99A4` 偏暗，vision 审查指出"对低视力用户对比度不足"
+- **修复**：DataDashboard.vue 13 处 `#8E99A4` → `#A8B4C0`（坐标轴/图例/次要标签）
+- **验证**：vision 复查"所有辅助文字对比度优秀，无偏暗元素"；admin home 复查"菜单图标间距完全统一、垂直居中对齐、整体协调"
+
+### 🔧 网格对齐补充
+- 三处 `.welcome-text h2` margin `6px` → `8px`（reader/librarian/admin 首页问候语）
+
+### 📦 Commit / Push
+- `7ebcf9a` polish(design): EP运行时间距网格化 + 大屏对比度提亮
+- build EXIT=0，5 文件改动
+
+---
+
 ## v7.0 (2026-09-14) — 苹果级设计复审：间距网格 token 化 + 大屏数据修复
 
 ### 📐 间距网格批量修正（最系统性违规）
