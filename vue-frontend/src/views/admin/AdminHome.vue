@@ -207,7 +207,7 @@ export default {
   gap: 16px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04);
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out);
 }
 
 .stat-card:hover {
@@ -265,7 +265,7 @@ export default {
   padding: 16px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.28s var(--ease-out), color 0.28s var(--ease-out);
   font-size: 13px;
   color: #4A5568;
 }

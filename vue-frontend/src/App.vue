@@ -282,6 +282,20 @@ html, body, #app {
   box-shadow: var(--glass-shadow), var(--glass-highlight), var(--glass-border);
 }
 
+/* 危险操作确认按钮 — 破坏性动作用 danger 语义，与普通 primary 区分
+   hover 只改光与色不改形，spring 惯性由按钮基础态承担 */
+.btn-danger,
+.el-message-box .btn-danger.el-button--primary {
+  background-color: var(--el-color-danger) !important;
+  border-color: var(--el-color-danger) !important;
+  color: #fff !important;
+}
+.btn-danger:hover,
+.el-message-box .btn-danger.el-button--primary:hover {
+  background-color: var(--el-color-danger-dark-2) !important;
+  border-color: var(--el-color-danger-dark-2) !important;
+}
+
 /* ========================================
    骨架屏 — 呼吸感 0.3↔0.6 / 1.5s
    安静但可见（谷底在暖背景接近消失则上调）

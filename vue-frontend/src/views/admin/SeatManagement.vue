@@ -199,7 +199,8 @@ export default {
       this.$confirm(this.$t('admin.seats.confirmDelete'), this.$t('common.action.confirm'), {
         confirmButtonText: this.$t('common.action.confirm'),
         cancelButtonText: this.$t('common.action.cancel'),
-        type: 'warning'
+        type: 'danger',
+        confirmButtonClass: 'btn-danger'
       }).then(async () => {
         try {
           await deleteSeat(id)
@@ -272,7 +273,7 @@ export default {
   padding: 15px;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
   display: flex;
   flex-direction: column;
   gap: 5px;

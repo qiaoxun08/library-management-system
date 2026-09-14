@@ -286,7 +286,8 @@ export default {
         await this.$confirm(this.$t('admin.books.confirmDelete'), this.$t('common.action.warning'), {
           confirmButtonText: this.$t('admin.books.confirmDeleteAction'),
           cancelButtonText: this.$t('common.action.cancel'),
-          type: 'warning'
+          type: 'danger',
+          confirmButtonClass: 'btn-danger'
         })
         await deleteBook(id)
         this.$message.success(this.$t('common.message.deleteSuccess'))
@@ -384,7 +385,8 @@ export default {
           {
             confirmButtonText: '确定删除',
             cancelButtonText: '取消',
-            type: 'error'
+            type: 'danger',
+            confirmButtonClass: 'btn-danger'
           }
         )
         await batchDeleteBooks(ids)

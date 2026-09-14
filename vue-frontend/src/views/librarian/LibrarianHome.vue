@@ -163,7 +163,7 @@ export default {
   background: white; border-radius: 10px; padding: 20px;
   display: flex; align-items: center; gap: 16px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04); cursor: pointer;
-  transition: all 0.3s ease;
+  transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out);
 }
 
 .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(44,62,80,0.10); }
@@ -193,7 +193,7 @@ export default {
 .action-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   padding: 16px; border-radius: 8px; cursor: pointer;
-  transition: all 0.3s ease; font-size: 13px; color: var(--el-text-color-regular);
+  transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), color 0.28s var(--ease-out); font-size: 13px; color: var(--el-text-color-regular);
 }
 
 .action-item.primary {

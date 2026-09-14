@@ -522,7 +522,8 @@ export default {
     async handleDeleteReply(reply, review) {
       try {
         await this.$confirm(this.$t('reader.bookSearch.confirmDeleteReply'), this.$t('common.button.confirm'), {
-          type: 'warning'
+          type: 'danger',
+          confirmButtonClass: 'btn-danger'
         })
         const { deleteReply } = await import('@/api/reviewReply')
         await deleteReply(reply.id)
@@ -545,7 +546,7 @@ export default {
     },
     async handleAdminDeleteReview(review) {
       try {
-        await this.$confirm(this.$t('reader.bookSearch.confirmDeleteReview'), this.$t('common.button.confirm'), { type: 'warning' })
+        await this.$confirm(this.$t('reader.bookSearch.confirmDeleteReview'), this.$t('common.button.confirm'), { type: 'danger' })
         const { deleteReview } = await import('@/api/review')
         await deleteReview(review.id)
         this.$message.success(this.$t('common.message.deleteSuccess'))
@@ -648,7 +649,7 @@ export default {
   background: white;
   border-radius: 10px;
   box-shadow: 0 2px 12px rgba(44,62,80,0.04);
-  transition: all 0.3s ease;
+  transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 
 .book-item:hover {
@@ -776,7 +777,7 @@ export default {
 
 /* 相似图书样式 */
 .similar-books { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-.similar-item { display: flex; gap: 10px; padding: 10px; border: 1px solid #EAE6E0; border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+.similar-item { display: flex; gap: 10px; padding: 10px; border: 1px solid #EAE6E0; border-radius: 10px; cursor: pointer; transition: border-color 0.28s var(--ease-out), background-color 0.28s var(--ease-out); }
 .similar-item:hover { border-color: #C0785C; box-shadow: 0 2px 8px rgba(192,120,92,0.15); }
 .similar-cover { width: 50px; height: 70px; border-radius: 4px; overflow: hidden; flex-shrink: 0; background: #F8F5F0; }
 .similar-cover img { width: 100%; height: 100%; object-fit: cover; }

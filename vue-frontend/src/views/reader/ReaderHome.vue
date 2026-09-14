@@ -326,7 +326,7 @@ export default {
 .action-item {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
   padding: 20px 12px; border-radius: 10px; cursor: pointer;
-  transition: all 0.25s ease; font-size: 13px; color: var(--el-text-color-regular);
+  transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), color 0.28s var(--ease-out); font-size: 13px; color: var(--el-text-color-regular);
   border: 1px solid transparent;
 }
 
@@ -360,7 +360,7 @@ export default {
 }
 .recommend-card {
   border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 12px;
-  cursor: pointer; transition: all 0.25s ease;
+  cursor: pointer; transition: transform 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 .recommend-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(44,62,80,0.08); }
 .recommend-cover { width: 100%; height: 120px; border-radius: 6px; overflow: hidden; background: var(--el-fill-color-lighter); margin-bottom: 8px; }
@@ -383,7 +383,7 @@ export default {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px;
 }
 .active-card {
-  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 14px; transition: all 0.25s;
+  border: 1px solid var(--el-border-color-lighter); border-radius: 10px; padding: 14px; transition: box-shadow 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 .active-card:hover { box-shadow: 0 4px 12px rgba(44,62,80,0.06); }
 .active-card.seat-reservation { border-left: 3px solid #6B8F71; }

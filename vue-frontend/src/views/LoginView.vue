@@ -235,7 +235,7 @@ export default {
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 4px;
-  transition: all 0.2s;
+  transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out), box-shadow 0.28s var(--ease-out);
 }
 
 .lang-switch span:hover,

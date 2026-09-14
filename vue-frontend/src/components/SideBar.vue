@@ -295,13 +295,13 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 8px;
+  padding: 8px 12px;
   color: rgba(255, 255, 255, 0.65);
   font-size: 13px;
   cursor: pointer;
-  border-radius: 6px;
-  transition: all 0.25s;
+  border-radius: 8px;
+  transition: background-color 0.28s var(--ease-out), color 0.28s var(--ease-out);
 }
 
 .lang-dropdown-link:hover {

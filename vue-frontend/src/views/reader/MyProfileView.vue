@@ -275,7 +275,8 @@ export default {
       this.$confirm(this.$t('reader.profile.confirmDeleteReview'), this.$t('reader.profile.deleteConfirm'), {
         confirmButtonText: this.$t('common.button.confirm'),
         cancelButtonText: this.$t('common.button.cancel'),
-        type: 'warning'
+        type: 'danger',
+        confirmButtonClass: 'btn-danger'
       }).then(async () => {
         try {
           const { deleteReview } = await import('@/api/review')

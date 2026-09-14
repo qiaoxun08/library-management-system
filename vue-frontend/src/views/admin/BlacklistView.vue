@@ -174,7 +174,8 @@ export default {
       this.$confirm(this.$t('admin.blacklist.confirmRemove', { name: row.readerName }), this.$t('common.action.confirm'), {
         confirmButtonText: this.$t('common.action.confirm'),
         cancelButtonText: this.$t('common.action.cancel'),
-        type: 'warning'
+        type: 'danger',
+        confirmButtonClass: 'btn-danger'
       }).then(async () => {
         try {
           await removeBlacklist(row.id)

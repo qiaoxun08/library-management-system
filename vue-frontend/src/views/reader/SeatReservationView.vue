@@ -704,7 +704,7 @@ export default {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: all 0.3s ease;
+  transition: background-color 0.28s var(--ease-out), border-color 0.28s var(--ease-out);
 }
 
 .seat-item:hover {
@@ -791,7 +791,7 @@ export default {
 .recommend-seat-item {
   display: flex; align-items: center; gap: 12px;
   padding: 12px; border: 1px solid #EAE6E0; border-radius: 10px;
-  margin-bottom: 8px; transition: all 0.3s;
+  margin-bottom: 8px; transition: border-color 0.28s var(--ease-out), background-color 0.28s var(--ease-out);
 }
 .recommend-seat-item:hover { border-color: #C0785C; background: #F5F0E8; }
 .recommend-rank {
@@ -967,7 +967,7 @@ export default {
   padding: 8px 4px;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.28s var(--ease-out), color 0.28s var(--ease-out);
   min-width: 52px;
 }
 
